@@ -1,0 +1,21 @@
+.required:after {
+    content: '*';
+    margin-left: 0.25rem;
+    color: red;
+}
+
+legend {
+    width: inherit;
+}
+
+legend {
+    font-size: 1rem;
+    position: 'absolute';
+    top: -20;
+    left: 10;
+    white-space: nowrap;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
