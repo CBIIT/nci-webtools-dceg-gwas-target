@@ -4,6 +4,11 @@ import { atom, selector, selectorFamily } from "recoil";
 export const defaultFormState = {
     analysis: '',
     rawOnly: false,
+    sampleSizeOption: '',
+    sampleSizeNum: '',
+    sampleSizeColumn: '',
+    jobName: '',
+    email: '',
 }
 
 export const formState = atom({

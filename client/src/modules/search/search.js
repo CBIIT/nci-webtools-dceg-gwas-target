@@ -43,15 +43,7 @@ export default function Search() {
 
                         <fieldset className='border px-3 mb-4'>
                             <legend className='legend font-weight-bold'>Gene Analysis</legend>
-                            <Form.Group className="mb-3">
-                                <Form.Check
-                                    type='checkbox'
-                                    id='rawonly'
-                                    name='rawOnly'
-                                    label='Only Generate Raw Data'
-                                    onChange={e => { mergeForm({ rawOnly: !form.rawOnly }) }}
-                                />
-                            </Form.Group>
+
                             <Form.Group className="mb-3">
                                 <Form.Label className='required'>Analysis Type</Form.Label>
                                 <Select
@@ -98,22 +90,45 @@ export default function Search() {
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Sample Size</Form.Label>
-                                    <input
-                                        type="number"
-                                        name="pvalFile"
-                                        className="form-control"
+                                    <Form.Label className='required'>Sample Size Input Type</Form.Label>
+                                    <Select
+                                        placeholder="Select method of inputting sample size"
+                                        name="sampleSizeOption"
+                                        value={form.sampleSizeOption}
+                                        options={[
+                                            { value: "input", label: "Provide one sample size" },
+                                            { value: "file", label: "File includes column for sample size" },
+                                        ]}
+                                        onChange={(e) => {
+                                            mergeForm({ sampleSizeOption: e })
+                                        }}
                                     />
                                 </Form.Group>
+                                {form.sampleSizeOption.value === 'input' && <Form.Group className="mb-3">
+                                    <Form.Label className="required">Sample Size</Form.Label>
+                                    <input
+                                        type="number"
+                                        name="sampleSizeNum"
+                                        className="form-control"
+                                    />
+                                </Form.Group>}
 
+                                {form.sampleSizeOption.value === 'file' && <Form.Group className="mb-3">
+                                    <Form.Label className="required">Column Name</Form.Label>
+                                    <input
+                                        type="text"
+                                        name="sampleSizeColumn"
+                                        className="form-control"
+                                    />
+                                </Form.Group>}
 
                             </>}
                         </fieldset>
-                        {!form.rawOnly && <fieldset className='border px-3 mb-4'>
+                        <fieldset className='border px-3 mb-4'>
                             <legend className='legend font-weight-bold'>Gene-set Analysis</legend>
 
                             <Form.Group className="mb-3">
-                                <Form.Label className='required'>Gene Set</Form.Label>
+                                <Form.Label>Gene Set</Form.Label>
                                 <input
                                     type="file"
                                     name="setFile"
@@ -121,14 +136,33 @@ export default function Search() {
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Label className='required'>Covar File</Form.Label>
+                                <Form.Label>Covar File</Form.Label>
                                 <input
                                     type="file"
                                     name="covarFile"
                                     className="form-control"
                                 />
                             </Form.Group>
-                        </fieldset>}
+                        </fieldset>
+                        <fieldset className='border px-3 mb-4'>
+                            <legend className='legend font-weight-bold'>Queue</legend>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="required">Job Name</Form.Label>
+                                <input
+                                    type="text"
+                                    name="jobName"
+                                    className="form-control"
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="required">Email</Form.Label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    className="form-control"
+                                />
+                            </Form.Group>
+                        </fieldset>
                         <div className="text-end">
                             <button type="reset" className="btn btn-outline-danger mx-1">
                                 Reset
