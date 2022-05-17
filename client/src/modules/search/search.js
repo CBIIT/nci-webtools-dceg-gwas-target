@@ -20,7 +20,7 @@ export default function Search() {
             <div className="col-xl-4 mb-5">
                 <Card className="my-3 shadow-sm h-100">
                     <Card.Body>
-                        <fieldset className='border px-3 mb-4'>
+                        <fieldset className='border px-3 my-4'>
                             <legend className='legend font-weight-bold'>Annotation</legend>
                             <Form.Group className="mb-3">
                                 <Form.Label className='required'>SNP Location</Form.Label>
@@ -129,6 +129,15 @@ export default function Search() {
                                 />
                             </Form.Group>
                         </fieldset>}
+                        <div className="text-end">
+                            <button type="reset" className="btn btn-outline-danger mx-1">
+                                Reset
+                            </button>
+
+                            <button type="submit" className="btn btn-primary">
+                                Submit
+                            </button>
+                        </div>
                     </Card.Body>
                 </Card>
             </div>

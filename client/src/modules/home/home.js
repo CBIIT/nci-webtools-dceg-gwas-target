@@ -3,6 +3,7 @@ import { useNavigate, createSearchParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import HomeImage from './images/stock-banner.jpg';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,11 +16,11 @@ export default function Home() {
   }
 
   return (
-    <>
-      <Container className="flex-grow-1 py-5">
+    <div className="cover-image" style={{ backgroundImage: `url(${HomeImage})` }}>
+      <Container className="flex-grow-1 py-5 cover-image" >
         <Row className="h-100 justify-content-center align-items-center">
           <Col md={8}>
-            <h1 className="display-4 mb-5 text-center text-uppercase">GWAS Target</h1>
+            <h1 className="display-4 mb-5 text-light text-center text-uppercase">GWAS Target</h1>
           </Col>
         </Row>
       </Container>
@@ -41,6 +42,6 @@ export default function Home() {
           </Row>
         </Container>
       </div>
-    </>
+    </div>
   );
 }

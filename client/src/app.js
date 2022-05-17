@@ -6,7 +6,6 @@ import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
 import Loader from "./modules/common/loader";
 import ErrorBoundary from "./modules/common/error-boundary";
-import HomeImage from "./modules/home/images/landing-page.png";
 import "./styles/main.scss";
 
 // preload lazy-loaded page components
@@ -37,7 +36,7 @@ export default function App() {
       <Router basename={process.env.PUBLIC_URL}>
         <div className="d-flex flex-column flex-grow-1">
           <Navbar expand="sm" variant="dark" className="py-0 flex-none-auto bg-dark">
-            <Container>
+            <Container className="px-5">
               <Navbar.Toggle aria-controls="app-navbar" />
               <Navbar.Collapse id="app-navbar">
                 <Nav className="d-flex w-100">

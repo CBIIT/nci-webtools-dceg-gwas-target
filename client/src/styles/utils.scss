@@ -10,12 +10,18 @@ legend {
 
 legend {
     font-size: 1rem;
-    position: 'absolute';
-    top: -20;
-    left: 10;
+    position: relative;
+    top: -15px;
     white-space: nowrap;
 }
 
 .font-weight-bold {
     font-weight: bold;
 }
+
+.cover-image {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
