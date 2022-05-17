@@ -60,7 +60,7 @@ export default function Search() {
                                     value={form.analysis}
                                     options={[
                                         { value: "rawData", label: "Raw Data" },
-                                        { value: "snpValues", label: "SNP P-Values" },
+                                        { value: "refData", label: "Reference Data" },
                                     ]}
                                     onChange={(e) => {
                                         mergeForm({ analysis: e })
@@ -79,7 +79,7 @@ export default function Search() {
                                 </Form.Group>
                             }
 
-                            {form.analysis.value === 'snpValues' && <>
+                            {form.analysis.value === 'refData' && <>
                                 <Form.Group className="mb-3">
                                     <Form.Label className='required'>Reference Data</Form.Label>
                                     <input
