@@ -1,0 +1,39 @@
+{
+    "server": {
+      "port": 10000,
+      "client": "../client/build"
+    },
+    "logs": {
+      "folder": "logs",
+      "level": "debug"
+    },
+    "results": {
+        "folder": "results"
+    },
+    "aws": {
+        "region": "",
+        "accessKeyId": "",
+        "secretAccessKey": ""
+    },
+    "queue": {
+        "url": "",
+        "errorUrl": "",
+        "visibilityTimeout": 60,
+        "pollInterval": 60
+    },
+    "email": {
+        "admin": "",
+        "sender": "",
+        "baseUrl": "http://localhost:4000",
+        "smtp": {
+            "host": "",
+            "port": 587
+        }
+    },
+    "s3": {
+        "bucket": "",
+        "inputKeyPrefix": "",
+        "outputKeyPrefix": ""
+    }
+  }
+  
