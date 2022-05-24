@@ -2,7 +2,7 @@ import { atom, selector, selectorFamily } from "recoil";
 
 
 export const defaultFormState = {
-    analysis: '',
+    analysisInput: '',
     rawOnly: false,
     sampleSizeOption: '',
     sampleSizeNum: '',

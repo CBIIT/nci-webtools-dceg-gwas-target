@@ -45,22 +45,22 @@ export default function Search() {
                             <legend className='legend font-weight-bold'>Gene Analysis</legend>
 
                             <Form.Group className="mb-3">
-                                <Form.Label className='required'>Analysis Type</Form.Label>
+                                <Form.Label className='required'>Input Data Type</Form.Label>
                                 <Select
                                     placeholder="No analysis selected"
-                                    name="analysis"
-                                    value={form.analysis}
+                                    name="analysisInput"
+                                    value={form.analysisInput}
                                     options={[
                                         { value: "rawData", label: "Raw Data" },
                                         { value: "refData", label: "Reference Data" },
                                     ]}
                                     onChange={(e) => {
-                                        mergeForm({ analysis: e })
+                                        mergeForm({ analysisInput: e })
                                     }}
                                 />
                             </Form.Group>
 
-                            {form.analysis.value === 'rawData' &&
+                            {form.analysisInput.value === 'rawData' &&
                                 <Form.Group className="mb-3">
                                     <Form.Label className='required'>Raw Data</Form.Label>
                                     <input
@@ -71,7 +71,7 @@ export default function Search() {
                                 </Form.Group>
                             }
 
-                            {form.analysis.value === 'refData' && <>
+                            {form.analysisInput.value === 'refData' && <>
                                 <Form.Group className="mb-3">
                                     <Form.Label className='required'>Reference Data</Form.Label>
                                     <input
