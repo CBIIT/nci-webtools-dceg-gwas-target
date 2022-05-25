@@ -19,7 +19,7 @@ services:
       args:
         BASE_IMAGE: "quay.io/centos/centos:stream9"
     environment:
-      API_HOST: http://backend:9000
+      API_BASE_URL: http://backend:9000
     links:
       - backend:backend
     ports:
