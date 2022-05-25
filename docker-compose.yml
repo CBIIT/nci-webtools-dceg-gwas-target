@@ -1,0 +1,26 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.dockerfile
+      args:
+        BASE_IMAGE: "quay.io/centos/centos:stream9"
+    environment:
+      APP_NAME: gwas-target
+      API_PORT: 9000
+      APP_BASE_URL: http://localhost:8080/
+      LOG_FOLDER: logs
+      LOG_LEVEL: debug
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.dockerfile
+      args:
+        BASE_IMAGE: "quay.io/centos/centos:stream9"
+    environment:
+      API_HOST: http://backend:9000
+    links:
+      - backend:backend
+    ports:
+      - "8080:80"
