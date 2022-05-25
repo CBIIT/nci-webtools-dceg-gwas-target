@@ -22,6 +22,8 @@ RUN npm run build \
 
 WORKDIR /var/www/html
 
+RUN touch index.html
+
 # Add custom httpd configuration
 COPY docker/httpd-gwastarget.conf /etc/httpd/conf.d/httpd-gwastarget.conf
 
