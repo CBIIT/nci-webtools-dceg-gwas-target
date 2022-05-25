@@ -1,19 +1,16 @@
 const { Router, json } = require("express");
-const cors = require("cors");
-const { APP_BASE_URL } = process.env;
-const api = Router();
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 
-api.use(cors());
-api.use(json());
+const apiRouter = Router();
 
+apiRouter.use(json());
 
-router.get("/ping", (request, response) => {
+apiRouter.get("/ping", (request, response) => {
   response.json(true)
 });
 
-router.get("/submit", async (request, response) => {
+apiRouter.get("/submit", async (request, response) => {
   try{
     const s3 = new AWS.S3();
     const sqs = new AWS.SQS();
@@ -32,4 +29,4 @@ router.get("/submit", async (request, response) => {
     }
 });
 
-module.exports = { api };
+module.exports = { apiRouter };

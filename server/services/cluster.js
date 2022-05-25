@@ -15,4 +15,4 @@ function forkCluster(numProcesses) {
   return true;
 }
 
-module.exports = forkCluster;
+module.exports = { forkCluster };

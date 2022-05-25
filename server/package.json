@@ -9,6 +9,7 @@
     "aws-sdk": "^2.1140.0",
     "better-sqlite3": "^7.5.0",
     "compression": "^1.7.4",
+    "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -18,7 +19,7 @@
     "winston-daily-rotate-file": "^4.6.1"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "node --require dotenv/config app.js",
     "test": "react-scripts test"
   },
   "eslintConfig": {

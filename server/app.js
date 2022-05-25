@@ -1,13 +1,11 @@
 const express = require("express");
-const { validateEnvironment } = require("./services/environment");
-const { logRequests, logErrors } = require("./services/middleware");
 const { getLogger } = require("./services/logger");
 const { forkCluster } = require("./services/cluster");
-const { api } = require("./services/api");
+const { apiRouter } = require("./services/api");
 const { APP_NAME, API_PORT, LOG_LEVEL } = process.env;
 
 // ensure that all environment variables are set
-validateEnvironment();
+// validateEnvironment();
 
 const isMasterProcess = forkCluster();
 
@@ -30,12 +28,9 @@ function createApp() {
   app.set("x-powered-by", false);
 
   // register services as app locals
-  app.locals.logger = getLogger(APP_NAME, { level: LOG_LEVEL });
+  app.locals.logger = getLogger(APP_NAME, LOG_LEVEL);
 
-  // register middleware
-  app.use(logRequests());
-  app.use("/api", api);
-  app.use(logErrors());
+  app.use("/api", apiRouter);
 
   return app;
 }
