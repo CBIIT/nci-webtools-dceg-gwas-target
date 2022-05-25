@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import { RecoilRoot } from "recoil";
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <RecoilRoot>
-      <Router basename={process.env.PUBLIC_URL}>
+      <Router>
         <div className="d-flex flex-column flex-grow-1">
           <Navbar expand="sm" variant="dark" className="py-0 flex-none-auto bg-dark">
             <Container className="px-5">
