@@ -10,7 +10,8 @@ import "./styles/main.scss";
 
 // preload lazy-loaded page components
 const Home = preloadLazyComponent(() => import("./modules/home/home"));
-const Search = preloadLazyComponent(() => import("./modules/search/search"));
+const Analysis = preloadLazyComponent(() => import("./modules/analysis/analysis"));
+const About = preloadLazyComponent(() => import("./modules/about/about"));
 
 function preloadLazyComponent(factory) {
   const loader = factory();
@@ -25,9 +26,14 @@ export default function App() {
       component: Home,
     },
     {
-      route: '/search',
-      title: 'Search',
-      component: Search,
+      route: '/analysis',
+      title: 'Analysis',
+      component: Analysis,
+    },
+    {
+      route: '/about',
+      title: 'About',
+      component: About
     }
   ];
 

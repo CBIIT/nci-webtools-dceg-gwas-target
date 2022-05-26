@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Card, Form } from 'react-bootstrap';
 import Select from 'react-select';
 import { useRecoilState } from 'recoil';
-import { defaultFormState } from "./search.state";
+import { defaultFormState } from "./analysis.state";
 
-export default function Search() {
+export default function Analysis() {
 
     const [form, setForm] = useState(defaultFormState);
     const mergeForm = (obj) => setForm({ ...form, ...obj });
