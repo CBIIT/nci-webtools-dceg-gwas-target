@@ -4,6 +4,13 @@ import { atom, selector, selectorFamily } from "recoil";
 export const defaultFormState = {
     analysisInput: '',
     rawOnly: false,
+    snpLoc: '',
+    geneLoc: '',
+    rawData: '',
+    refData: '',
+    pvalFile: '',
+    setFile: '',
+    covarFile: '',
     sampleSizeOption: '',
     sampleSizeNum: '',
     sampleSizeColumn: '',

@@ -26,8 +26,11 @@ export default function Search() {
                                 <Form.Label className='required'>SNP Location</Form.Label>
                                 <input
                                     type="file"
-                                    name="snploc"
+                                    name="snpLoc"
                                     className="form-control"
+                                    onChange={(e) =>{
+                                        mergeForm({ snpLoc: e.target.files[0]})
+                                    }}
                                 />
                             </Form.Group>
 
@@ -35,8 +38,11 @@ export default function Search() {
                                 <Form.Label className='required'>Gene Location</Form.Label>
                                 <input
                                     type="file"
-                                    name="geneloc"
+                                    name="geneLoc"
                                     className="form-control"
+                                    onChange={(e) =>{
+                                        mergeForm({ geneLoc: e.target.files[0]})
+                                    }}
                                 />
                             </Form.Group>
                         </fieldset>
@@ -67,6 +73,9 @@ export default function Search() {
                                         type="file"
                                         name="geneData"
                                         className="form-control"
+                                        onChange={(e) =>{
+                                            mergeForm({ rawData: e.target.files[0]})
+                                        }}
                                     />
                                 </Form.Group>
                             }
@@ -78,6 +87,9 @@ export default function Search() {
                                         type="file"
                                         name="refData"
                                         className="form-control"
+                                        onChange={(e) =>{
+                                            mergeForm({ refData: e.target.files[0]})
+                                        }}
                                     />
                                 </Form.Group>
 
@@ -87,6 +99,9 @@ export default function Search() {
                                         type="file"
                                         name="pvalFile"
                                         className="form-control"
+                                        onChange={(e) =>{
+                                            mergeForm({ pvalFile: e.target.files[0]})
+                                        }}
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
@@ -110,6 +125,7 @@ export default function Search() {
                                         type="number"
                                         name="sampleSizeNum"
                                         className="form-control"
+                                        onChange={handleChange}
                                     />
                                 </Form.Group>}
 
@@ -119,6 +135,7 @@ export default function Search() {
                                         type="text"
                                         name="sampleSizeColumn"
                                         className="form-control"
+                                        onChange={handleChange}
                                     />
                                 </Form.Group>}
 
@@ -133,6 +150,9 @@ export default function Search() {
                                     type="file"
                                     name="setFile"
                                     className="form-control"
+                                    onChange={(e) =>{
+                                        mergeForm({ setFile: e.target.files[0]})
+                                    }}
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -141,6 +161,9 @@ export default function Search() {
                                     type="file"
                                     name="covarFile"
                                     className="form-control"
+                                    onChange={(e) =>{
+                                        mergeForm({ covarFile: e.target.files[0]})
+                                    }}
                                 />
                             </Form.Group>
                         </fieldset>
@@ -152,6 +175,7 @@ export default function Search() {
                                     type="text"
                                     name="jobName"
                                     className="form-control"
+                                    onChange={handleChange}
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -160,6 +184,7 @@ export default function Search() {
                                     type="email"
                                     name="email"
                                     className="form-control"
+                                    onChange={handleChange}
                                 />
                             </Form.Group>
                         </fieldset>
