@@ -2,6 +2,7 @@ import { atom, selector, selectorFamily } from "recoil";
 
 
 export const defaultFormState = {
+    openSidebar: true,
     analysisInput: '',
     rawOnly: false,
     snpLoc: '',
@@ -14,6 +15,7 @@ export const defaultFormState = {
     sampleSizeOption: '',
     sampleSizeNum: '',
     sampleSizeColumn: '',
+    queue: true,
     jobName: '',
     email: '',
 }
