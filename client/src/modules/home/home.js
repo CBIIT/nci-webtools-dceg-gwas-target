@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate, createSearchParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -9,10 +8,16 @@ export default function Home() {
 
   return (
     <div className="cover-image" style={{ backgroundImage: `url(${HomeImage})` }}>
-      <Container className="flex-grow-1 py-5 cover-image" style={{height: '60vh'}} >
+      <Container className="flex-grow-1 py-5 cover-image" style={{ height: '60vh' }} >
         <Row className="h-100 justify-content-center align-items-center">
-          <Col md={8}>
+          <Col className="justify-content-center" md={8}>
             <h1 className="display-4 mb-5 text-light text-center text-uppercase">GWAS Target</h1>
+            <p className="lead pt-3 text-light text-center" style={{ borderTop: '1px solid white'}}>Perform gene analysis and generalized gene set analysis of GWAS data using MAGMA</p>
+            <div className="d-flex justify-content-center">
+              <NavLink className=" btn btn-outline-secondary" to="analysis">
+                Perform Analysis
+              </NavLink>
+            </div>
           </Col>
         </Row>
       </Container>
