@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, Form } from 'react-bootstrap';
+import { Row, Col, Form } from 'react-bootstrap';
 import Select from 'react-select';
 import { useRecoilState } from 'recoil';
 import { defaultFormState } from "./analysis.state";
@@ -17,10 +17,16 @@ export default function AnalysisForm() {
     console.log(form)
     return (
         <Form>
+            <Row className="mb-2 justify-content-end">
+                <Col className="d-flex justify-content-end" xl={6}>
+                    <a href="javascript:void(0)">Download Sample Data</a>
+                </Col>
+            </Row>
             <fieldset className='border px-3 my-4'>
                 <legend className='legend font-weight-bold'>Annotation</legend>
+
                 <Form.Group className="mb-3">
-                    <Form.Label className='required'>SNP Location</Form.Label>
+                    <Form.Label className='required'>SNP Location File</Form.Label>
                     <input
                         type="file"
                         name="snpLoc"
@@ -32,7 +38,7 @@ export default function AnalysisForm() {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label className='required'>Gene Location</Form.Label>
+                    <Form.Label className='required'>Gene Location File</Form.Label>
                     <input
                         type="file"
                         name="geneLoc"
@@ -46,7 +52,6 @@ export default function AnalysisForm() {
 
             <fieldset className='border px-3 mb-4'>
                 <legend className='legend font-weight-bold'>Gene Analysis</legend>
-
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>Input Data Type</Form.Label>
                     <Select
@@ -65,7 +70,7 @@ export default function AnalysisForm() {
 
                 {form.analysisInput.value === 'rawData' &&
                     <Form.Group className="mb-3">
-                        <Form.Label className='required'>Raw Data</Form.Label>
+                        <Form.Label className='required'>Raw Data File</Form.Label>
                         <input
                             type="file"
                             name="geneData"
@@ -79,7 +84,7 @@ export default function AnalysisForm() {
 
                 {form.analysisInput.value === 'refData' && <>
                     <Form.Group className="mb-3">
-                        <Form.Label className='required'>Reference Data</Form.Label>
+                        <Form.Label className='required'>Reference Data File</Form.Label>
                         <input
                             type="file"
                             name="refData"
@@ -91,7 +96,7 @@ export default function AnalysisForm() {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label className='required'>SNP P-Values</Form.Label>
+                        <Form.Label className='required'>SNP P-Value File</Form.Label>
                         <input
                             type="file"
                             name="pvalFile"
@@ -139,10 +144,10 @@ export default function AnalysisForm() {
                 </>}
             </fieldset>
             <fieldset className='border px-3 mb-4'>
-                <legend className='legend font-weight-bold'>Gene-set Analysis</legend>
 
+                <legend className='legend font-weight-bold'>Gene-set Analysis</legend>
                 <Form.Group className="mb-3">
-                    <Form.Label>Gene Set</Form.Label>
+                    <Form.Label>Gene Set File</Form.Label>
                     <input
                         type="file"
                         name="setFile"
