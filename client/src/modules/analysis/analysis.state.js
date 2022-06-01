@@ -5,6 +5,7 @@ export const defaultFormState = {
     openSidebar: true,
     analysisInput: '',
     rawOnly: false,
+    snpType: "",
     snpLoc: '',
     geneLoc: '',
     rawData: '',

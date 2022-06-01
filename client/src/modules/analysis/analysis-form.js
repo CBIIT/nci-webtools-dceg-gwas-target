@@ -26,6 +26,27 @@ export default function AnalysisForm() {
                 <legend className='legend font-weight-bold'>Annotation</legend>
 
                 <Form.Group className="mb-3">
+                    <Form.Label className='required'>SNP Location Population</Form.Label>
+                    <Select
+                        placeholder="No Population Selecteed"
+                        name="snpType"
+                        value={form.snpType}
+                        options={[
+                            { value: "european", label: "European" },
+                            { value: "african", label: "African" },
+                            { value: "eastAsian", label: "East Asian" },
+                            { value: "southAsian", label: "South Asian" },
+                            { value: "southAmerican", label: "Middle/South American" },
+                            { value: "subPopulation", label: "Sub-population definitions" },
+                            { value: "custom", label: "Upload custom population file" },
+                        ]}
+                        onChange={(e) => {
+                            mergeForm({ snpType: e })
+                        }}
+                    />
+                </Form.Group>
+
+                {form.snpType.value === 'custom' && <Form.Group className="mb-3">
                     <Form.Label className='required'>SNP Location File</Form.Label>
                     <input
                         type="file"
@@ -35,7 +56,7 @@ export default function AnalysisForm() {
                             mergeForm({ snpLoc: e.target.files[0] })
                         }}
                     />
-                </Form.Group>
+                </Form.Group>}
 
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>Gene Location File</Form.Label>
