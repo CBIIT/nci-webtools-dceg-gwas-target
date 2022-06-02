@@ -6,12 +6,11 @@ export const defaultFormState = {
     analysisInput: '',
     rawOnly: false,
     snpType: "",
-    snpLoc: '',
-    geneLoc: '',
-    rawData: '',
-    refData: '',
+    snpLocFile: '',
+    geneLocFile: '',
+    geneAnalysisFile: '',
     pvalFile: '',
-    setFile: '',
+    geneSetFile: '',
     covarFile: '',
     sampleSizeOption: '',
     sampleSizeNum: '',
@@ -19,6 +18,7 @@ export const defaultFormState = {
     queue: true,
     jobName: '',
     email: '',
+    loading: false,
 }
 
 export const formState = atom({

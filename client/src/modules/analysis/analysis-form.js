@@ -1,22 +1,95 @@
 import { useState } from "react";
 import { Row, Col, Form } from 'react-bootstrap';
 import Select from 'react-select';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { defaultFormState } from "./analysis.state";
+import { uploadFiles } from "../../services/uploadFiles";
+import Loader from '../common/loader';
+const { v1: uuidv1 } = require('uuid');
 
 export default function AnalysisForm() {
 
     const [form, setForm] = useState(defaultFormState);
     const mergeForm = (obj) => setForm({ ...form, ...obj });
 
+    const [snpLocFile, setSnpLocFile] = useState('');
+    const [geneLocFile, setGeneLocFile] = useState('');
+    const [geneAnalysisFile, setGeneAnalysisFile] = useState('');
+    const [pvalFile, setPvalFile] = useState('');
+    const [geneSetFile, setGeneSetFile] = useState('');
+    const [covarFile, setCovarFile] = useState('')
+
     function handleChange(event) {
         console.log(event.target)
         const { name, value } = event.target;
         mergeForm({ [name]: value });
     }
+
+    async function handleSubmit() {
+        mergeForm({ loading: true })
+        const requestId = uuidv1();
+
+        const files = await uploadFiles({
+            requestId: requestId,
+            snpLocFile: snpLocFile,
+            snpLocFilename: snpLocFile ? snpLocFile.name : '',
+            geneLocFile: geneLocFile,
+            geneLocFilename: geneLocFile ? geneLocFile.name : '',
+            geneAnalysisFile: geneAnalysisFile,
+            geneAnalysisFileName: geneAnalysisFile ? geneAnalysisFile.name : '',
+            pvalFile: pvalFile,
+            pvalFilename: pvalFile ? pvalFile.name : '',
+            geneSetFile: geneSetFile,
+            geneSetFileName: geneSetFile ? geneSetFile.name : '',
+            covarFile: covarFile,
+            covarFileName: covarFile ? covarFile.name : ''
+        })
+
+        await mergeForm({
+            snpLocFile:
+                files.data.body.snpLocFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.snpLocFilename
+                    )[0].filename
+                    : '',
+            geneLocFile:
+                files.data.body.geneLocFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.geneLocFilename
+                    )[0].filename
+                    : '',
+            geneAnalysisFile:
+                files.data.body.geneAnalysisFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.geneAnalysisFilename
+                    )[0].filename
+                    : '',
+            pvalFile:
+                files.data.body.pvalFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.pvalFilename
+                    )[0].filename
+                    : '',
+            geneSetFile:
+                files.data.body.geneSetFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.geneSetFilename
+                    )[0].filename
+                    : '',
+            covarFile:
+                files.data.body.covarFilename !== 'undefined'
+                    ? files.data.files.filter((e) =>
+                        e.filename === files.data.body.covarFilename
+                    )[0].filename
+                    : '',
+        })
+
+        mergeForm({ loading: false })
+    }
     console.log(form)
     return (
         <Form>
+            <Loader show={form.loading} fullscreen />
             <Row className="mb-2 justify-content-end">
                 <Col className="d-flex justify-content-end" xl={6}>
                     <a href="javascript:void(0)">Download Sample Data</a>
@@ -28,7 +101,7 @@ export default function AnalysisForm() {
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>SNP Location Population</Form.Label>
                     <Select
-                        placeholder="No Population Selecteed"
+                        placeholder="No Population Selected"
                         name="snpType"
                         value={form.snpType}
                         options={[
@@ -53,7 +126,7 @@ export default function AnalysisForm() {
                         name="snpLoc"
                         className="form-control"
                         onChange={(e) => {
-                            mergeForm({ snpLoc: e.target.files[0] })
+                            setSnpLocFile(e.target.files[0])
                         }}
                     />
                 </Form.Group>}
@@ -65,7 +138,7 @@ export default function AnalysisForm() {
                         name="geneLoc"
                         className="form-control"
                         onChange={(e) => {
-                            mergeForm({ geneLoc: e.target.files[0] })
+                            setGeneLocFile(e.target.files[0])
                         }}
                     />
                 </Form.Group>
@@ -97,7 +170,7 @@ export default function AnalysisForm() {
                             name="geneData"
                             className="form-control"
                             onChange={(e) => {
-                                mergeForm({ rawData: e.target.files[0] })
+                                setGeneAnalysisFile(e.target.files[0])
                             }}
                         />
                     </Form.Group>
@@ -111,7 +184,7 @@ export default function AnalysisForm() {
                             name="refData"
                             className="form-control"
                             onChange={(e) => {
-                                mergeForm({ refData: e.target.files[0] })
+                                setGeneAnalysisFile(e.target.files[0])
                             }}
                         />
                     </Form.Group>
@@ -123,7 +196,7 @@ export default function AnalysisForm() {
                             name="pvalFile"
                             className="form-control"
                             onChange={(e) => {
-                                mergeForm({ pvalFile: e.target.files[0] })
+                                setPvalFile(e.target.files[0])
                             }}
                         />
                     </Form.Group>
@@ -174,7 +247,7 @@ export default function AnalysisForm() {
                         name="setFile"
                         className="form-control"
                         onChange={(e) => {
-                            mergeForm({ setFile: e.target.files[0] })
+                            setGeneSetFile(e.target.files[0])
                         }}
                     />
                 </Form.Group>
@@ -185,7 +258,7 @@ export default function AnalysisForm() {
                         name="covarFile"
                         className="form-control"
                         onChange={(e) => {
-                            mergeForm({ covarFile: e.target.files[0] })
+                            setCovarFile(e.target.files[0])
                         }}
                     />
                 </Form.Group>
@@ -228,7 +301,7 @@ export default function AnalysisForm() {
                     Reset
                 </button>
 
-                <button type="submit" className="btn btn-primary">
+                <button type="button" className="btn btn-primary" onClick={handleSubmit}>
                     Submit
                 </button>
             </div>
