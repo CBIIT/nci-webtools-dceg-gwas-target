@@ -10,3 +10,4 @@ server/logs
 /results
 **/logs
 **/tmp/
+**/efs/
