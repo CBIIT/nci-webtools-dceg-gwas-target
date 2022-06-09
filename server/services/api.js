@@ -1,29 +1,31 @@
 const { Router, json } = require("express");
 const AWS = require('aws-sdk');
-const logger = require('./logger');
 const crypto = require('crypto');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const config = require('../config');
+const analysis = require('./analysis');
 
 const apiRouter = Router();
 
-const tmpDir = path.resolve(config.tmp.folder);
+const inputDir = path.resolve(config.efs.input_folder);
 
 const storage = multer.diskStorage({
-  
+
   destination: function (req, file, cb) {
     const { request_id } = req.body;
-    
-    const uploadDir = path.resolve(tmpDir, request_id);
-    
+
+    const uploadDir = path.resolve(inputDir, request_id);
+
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir);
     }
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
+    const { logger } = req.app.locals
+    logger.debug(file)
     cb(null, file.originalname);
   },
 });
@@ -36,7 +38,9 @@ apiRouter.get("/ping", (request, response) => {
   response.json(true)
 });
 
-apiRouter.get("/submit", async (request, response) => {
+apiRouter.post("/submit", async (request, response) => {
+  const { logger } = request.app.locals
+  logger.info(`[${request.body.request_id}] Execute /submit`);
   try {
     const s3 = new AWS.S3();
     const sqs = new AWS.SQS();
@@ -50,12 +54,9 @@ apiRouter.get("/submit", async (request, response) => {
       timestamp: new Date().toLocaleString(),
     });
 
-    if(request.queue){
-    
-    }
-    else{
-      
-    }
+    logger.info(request.body)
+    analysis.runMagma(request)
+    return res
   } catch (error) {
     const errorText = String(error.stderr || error);
     response.status(500).json(errorText);
