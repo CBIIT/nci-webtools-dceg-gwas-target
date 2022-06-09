@@ -6,6 +6,7 @@ import { defaultFormState } from "./analysis.state";
 import { uploadFiles } from "../../services/uploadFiles";
 import Loader from '../common/loader';
 const { v1: uuidv1 } = require('uuid');
+const axios = require('axios');
 
 export default function AnalysisForm() {
 
@@ -28,7 +29,7 @@ export default function AnalysisForm() {
     async function handleSubmit() {
         mergeForm({ loading: true })
         const requestId = uuidv1();
-
+    
         const files = await uploadFiles({
             requestId: requestId,
             snpLocFile: snpLocFile,
@@ -44,49 +45,29 @@ export default function AnalysisForm() {
             covarFile: covarFile,
             covarFileName: covarFile ? covarFile.name : ''
         })
+        console.log(files.data.body)
+        const params = {
+            ...form,
+            request_id: requestId.toString(),
+            snpLocFile: snpLocFile.name,
+            geneLocFile: geneLocFile.name,
+            geneAnalysisFile: geneAnalysisFile.name,
+            pvalFile: pvalFile.name,
+            geneSetFile: geneSetFile.name,
+            covarFile: covarFile.name,
+        }
 
-        await mergeForm({
-            snpLocFile:
-                files.data.body.snpLocFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.snpLocFilename
-                    )[0].filename
-                    : '',
-            geneLocFile:
-                files.data.body.geneLocFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.geneLocFilename
-                    )[0].filename
-                    : '',
-            geneAnalysisFile:
-                files.data.body.geneAnalysisFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.geneAnalysisFilename
-                    )[0].filename
-                    : '',
-            pvalFile:
-                files.data.body.pvalFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.pvalFilename
-                    )[0].filename
-                    : '',
-            geneSetFile:
-                files.data.body.geneSetFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.geneSetFilename
-                    )[0].filename
-                    : '',
-            covarFile:
-                files.data.body.covarFilename !== 'undefined'
-                    ? files.data.files.filter((e) =>
-                        e.filename === files.data.body.covarFilename
-                    )[0].filename
-                    : '',
-        })
+        try {
+            console.log(params)
+            const res = await axios.post('api/submit', params);
+            console.log(res)
+        } catch (error) {
+            console.log(error);
+        }
 
         mergeForm({ loading: false })
     }
-    console.log(form)
+    console.log(snpLocFile)
     return (
         <Form>
             <Loader show={form.loading} fullscreen />
@@ -99,28 +80,29 @@ export default function AnalysisForm() {
                 <legend className='legend font-weight-bold'>Annotation</legend>
 
                 <Form.Group className="mb-3">
-                    <Form.Label className='required'>SNP Location Population</Form.Label>
+                    <Form.Label className='required'>SNP Population</Form.Label>
                     <Select
                         placeholder="No Population Selected"
                         name="snpType"
                         value={form.snpType}
                         options={[
+                            { value: "custom", label: "User Population File" },
                             { value: "european", label: "European" },
                             { value: "african", label: "African" },
                             { value: "eastAsian", label: "East Asian" },
                             { value: "southAsian", label: "South Asian" },
                             { value: "southAmerican", label: "Middle/South American" },
                             { value: "subPopulation", label: "Sub-population definitions" },
-                            { value: "custom", label: "Upload custom population file" },
                         ]}
                         onChange={(e) => {
-                            mergeForm({ snpType: e })
+                            mergeForm({ snpType: e, snpLocFile: '' })
+                            setSnpLocFile('')
                         }}
                     />
                 </Form.Group>
 
                 {form.snpType.value === 'custom' && <Form.Group className="mb-3">
-                    <Form.Label className='required'>SNP Location File</Form.Label>
+                    <Form.Label className='required'>SNP Population File</Form.Label>
                     <input
                         type="file"
                         name="snpLoc"
@@ -219,7 +201,7 @@ export default function AnalysisForm() {
                         <Form.Label className="required">Sample Size</Form.Label>
                         <input
                             type="number"
-                            name="sampleSizeNum"
+                            name="sampleSize"
                             className="form-control"
                             onChange={handleChange}
                         />
@@ -229,7 +211,7 @@ export default function AnalysisForm() {
                         <Form.Label className="required">Column Name</Form.Label>
                         <input
                             type="text"
-                            name="sampleSizeColumn"
+                            name="sampleSize"
                             className="form-control"
                             onChange={handleChange}
                         />
