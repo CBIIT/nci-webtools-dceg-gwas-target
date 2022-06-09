@@ -3,10 +3,10 @@ const axios = require('axios');
 export async function uploadFiles(params) {
     const formData = new FormData()
     formData.append('request_id', params.requestId.toString())
-    if (params.snpLocFile !== '') {
-        formData.append('snpLocFile', params.snpLocFile)
-        formData.append('snpLocFilename', params.snpLocFilename)
-    }
+
+    formData.append('snpLocFile', params.snpLocFile)
+    formData.append('snpLocFilename', params.snpLocFilename)
+
 
     formData.append('geneLocFile', params.geneLocFile)
     formData.append('geneLocFilename', params.geneLocFilename)
@@ -30,7 +30,7 @@ export async function uploadFiles(params) {
             'Content-Type': 'multipart/form-data',
         },
     };
-
+    console.log(params)
     try {
         const res = await axios.post('api/file-upload', formData, config);
         return res
