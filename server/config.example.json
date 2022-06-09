@@ -20,12 +20,9 @@
         "queue_long_pull_time": 20,
         "pull_delay": 5
     },
-    "s3": {
-        "input_bucket": "",
-        "output_bucket": "",
-        "input_folder": "gwastarget/input/",
-        "output_folder": "gwastarget/output/",
-        "url__expire_time": 1209600
+    "efs":{
+      "input_folder": "../efs/input",
+      "output_folder": "../efs/output"
     }
   }
   
