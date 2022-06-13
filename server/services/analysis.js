@@ -1,12 +1,11 @@
 
 const os = require('node:os')
 const fs = require('fs');
+const { promisify } = require('node:util')
 const { execFile } = require('node:child_process')
 const path = require('path');
-const config = require('../config');
-
-const inputDir = path.resolve(config.efs.input_folder);
-const magmaDir = path.resolve(config.magma.folder);
+const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA } = process.env;
+const execFileAsync = promisify(execFile)
 
 async function runMagma(req) {
     const { logger } = req.app.locals;
@@ -17,34 +16,35 @@ async function runMagma(req) {
     var exec;
 
     if (platform === 'win32') {
-        exec = path.resolve(magmaDir, 'magma_win.exe')
+        exec = path.resolve(MAGMA, 'magma_win.exe')
     }
     else if (platform === 'linux') {
-        exec = path.resolve(magmaDir, 'magma_linux')
+        exec = path.resolve(MAGMA, 'magma_linux')
     }
     else if (platform === 'darwin') {
-        exec = path.resolve(magmaDir, 'magma_mac')
+        exec = path.resolve(MAGMA, 'magma_mac')
     }
 
-    const resultDir = path.resolve(config.efs.output_folder, request_id);
+    logger.debug(OUTPUT_FOLDER)
+    const inputDir = path.resolve(INPUT_FOLDER, request_id);
+    const resultDir = path.resolve(OUTPUT_FOLDER, request_id);
 
     if (!fs.existsSync(resultDir)) {
         fs.mkdirSync(resultDir);
     }
 
-
     var args = [
         '--annotate',
         '--snp-loc',
-        path.resolve(inputDir, request_id, req.body.snpLocFile),
+        path.resolve(inputDir, req.body.snpLocFile),
         '--gene-loc',
-        path.resolve(inputDir, request_id, req.body.geneLocFile),
+        path.resolve(inputDir, req.body.geneLocFile),
         '--out',
         path.resolve(resultDir, 'annotation')
     ]
 
     logger.info(args)
-    await execFile(exec, args, (error, stdout, stderr) => {
+    await execFileAsync(exec, args, (error, stdout, stderr) => {
 
         if (error)
             logger.error(error)
@@ -57,7 +57,7 @@ async function runMagma(req) {
 
         geneAnalysis = [
             '--bfile',
-            path.resolve(inputDir, request_id, req.body.geneAnalysisFile),
+            path.resolve(inputDir, req.body.geneAnalysisFile),
             '--gene-annot',
             path.resolve(resultDir, 'annotation.genes.annot.txt'),
             '--out',
@@ -72,9 +72,9 @@ async function runMagma(req) {
             sampleSizeParam = 'ncol='
         geneAnalysis = [
             '--bfile',
-            path.resolve(inputDir, request_id, path.parse(req.body.geneAnalysisFile).name),
+            path.resolve(inputDir, path.parse(req.body.geneAnalysisFile).name),
             '--pval',
-            path.resolve(inputDir, request_id, req.body.pvalFile),
+            path.resolve(inputDir, req.body.pvalFile),
             `${sampleSizeParam}${req.body.sampleSize}`,
             '--gene-annot',
             path.resolve(resultDir, 'annotation.genes.annot.txt'),
@@ -84,7 +84,7 @@ async function runMagma(req) {
     }
 
     logger.info(geneAnalysis)
-    await execFile(exec, geneAnalysis, (error, stdout, stderr) => {
+    await execFileAsync(exec, geneAnalysis, (error, stdout, stderr) => {
 
         if (error)
             logger.error(error)

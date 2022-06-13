@@ -4,19 +4,18 @@ const crypto = require('crypto');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-const config = require('../config');
 const analysis = require('./analysis');
+const { INPUT_FOLDER } = process.env;
 
 const apiRouter = Router();
-
-const inputDir = path.resolve(config.efs.input_folder);
 
 const storage = multer.diskStorage({
 
   destination: function (req, file, cb) {
     const { request_id } = req.body;
 
-    const uploadDir = path.resolve(inputDir, request_id);
+    const { logger } = req.app.locals
+    const uploadDir = path.resolve(INPUT_FOLDER, request_id);
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir);
@@ -24,8 +23,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    const { logger } = req.app.locals
-    logger.debug(file)
+    
     cb(null, file.originalname);
   },
 });
