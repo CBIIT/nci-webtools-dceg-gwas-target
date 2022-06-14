@@ -5,7 +5,7 @@ RUN dnf -y update \
     nodejs \
  && dnf clean all
 
-RUN mkdir -p /deploy/server /deploy/logs
+RUN mkdir -p /deploy/server
 
 WORKDIR /deploy/server
 
@@ -15,6 +15,6 @@ COPY server/package*.json /deploy/server/
 RUN npm install
 
 # copy the rest of the application
-COPY . /deploy/
+COPY server /deploy/server
 
 CMD npm start
