@@ -17,6 +17,4 @@ RUN npm install
 # copy the rest of the application
 COPY server /deploy/server
 
-COPY bin /usr/bin
-
 CMD npm start
