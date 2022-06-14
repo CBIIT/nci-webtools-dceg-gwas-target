@@ -7,15 +7,15 @@ RUN dnf -y update \
     nodejs \
  && dnf clean all
 
-RUN mkdir /client
+RUN mkdir /deploy/client
 
 WORKDIR /client
 
-COPY client/package*.json /client/
+COPY client/package*.json /deploy/client/
 
 RUN npm install
 
-COPY client /client/
+COPY client /deploy/client/
 
 RUN npm run build \
  && cp -r /client/build /var/www/html/gwas-target
