@@ -9,7 +9,7 @@ const execFileAsync = promisify(execFile)
 
 async function runMagma(req) {
     const { logger } = req.app.locals;
-    logger.info(`[${req.body.request_id}] Execute /run-magma`);
+    logger.info(`[${req.body.request_id}] Run annotation`);
 
     const { request_id } = req.body;
     const platform = os.platform()
@@ -48,50 +48,58 @@ async function runMagma(req) {
 
         if (error)
             logger.error(error)
+
+        logger.info(`[${req.body.request_id}] Finish annotation`);
+
+        var geneAnalysis;
+
+        if (req.body.analysisInput.value === 'rawData') {
+
+            geneAnalysis = [
+                '--bfile',
+                path.resolve(inputDir, req.body.geneAnalysisFile),
+                '--gene-annot',
+                path.resolve(resultDir, 'annotation.genes.annot.txt'),
+                '--out',
+                path.resolve(resultDir, 'gene_analysis')
+            ]
+        }
+        else {
+            var sampleSizeParam;
+            if (req.body.sampleSizeOption.value === 'input')
+                sampleSizeParam = 'N='
+            else
+                sampleSizeParam = 'ncol='
+            geneAnalysis = [
+                '--bfile',
+                path.resolve(inputDir, path.parse(req.body.geneAnalysisFile).name),
+                '--pval',
+                path.resolve(inputDir, req.body.pvalFile),
+                `${sampleSizeParam}${req.body.sampleSize}`,
+                '--gene-annot',
+                path.resolve(resultDir, 'annotation.genes.annot.txt'),
+                '--out',
+                path.resolve(resultDir, 'gene_analysis')
+            ]
+        }
+
+        logger.info(`[${req.body.request_id}] Finish gene analsyis`);
+        logger.info(geneAnalysis)
+
+        logger.info(`[${req.body.request_id}] Run gene analsyis`);
+        execFile(exec, geneAnalysis, (error, stdout, stderr) => {
+
+            if (error)
+                logger.error(error)
+
+            logger.info(`[${req.body.request_id}] Finish gene analsyis`);
+            logger.info(`[${request_id}] Finished /run-magma`);
+        })
+
+
     })
 
-    
-    var geneAnalysis;
 
-    if (req.body.analysisInput.value === 'rawData') {
-
-        geneAnalysis = [
-            '--bfile',
-            path.resolve(inputDir, req.body.geneAnalysisFile),
-            '--gene-annot',
-            path.resolve(resultDir, 'annotation.genes.annot.txt'),
-            '--out',
-            path.resolve(resultDir, 'gene_analysis')
-        ]
-    }
-    else {
-        var sampleSizeParam;
-        if (req.body.sampleSizeOption.value === 'input')
-            sampleSizeParam = 'N='
-        else
-            sampleSizeParam = 'ncol='
-        geneAnalysis = [
-            '--bfile',
-            path.resolve(inputDir, path.parse(req.body.geneAnalysisFile).name),
-            '--pval',
-            path.resolve(inputDir, req.body.pvalFile),
-            `${sampleSizeParam}${req.body.sampleSize}`,
-            '--gene-annot',
-            path.resolve(resultDir, 'annotation.genes.annot.txt'),
-            '--out',
-            path.resolve(resultDir, 'gene_analysis')
-        ]
-    }
-
-    logger.info(geneAnalysis)
-    await execFileAsync(exec, geneAnalysis, (error, stdout, stderr) => {
-
-        if (error)
-            logger.error(error)
-    })
-
-
-    logger.info(`[${request_id}] Finished /run-magma`);
 }
 
 module.exports = { runMagma }

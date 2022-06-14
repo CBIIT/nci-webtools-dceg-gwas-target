@@ -5,12 +5,12 @@ RUN dnf -y update \
     nodejs \
  && dnf clean all
 
-RUN mkdir -p /deploy/server
+RUN mkdir -p /deploy/server /deploy/logs
 
 WORKDIR /deploy/server
 
 # use build cache for npm packages
-COPY server/package*.json /deploy/server/ 
+COPY server/package*.json /deploy/server/
 
 RUN npm install
 

@@ -15,7 +15,7 @@ export default function AnalysisForm() {
 
     const [snpLocFile, setSnpLocFile] = useState('');
     const [geneLocFile, setGeneLocFile] = useState('');
-    const [geneAnalysisFile, setGeneAnalysisFile] = useState('');
+    const [geneAnalysisFile, setGeneAnalysisFile] = useState([]);
     const [pvalFile, setPvalFile] = useState('');
     const [geneSetFile, setGeneSetFile] = useState('');
     const [covarFile, setCovarFile] = useState('')
@@ -29,15 +29,19 @@ export default function AnalysisForm() {
     async function handleSubmit() {
         mergeForm({ loading: true })
         const requestId = uuidv1();
-    
+
         const files = await uploadFiles({
             requestId: requestId,
             snpLocFile: snpLocFile,
             snpLocFilename: snpLocFile ? snpLocFile.name : '',
             geneLocFile: geneLocFile,
             geneLocFilename: geneLocFile ? geneLocFile.name : '',
-            geneAnalysisFile: geneAnalysisFile,
-            geneAnalysisFileName: geneAnalysisFile ? geneAnalysisFile.name : '',
+            geneAnalysisFile1: geneAnalysisFile[0],
+            geneAnalysisFileName1: geneAnalysisFile[0] ? geneAnalysisFile[0].name : '',
+            geneAnalysisFile2: geneAnalysisFile[1],
+            geneAnalysisFileName2: geneAnalysisFile[1] ? geneAnalysisFile[1].name : '',
+            geneAnalysisFile3: geneAnalysisFile[2],
+            geneAnalysisFileName3: geneAnalysisFile[2] ? geneAnalysisFile[2].name : '',
             pvalFile: pvalFile,
             pvalFilename: pvalFile ? pvalFile.name : '',
             geneSetFile: geneSetFile,
@@ -49,9 +53,9 @@ export default function AnalysisForm() {
         const params = {
             ...form,
             request_id: requestId.toString(),
-            snpLocFile: snpLocFile.name,
+            snpLocFile: snpLocFile ? snpLocFile.name : form.snpType.value,
             geneLocFile: geneLocFile.name,
-            geneAnalysisFile: geneAnalysisFile.name,
+            geneAnalysisFile: geneAnalysisFile.length ? geneAnalysisFile[0].name : form.snpType.value,
             pvalFile: pvalFile.name,
             geneSetFile: geneSetFile.name,
             covarFile: covarFile.name,
@@ -67,7 +71,7 @@ export default function AnalysisForm() {
 
         mergeForm({ loading: false })
     }
-    console.log(snpLocFile)
+    console.log(form)
     return (
         <Form>
             <Loader show={form.loading} fullscreen />
@@ -77,8 +81,7 @@ export default function AnalysisForm() {
                 </Col>
             </Row>
             <fieldset className='border px-3 my-4'>
-                <legend className='legend font-weight-bold'>Annotation</legend>
-
+                <legend className='legend font-weight-bold'>Population</legend>
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>SNP Population</Form.Label>
                     <Select
@@ -89,7 +92,7 @@ export default function AnalysisForm() {
                             { value: "custom", label: "User Population File" },
                             { value: "european", label: "European" },
                             { value: "african", label: "African" },
-                            { value: "eastAsian", label: "East Asian" },
+                            { value: "g1000_eas", label: "East Asian" },
                             { value: "southAsian", label: "South Asian" },
                             { value: "southAmerican", label: "Middle/South American" },
                             { value: "subPopulation", label: "Sub-population definitions" },
@@ -112,6 +115,26 @@ export default function AnalysisForm() {
                         }}
                     />
                 </Form.Group>}
+
+                <Form.Group className="mb-3">
+                    <Form.Label className='required'>Reference Data File</Form.Label>
+                    <input
+                        type="file"
+                        name="refData"
+                        className="form-control"
+                        multiple
+                        max={3}
+                        accept=".bim,.bed,.fam"
+                        onChange={(e) => {
+                            console.log(e.target.files)
+                            setGeneAnalysisFile(e.target.files)
+                        }}
+                    />
+
+                </Form.Group>
+            </fieldset>
+            <fieldset className='border px-3 my-4'>
+                <legend className='legend font-weight-bold'>Annotation</legend>
 
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>Gene Location File</Form.Label>
@@ -159,17 +182,7 @@ export default function AnalysisForm() {
                 }
 
                 {form.analysisInput.value === 'refData' && <>
-                    <Form.Group className="mb-3">
-                        <Form.Label className='required'>Reference Data File</Form.Label>
-                        <input
-                            type="file"
-                            name="refData"
-                            className="form-control"
-                            onChange={(e) => {
-                                setGeneAnalysisFile(e.target.files[0])
-                            }}
-                        />
-                    </Form.Group>
+
 
                     <Form.Group className="mb-3">
                         <Form.Label className='required'>SNP P-Value File</Form.Label>

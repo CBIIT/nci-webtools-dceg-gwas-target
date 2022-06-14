@@ -11,9 +11,14 @@ export async function uploadFiles(params) {
     formData.append('geneLocFile', params.geneLocFile)
     formData.append('geneLocFilename', params.geneLocFilename)
 
-    formData.append('geneAnalysisFile', params.geneAnalysisFile)
-    formData.append('geneAnalysisFilename', params.geneAnalysisFilename)
+    formData.append('geneAnalysisFile1', params.geneAnalysisFile1)
+    formData.append('geneAnalysisFilename1', params.geneAnalysisFilename1)
 
+    formData.append('geneAnalysisFile2', params.geneAnalysisFile2)
+    formData.append('geneAnalysisFilename2', params.geneAnalysisFilename2)
+
+    formData.append('geneAnalysisFile3', params.geneAnalysisFile3)
+    formData.append('geneAnalysisFilename3', params.geneAnalysisFilename3)
 
     formData.append('pvalFile', params.pvalFile)
     formData.append('pvalFilename', params.pvalFileName)
