@@ -90,12 +90,12 @@ export default function AnalysisForm() {
                         value={form.snpType}
                         options={[
                             { value: "custom", label: "User Population File" },
-                            { value: "european", label: "European" },
-                            { value: "african", label: "African" },
+                            { value: "g1000_eur", label: "European" },
+                            { value: "g1000_afr", label: "African" },
                             { value: "g1000_eas", label: "East Asian" },
-                            { value: "southAsian", label: "South Asian" },
-                            { value: "southAmerican", label: "Middle/South American" },
-                            { value: "subPopulation", label: "Sub-population definitions" },
+                            { value: "g1000_sas", label: "South Asian" },
+                            { value: "g1000_amr", label: "Middle/South American" },
+                            { value: "g1000_subpop", label: "Sub-population definitions" },
                         ]}
                         onChange={(e) => {
                             mergeForm({ snpType: e, snpLocFile: '' })
