@@ -5,7 +5,7 @@ RUN dnf -y update \
     nodejs \
  && dnf clean all
 
-RUN mkdir -p /deploy/server /deploy/logs
+RUN mkdir -p /deploy/server
 
 WORKDIR /deploy/server
 
