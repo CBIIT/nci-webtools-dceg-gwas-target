@@ -20,6 +20,12 @@ export default function AnalysisForm() {
     const [geneSetFile, setGeneSetFile] = useState('');
     const [covarFile, setCovarFile] = useState('')
 
+    const [bimFile, setBimFile] = useState('')
+    const [bedFile, setBedFile] = useState('')
+    const [famFile, setFamFile] = useState('')
+
+    const [geneAnalysisError, setGeneAnalysisError] = useState('')
+
     function handleChange(event) {
         console.log(event.target)
         const { name, value } = event.target;
@@ -71,7 +77,7 @@ export default function AnalysisForm() {
 
         mergeForm({ loading: false })
     }
-    console.log(form)
+    console.log(geneAnalysisFile)
     return (
         <Form>
             <Loader show={form.loading} fullscreen />
@@ -127,10 +133,18 @@ export default function AnalysisForm() {
                         accept=".bim,.bed,.fam"
                         onChange={(e) => {
                             console.log(e.target.files)
+
+                            if(e.target.files.length !== 3)
+                                setGeneAnalysisError('Please submit 3 files (.bim,.bed,.fam)')
+
                             setGeneAnalysisFile(e.target.files)
                         }}
                     />
-
+                    {/*!geneAnalysisError && geneAnalysisFile ? 
+                        geneAnalysisFile.map((e) => {
+                            <span>e.name</span>
+                        })
+                    : geneAnalysisError*/}
                 </Form.Group>
             </fieldset>
             <fieldset className='border px-3 my-4'>

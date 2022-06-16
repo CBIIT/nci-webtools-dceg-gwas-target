@@ -5,10 +5,12 @@ export const defaultFormState = {
     openSidebar: true,
     analysisInput: '',
     rawOnly: false,
-    snpType: { value: "custom", label: "User Population File" },
+    snpType: { value: "g1000_eur", label: "European" },
     snpLocFile: '',
     geneLocFile: '',
-    geneAnalysisFile: '',
+    geneAnalysisFile: new FileList([
+        
+    ]),
     pvalFile: '',
     geneSetFile: '',
     covarFile: '',
