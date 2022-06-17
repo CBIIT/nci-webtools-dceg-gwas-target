@@ -2,7 +2,9 @@ const express = require("express");
 const { getLogger } = require("./services/logger");
 const { forkCluster } = require("./services/cluster");
 const { apiRouter } = require("./services/api");
-const { APP_NAME, API_PORT, LOG_LEVEL } = process.env;
+const fs = require('fs');
+const path = require('path');
+const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER } = process.env;
 
 // ensure that all environment variables are set
 // validateEnvironment();
@@ -31,6 +33,13 @@ function createApp() {
   app.locals.logger = getLogger(APP_NAME, LOG_LEVEL);
 
   app.use("/api", apiRouter);
+
+  if (!fs.existsSync(INPUT_FOLDER))
+    fs.mkdirSync(path.resolve(INPUT_FOLDER), { recursive: true })
+
+  if (!fs.existsSync(OUTPUT_FOLDER))
+    fs.mkdirSync(path.resolve(OUTPUT_FOLDER), { recursive: true})
+
 
   return app;
 }
