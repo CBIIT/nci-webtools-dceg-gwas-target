@@ -11,6 +11,8 @@ const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER } = process.e
 
 const isMasterProcess = forkCluster();
 
+
+
 // if in child process, create express application
 if (!isMasterProcess) {
   const app = createApp();
@@ -31,6 +33,11 @@ function createApp() {
 
   // register services as app locals
   app.locals.logger = getLogger(APP_NAME, LOG_LEVEL);
+  app.locals.logger.info(`App Name: ${APP_NAME}`)
+  app.locals.logger.info(`API Port: ${API_PORT}`)
+  app.locals.logger.info(`Log Level: ${LOG_LEVEL}`)
+  app.locals.logger.info(`Input Folder: ${INPUT_FOLDER}`)
+  app.locals.logger.info(`Input Folder: ${OUTPUT_FOLDER}`)
 
   app.use("/api", apiRouter);
 
