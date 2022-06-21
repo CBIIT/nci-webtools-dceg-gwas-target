@@ -21,12 +21,12 @@ function preloadLazyComponent(factory) {
 export default function App() {
   const links = [
     {
-      route: "/",
+      route: "/home",
       title: "Home",
       component: Home,
     },
     {
-      route: '/analysis',
+      route: '/',
       title: 'Analysis',
       component: Analysis,
     },
@@ -59,9 +59,11 @@ export default function App() {
             <ErrorBoundary fallback="">
               <Suspense fallback={<Loader>Loading Page</Loader>}>
                 <Routes>
+                  
                   {links.map((link, index) => (
                     <Route exact key={`route-${index}`} path={link.route} element={<link.component />} />
                   ))}
+      
                 </Routes>
               </Suspense>
             </ErrorBoundary>
