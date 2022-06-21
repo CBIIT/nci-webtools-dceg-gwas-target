@@ -23,7 +23,8 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    
+    const { logger } = req.app.locals
+    logger.info(file.originalname)
     cb(null, file.originalname);
   },
 });
