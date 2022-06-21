@@ -77,6 +77,28 @@ export default function AnalysisForm() {
 
         mergeForm({ loading: false })
     }
+
+    function processRefData(fileList) {
+        
+        const type = /(?:\.([^.]+))?$/;
+
+        if (fileList.length !== 3)
+            setGeneAnalysisError('Please submit 3 files (.bim,.bed,.fam)')
+        else{
+            const extensions = [type.exec(fileList[0].name)[1], type.exec(fileList[1].name)[1], type.exec(fileList[2].name)[1]]
+            console.log(extensions)
+            if(!extensions.includes('bed') || !extensions.includes('fam') || !extensions.includes('bim') ) 
+                setGeneAnalysisError('Please check file types and ensure they are of type .bim,.bed, and .fam')
+            else{
+
+                setGeneAnalysisError('')
+            }
+            
+        }
+           
+        setGeneAnalysisFile(fileList)
+    }
+
     console.log(geneAnalysisFile)
     return (
         <Form>
@@ -125,6 +147,7 @@ export default function AnalysisForm() {
                 <Form.Group className="mb-3">
                     <Form.Label className='required'>Reference Data File</Form.Label>
                     <input
+                        id="refData"
                         type="file"
                         name="refData"
                         className="form-control"
@@ -132,20 +155,35 @@ export default function AnalysisForm() {
                         max={3}
                         accept=".bim,.bed,.fam"
                         onChange={(e) => {
-                            console.log(e.target.files)
-
-                            if(e.target.files.length !== 3)
-                                setGeneAnalysisError('Please submit 3 files (.bim,.bed,.fam)')
-
-                            setGeneAnalysisFile(e.target.files)
+                            const fileList = Array.from(geneAnalysisFile).concat(Array.from(e.target.files))
+                            processRefData(fileList)
                         }}
                     />
-                    {/*!geneAnalysisError && geneAnalysisFile ? 
-                        geneAnalysisFile.map((e) => {
-                            <span>e.name</span>
-                        })
-                    : geneAnalysisError*/}
                 </Form.Group>
+
+                {console.log(geneAnalysisFile)}
+                {geneAnalysisFile.length ? <Form.Group className="mb-3">
+
+                    {Array.from(geneAnalysisFile).map((e, index) => {
+                        return (
+                            <div>
+                                <span>{`File ${index + 1}: ${e.name}`}</span>
+                                <span
+                                    onClick={() => {
+                                        var fileList = Array.from(geneAnalysisFile);
+                                        fileList.splice(index, 1)
+                                        console.log(fileList)
+                                        processRefData(fileList)
+
+                                    }}
+                                    style={{ color: 'red', cursor: 'pointer' }}
+                                > x</span>
+                            </div>
+                        )
+                    })}
+
+                    {geneAnalysisError ? <div style={{ color: 'red' }}>{geneAnalysisError}</div> : <></>}
+                </Form.Group> : <></>}
             </fieldset>
             <fieldset className='border px-3 my-4'>
                 <legend className='legend font-weight-bold'>Annotation</legend>

@@ -8,9 +8,7 @@ export const defaultFormState = {
     snpType: { value: "g1000_eur", label: "European" },
     snpLocFile: '',
     geneLocFile: '',
-    geneAnalysisFile: new FileList([
-        
-    ]),
+    geneAnalysisFile: [],
     pvalFile: '',
     geneSetFile: '',
     covarFile: '',
