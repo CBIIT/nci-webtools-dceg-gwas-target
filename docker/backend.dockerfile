@@ -1,8 +1,12 @@
-FROM quay.io/centos/centos:stream9
+FROM quay.io/centos/centos:stream8
+
 
 RUN dnf -y update \
+&& curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
  && dnf -y install \
-    nodejs \
+      make \
+      gcc-c++ \
+      nodejs \
  && dnf clean all
 
 RUN mkdir -p /deploy/server
