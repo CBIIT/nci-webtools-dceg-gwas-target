@@ -1,15 +1,16 @@
 FROM quay.io/centos/centos:stream9
 
 RUN dnf -y update \
+ && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
  && dnf -y install \
     httpd \
     make \
     nodejs \
  && dnf clean all
 
-RUN mkdir /deploy/client
+RUN mkdir -p /deploy/client
 
-WORKDIR /client
+WORKDIR /deploy/client
 
 COPY client/package*.json /deploy/client/
 

@@ -2,7 +2,7 @@ FROM quay.io/centos/centos:stream9
 
 
 RUN dnf -y update \
-&& curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
+ && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
  && dnf -y install \
       make \
       gcc-c++ \
