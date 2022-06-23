@@ -44,15 +44,12 @@ async function runMagma(req) {
     ]
 
     logger.info(args)
-    await execFileAsync(exec, args, (error, stdout, stderr) => {
 
-        if (error)
-            logger.error(error)
+    try {
 
-        logger.info(`[${req.body.request_id}] Finish annotation`);
+        await execFileAsync(exec, args)
 
-        var geneAnalysis;
-
+        logger.info(`[${req.body.request_id}] Finished /annotation`);
         if (req.body.analysisInput.value === 'rawData') {
 
             geneAnalysis = [
@@ -83,21 +80,15 @@ async function runMagma(req) {
             ]
         }
 
-        logger.info(`[${req.body.request_id}] Finish gene analsyis`);
+
         logger.info(geneAnalysis)
 
         logger.info(`[${req.body.request_id}] Run gene analsyis`);
-        execFile(exec, geneAnalysis, (error, stdout, stderr) => {
+        await execFileAsync(exec, geneAnalysis)
+    } catch (error) {
+        logger.info(error)
+    }
 
-            if (error)
-                logger.error(error)
-
-            logger.info(`[${req.body.request_id}] Finish gene analsyis`);
-            logger.info(`[${request_id}] Finished /run-magma`);
-        })
-
-
-    })
 
 
 }

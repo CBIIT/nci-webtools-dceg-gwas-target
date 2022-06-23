@@ -8,7 +8,7 @@ import Loader from '../common/loader';
 const { v1: uuidv1 } = require('uuid');
 const axios = require('axios');
 
-export default function AnalysisForm() {
+export default function AnalysisForm({ onSubmit }) {
 
     const [form, setForm] = useState(defaultFormState);
     const mergeForm = (obj) => setForm({ ...form, ...obj });
@@ -33,8 +33,9 @@ export default function AnalysisForm() {
     }
 
     async function handleSubmit() {
-        mergeForm({ loading: true })
         const requestId = uuidv1();
+        mergeForm({ loading: true, requestId: requestId })
+
 
         const files = await uploadFiles({
             requestId: requestId,
@@ -71,35 +72,37 @@ export default function AnalysisForm() {
             console.log(params)
             const res = await axios.post('api/submit', params);
             console.log(res)
+            mergeForm({ loading: false  })
+            onSubmit(params)
         } catch (error) {
             console.log(error);
+            mergeForm({ loading: false  })
         }
 
-        mergeForm({ loading: false })
+       
     }
-
+    console.log(form)
     function processRefData(fileList) {
-        
+
         const type = /(?:\.([^.]+))?$/;
 
         if (fileList.length !== 3)
             setGeneAnalysisError('Please submit 3 files (.bim,.bed,.fam)')
-        else{
+        else {
             const extensions = [type.exec(fileList[0].name)[1], type.exec(fileList[1].name)[1], type.exec(fileList[2].name)[1]]
             console.log(extensions)
-            if(!extensions.includes('bed') || !extensions.includes('fam') || !extensions.includes('bim') ) 
+            if (!extensions.includes('bed') || !extensions.includes('fam') || !extensions.includes('bim'))
                 setGeneAnalysisError('Please check file types and ensure they are of type .bim,.bed, and .fam')
-            else{
+            else {
 
                 setGeneAnalysisError('')
             }
-            
+
         }
-           
+
         setGeneAnalysisFile(fileList)
     }
 
-    console.log(geneAnalysisFile)
     return (
         <Form>
             <Loader show={form.loading} fullscreen />

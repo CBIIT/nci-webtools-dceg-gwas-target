@@ -18,6 +18,8 @@ export const defaultFormState = {
     jobName: '',
     email: '',
     loading: false,
+    submitted: false,
+    requestId: '',
 }
 
 export const formState = atom({

@@ -5,7 +5,8 @@ const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const analysis = require('./analysis');
-const { INPUT_FOLDER } = process.env;
+var zip = require('express-zip');
+const { INPUT_FOLDER, OUTPUT_FOLDER } = process.env;
 
 const apiRouter = Router();
 
@@ -54,8 +55,9 @@ apiRouter.post("/submit", async (request, response) => {
     });
 
     logger.info(request.body)
-    analysis.runMagma(request)
-    return res
+    await analysis.runMagma(request)
+    logger.info(`[${request.body.request_id}] Finish /submit`);
+    response.status(200).json('Finished Magma')
   } catch (error) {
     const errorText = String(error.stderr || error);
     response.status(500).json(errorText);
@@ -82,6 +84,24 @@ apiRouter.post('/file-upload', upload.any(), async (req, res) => {
     logger.error(`[${req.body.request_id}] Error /file-upload ${err}`);
     res.status(500).json(err);
   }
+});
+
+apiRouter.post("/fetch-results", async (request, response) => {
+  const { request_id } = request.body;
+  const { logger } = request.app.locals
+  logger.info(request.body)
+  logger.info(`[${request_id}] Execute /fetch-results`);
+
+  const resultsFolder = path.resolve(OUTPUT_FOLDER, request_id)
+  
+  try{
+    response.download(path.resolve(resultsFolder,'gene_analysis.genes.out.txt'))
+    logger.info(`[${request_id}] Finish /fetch-results`);
+  }catch (err) {
+    logger.error(`[${request_id}] Error /fetch-results ${err}`);
+    res.status(500).json(err);
+  }
+ 
 });
 
 module.exports = { apiRouter };
