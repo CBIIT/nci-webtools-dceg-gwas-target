@@ -19,7 +19,7 @@ RUN npm install
 COPY client /deploy/client/
 
 RUN npm run build \
- && cp -r /client/build /var/www/html/gwas-target
+ && cp -r /deploy/client/build /var/www/html/gwas-target
 
 WORKDIR /var/www/html
 
