@@ -1,6 +1,5 @@
 FROM quay.io/centos/centos:stream9
 
-
 RUN dnf -y update \
  && curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - \
  && dnf -y install \
@@ -10,6 +9,8 @@ RUN dnf -y update \
  && dnf clean all
 
 RUN mkdir -p /deploy/server
+
+COPY bin/magma_linux /bin/magma
 
 WORKDIR /deploy/server
 
