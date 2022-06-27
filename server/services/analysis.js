@@ -1,8 +1,8 @@
 
-const os = require('node:os')
+const os = require('os')
 const fs = require('fs');
-const { promisify } = require('node:util')
-const { execFile } = require('node:child_process')
+const { promisify } = require('util')
+const { execFile } = require('child_process')
 const path = require('path');
 const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA } = process.env;
 const execFileAsync = promisify(execFile)
@@ -13,17 +13,12 @@ async function runMagma(req) {
 
     const { request_id } = req.body;
     const platform = os.platform()
-    var exec;
 
-    if (platform === 'win32') {
-        exec = path.resolve(MAGMA, 'magma_win.exe')
-    }
-    else if (platform === 'linux') {
-        exec = path.resolve(MAGMA, 'magma_linux')
-    }
-    else if (platform === 'darwin') {
-        exec = path.resolve(MAGMA, 'magma_mac')
-    }
+    const exec = {
+        win32: path.resolve(MAGMA,'magma_win.exe'),
+        linux: 'magma',
+        darwin: 'magma_mac'
+      }[platform];
 
     logger.debug(OUTPUT_FOLDER)
     const inputDir = path.resolve(INPUT_FOLDER, request_id);
@@ -56,7 +51,7 @@ async function runMagma(req) {
                 '--bfile',
                 path.resolve(inputDir, req.body.geneAnalysisFile),
                 '--gene-annot',
-                path.resolve(resultDir, 'annotation.genes.annot.txt'),
+                path.resolve(resultDir, 'annotation.genes.annot'),
                 '--out',
                 path.resolve(resultDir, 'gene_analysis')
             ]
@@ -74,7 +69,7 @@ async function runMagma(req) {
                 path.resolve(inputDir, req.body.pvalFile),
                 `${sampleSizeParam}${req.body.sampleSize}`,
                 '--gene-annot',
-                path.resolve(resultDir, 'annotation.genes.annot.txt'),
+                path.resolve(resultDir, 'annotation.genes.annot'),
                 '--out',
                 path.resolve(resultDir, 'gene_analysis')
             ]
@@ -85,6 +80,7 @@ async function runMagma(req) {
 
         logger.info(`[${req.body.request_id}] Run gene analsyis`);
         await execFileAsync(exec, geneAnalysis)
+        logger.info(`[${req.body.request_id}] Finish gene analsyis`);
     } catch (error) {
         logger.info(error)
     }
