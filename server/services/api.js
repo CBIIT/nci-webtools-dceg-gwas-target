@@ -95,7 +95,7 @@ apiRouter.post("/fetch-results", async (request, response) => {
   const resultsFolder = path.resolve(OUTPUT_FOLDER, request_id)
   
   try{
-    response.download(path.resolve(resultsFolder,'gene_analysis.genes.out.txt'))
+    response.download(path.resolve(resultsFolder,'gene_analysis.genes.out'))
     logger.info(`[${request_id}] Finish /fetch-results`);
   }catch (err) {
     logger.error(`[${request_id}] Error /fetch-results ${err}`);
