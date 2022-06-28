@@ -4,28 +4,61 @@ const fs = require('fs');
 const { promisify } = require('util')
 const { execFile } = require('child_process')
 const path = require('path');
-const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA } = process.env;
+const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
 const execFileAsync = promisify(execFile)
+const AWS = require('aws-sdk');
 
 async function runMagma(req) {
     const { logger } = req.app.locals;
-    logger.info(`[${req.body.request_id}] Run annotation`);
+    
 
     const { request_id } = req.body;
     const platform = os.platform()
+    const s3 = new AWS.S3();
+
+    const objects = await s3.listObjectsV2({
+        Bucket: DATA_BUCKET,
+        Prefix: `gwastarget/g1000_eur`
+    }).promise()
+
 
     const exec = {
-        win32: path.resolve(MAGMA,'magma_win.exe'),
+        win32: path.resolve(MAGMA, 'magma_win.exe'),
         linux: 'magma',
         darwin: 'magma_mac'
-      }[platform];
+    }[platform];
 
-    logger.debug(OUTPUT_FOLDER)
     const inputDir = path.resolve(INPUT_FOLDER, request_id);
     const resultDir = path.resolve(OUTPUT_FOLDER, request_id);
 
     if (!fs.existsSync(resultDir)) {
         fs.mkdirSync(resultDir);
+    }
+
+    if (!fs.existsSync(inputDir)) {
+        fs.mkdirSync(inputDir);
+    }
+
+    if (req.body.snpType.value !== 'custom') {
+
+        const filepath = path.resolve(inputDir, `${req.body.snpLocFile}`)
+        logger.info(filepath)
+
+        //Donwload results if they do no exist
+        if (!fs.existsSync(filepath)) {
+            
+            logger.info(`[${req.body.request_id}] Download SNP Loc file`);
+            const object = await s3.getObject({
+                Bucket: DATA_BUCKET,
+                Key: `gwastarget/${req.body.snpType.value}/${req.body.snpLocFile}`
+            }).promise();
+
+            await fs.promises.writeFile(
+                filepath,
+                object.Body
+            )
+            logger.info(`[${req.body.request_id}] Finished downloading SNP Loc file`);
+        }
     }
 
     var args = [
@@ -41,9 +74,8 @@ async function runMagma(req) {
     logger.info(args)
 
     try {
-
+        logger.info(`[${req.body.request_id}] Run annotation`);
         await execFileAsync(exec, args)
-
         logger.info(`[${req.body.request_id}] Finished /annotation`);
         if (req.body.analysisInput.value === 'rawData') {
 

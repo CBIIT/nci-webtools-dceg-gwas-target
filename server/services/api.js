@@ -1,5 +1,4 @@
 const { Router, json } = require("express");
-const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const fs = require('fs');
 const multer = require('multer');
@@ -42,8 +41,6 @@ apiRouter.post("/submit", async (request, response) => {
   const { logger } = request.app.locals
   logger.info(`[${request.body.request_id}] Execute /submit`);
   try {
-    const s3 = new AWS.S3();
-    const sqs = new AWS.SQS();
 
     // generate unique id for response
     const id = crypto.randomBytes(16).toString('hex');
@@ -59,7 +56,7 @@ apiRouter.post("/submit", async (request, response) => {
     logger.info(`[${request.body.request_id}] Finish /submit`);
     response.status(200).json('Finished Magma')
   } catch (error) {
-    const errorText = String(error.stderr || error);
+    const errorText = String(error.stderr || error); 
     response.status(500).json(errorText);
   }
 });

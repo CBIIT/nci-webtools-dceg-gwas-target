@@ -60,7 +60,7 @@ export default function AnalysisForm({ onSubmit }) {
         const params = {
             ...form,
             request_id: requestId.toString(),
-            snpLocFile: snpLocFile ? snpLocFile.name : form.snpType.value,
+            snpLocFile: snpLocFile ? snpLocFile.name : `${form.snpType.value}.bim`,
             geneLocFile: geneLocFile.name,
             geneAnalysisFile: geneAnalysisFile.length ? geneAnalysisFile[0].name : form.snpType.value,
             pvalFile: pvalFile.name,
@@ -164,7 +164,7 @@ export default function AnalysisForm({ onSubmit }) {
                     />
                 </Form.Group>
 
-                {console.log(geneAnalysisFile)}
+                {console.log(form)}
                 {geneAnalysisFile.length ? <Form.Group className="mb-3">
 
                     {Array.from(geneAnalysisFile).map((e, index) => {
