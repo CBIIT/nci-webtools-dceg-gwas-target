@@ -56,7 +56,7 @@ export default function AnalysisForm({ onSubmit }) {
             covarFile: covarFile,
             covarFileName: covarFile ? covarFile.name : ''
         })
-        console.log(files.data.body)
+
         const params = {
             ...form,
             request_id: requestId.toString(),
