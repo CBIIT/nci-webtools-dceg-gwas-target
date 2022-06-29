@@ -8,7 +8,7 @@ export function forkCluster(numProcesses) {
 
   for (let i = 0; i < numProcesses; i++) cluster.fork();
 
-  cluster.on("exit", (worker, code, signal) => {
+  cluster.on("exit", () => {
     cluster.fork();
   });
 

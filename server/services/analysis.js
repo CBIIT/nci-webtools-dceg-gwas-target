@@ -18,8 +18,8 @@ export async function runMagma(params, logger) {
   }[platform];
 
   logger.debug(OUTPUT_FOLDER);
-  const inputDir = path.resolve(INPUT_FOLDER, request_id);
-  const resultDir = path.resolve(OUTPUT_FOLDER, request_id);
+  const inputDir = path.resolve(INPUT_FOLDER, params.request_id);
+  const resultDir = path.resolve(OUTPUT_FOLDER, params.request_id);
 
   if (!fs.existsSync(resultDir)) {
     fs.mkdirSync(resultDir);
@@ -40,6 +40,8 @@ export async function runMagma(params, logger) {
   await execFileAsync(exec, args);
 
   logger.info(`[${params.request_id}] Finished /annotation`);
+  let geneAnalysis;
+
   if (params.analysisInput.value === "rawData") {
     geneAnalysis = [
       "--bfile",

@@ -14,7 +14,7 @@ export function logRequests(formatter = (request) => [request.path, request.quer
   };
 }
 
-export function logErrors(error, request, response, next) {
+export function logErrors(error, request, response) {
   const { name, message } = error;
   request.app.locals.logger.error(error);
   response.status(500).json(`${name}: ${message}`);

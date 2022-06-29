@@ -49,7 +49,7 @@ apiRouter.post("/submit", async (request, response) => {
     });
 
     logger.info(request.body);
-    await runMagma(request.body, logger);
+    await runMagma(body, logger);
     logger.info(`[${request.body.request_id}] Finish /submit`);
     response.status(200).json("Finished Magma");
   } catch (error) {
@@ -87,6 +87,6 @@ apiRouter.post("/fetch-results", async (request, response) => {
     logger.info(`[${request_id}] Finish /fetch-results`);
   } catch (err) {
     logger.error(`[${request_id}] Error /fetch-results ${err}`);
-    res.status(500).json(err);
+    response.status(500).json(err);
   }
 });
