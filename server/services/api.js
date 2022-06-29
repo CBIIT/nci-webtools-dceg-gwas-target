@@ -12,7 +12,6 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const { request_id } = req.body;
 
-    const { logger } = req.app.locals;
     const uploadDir = path.resolve(INPUT_FOLDER, request_id);
 
     if (!fs.existsSync(uploadDir)) {
