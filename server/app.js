@@ -1,7 +1,6 @@
 import express from "express";
 import fs from "fs";
 import { getLogger } from "./services/logger.js";
-import { forkCluster } from "./services/cluster.js";
 import { apiRouter } from "./services/api.js";
 import { validateEnvironment } from "./services/environment.js";
 const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER } = process.env;
@@ -9,17 +8,11 @@ const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER } = process.e
 // ensure that all environment variables are set
 validateEnvironment();
 
-const isMasterProcess = forkCluster();
-
-// if in child process, create express application
-if (!isMasterProcess) {
-  const app = createApp();
-
-  // start app on specified port
-  app.listen(API_PORT, () => {
-    app.locals.logger.info(`${APP_NAME} started on port ${API_PORT}`);
-  });
-}
+// start app on specified port
+const app = createApp();
+app.listen(API_PORT, () => {
+  app.locals.logger.info(`${APP_NAME} started on port ${API_PORT}`);
+});
 
 export function createApp() {
   const app = express();
