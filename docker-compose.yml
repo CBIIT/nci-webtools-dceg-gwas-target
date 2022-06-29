@@ -10,8 +10,10 @@ services:
       APP_NAME: gwas-target
       API_PORT: 9000
       APP_BASE_URL: http://localhost:8080/
-      LOG_FOLDER: logs
       LOG_LEVEL: debug
+      INPUT_FOLDER: ../efs/input
+      OUTPUT_FOLDER: ../efs/output
+      MAGMA: ../bin
   frontend:
     build:
       context: .
