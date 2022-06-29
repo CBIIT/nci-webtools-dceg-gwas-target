@@ -59,8 +59,7 @@ export function SidebarContainer({
         className={`
                 position-relative
                 ${_collapsed ? "col-md" : mainPanelClass}
-            `}
-      >
+            `}>
         {collapseButton({
           collapsed: _collapsed,
           toggleCollapse: toggleCollapse,

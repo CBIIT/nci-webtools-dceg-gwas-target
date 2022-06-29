@@ -32,16 +32,15 @@ hr {
 
 .navbar-dark .navbar-nav .nav-link {
   color: white;
-  &.active{
-      color: #2e2e2e;
-      border-bottom-color: #14819B;
-      background-color: #F1F1F1;
+  &.active {
+    color: #2e2e2e;
+    border-bottom-color: #14819b;
+    background-color: #f1f1f1;
   }
-  &:hover{
-      color: #14819B;
+  &:hover {
+    color: #14819b;
   }
 }
-
 
 .loader {
   z-index: 9999;

@@ -18,7 +18,7 @@
       gtag("config", "UA-XXXXXXXXXX");
 
       function handleKey(e) {
-        console.log('hi')
+        console.log("hi");
         text = document.getElementById("doc_search").value;
         if (e.keyCode === 13) {
           window.open("https://www.google.com/search?q=site:https://gwastarget.cancer.gov " + text, "_blank");
@@ -40,8 +40,7 @@
             src="%PUBLIC_URL%/images/nci-dceg-logo.svg"
             class="img-fluid my-3"
             alt="National Cancer Institute"
-            style="height: 56px; max-width: 100%"
-          />
+            style="height: 56px; max-width: 100%" />
           <span class="visually-hidden">Division of Cancer Epidemiology and Genetics</span>
         </a>
         <div class="d-flex col-lg-3 mb-2 pr-2" style="width: auto !important">
@@ -52,11 +51,26 @@
             type="text"
             class="form-control"
             placeholder="Documentation Search"
-            style="border-top-left-radius: 20px;border-bottom-left-radius: 20px; border-bottom-right-radius: 0;border-top-right-radius: 0"
-          />
-          <div class="input-group-text" onclick="handleClick()" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 0;border-top-left-radius: 0;margin-left: -1px;cursor: pointer;">
+            style="
+              border-top-left-radius: 20px;
+              border-bottom-left-radius: 20px;
+              border-bottom-right-radius: 0;
+              border-top-right-radius: 0;
+            " />
+          <div
+            class="input-group-text"
+            onclick="handleClick()"
+            style="
+              border-top-right-radius: 20px;
+              border-bottom-right-radius: 20px;
+              border-bottom-left-radius: 0;
+              border-top-left-radius: 0;
+              margin-left: -1px;
+              cursor: pointer;
+            ">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="1em" height="1em">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
+              <path
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
             </svg>
           </div>
         </div>
@@ -73,7 +87,7 @@
             <div class="h6">
               at the
               <a class="text-light" target="_blank" href="https://www.cancer.gov/">National Cancer Institute</a>
-            </div>  
+            </div>
           </div>
           <div class="row">
             <div class="col-lg-4 mb-4">
@@ -88,7 +102,9 @@
               <div class="h5 mb-1 font-weight-light">POLICIES</div>
               <ul class="list-unstyled mb-0">
                 <li>
-                  <a class="text-light" target="_blank" href="https://www.cancer.gov/policies/accessibility">Accessibility</a>
+                  <a class="text-light" target="_blank" href="https://www.cancer.gov/policies/accessibility"
+                    >Accessibility</a
+                  >
                 </li>
                 <li>
                   <a class="text-light" target="_blank" href="https://www.cancer.gov/policies/disclaimer">Disclaimer</a>
@@ -97,7 +113,12 @@
                   <a class="text-light" target="_blank" href="https://www.cancer.gov/policies/foia">FOIA</a>
                 </li>
                 <li>
-                  <a class="text-light" target="_blank" href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html">HHS Vulnerability Disclosure</a>
+                  <a
+                    class="text-light"
+                    target="_blank"
+                    href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html"
+                    >HHS Vulnerability Disclosure</a
+                  >
                 </li>
               </ul>
             </div>
@@ -105,7 +126,9 @@
               <div class="h5 mb-1 font-weight-light">MORE INFORMATION</div>
               <ul class="list-unstyled mb-0">
                 <li>
-                  <a class="text-light" target="_blank" href="http://www.hhs.gov/">U.S. Department of Health and Human Services</a>
+                  <a class="text-light" target="_blank" href="http://www.hhs.gov/"
+                    >U.S. Department of Health and Human Services</a
+                  >
                 </li>
                 <li>
                   <a class="text-light" target="_blank" href="http://www.nih.gov/">National Institutes of Health</a>
@@ -116,7 +139,6 @@
                 <li>
                   <a class="text-light" target="_blank" href="http://usa.gov/">USA.gov</a>
                 </li>
-                
               </ul>
             </div>
           </div>
