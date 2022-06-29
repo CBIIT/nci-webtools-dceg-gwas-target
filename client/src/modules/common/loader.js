@@ -11,7 +11,7 @@ export default function Loader({
     <div
       className={classNames(
         "d-flex flex-column align-items-center justify-content-center w-100 h-100 top-0 start-0",
-        className,
+        className
       )}
       style={{ zIndex: 9999, position: fullscreen ? "fixed" : "absolute" }}>
       <div className="text-center">

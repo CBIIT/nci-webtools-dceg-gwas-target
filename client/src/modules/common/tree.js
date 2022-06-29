@@ -78,7 +78,7 @@ export function createTree(
     strokeLinecap, // stroke line cap for links
     halo = "#fff", // color of label halo
     haloWidth = 3, // padding around the labels
-  } = {},
+  } = {}
 ) {
   // If id and parentId options are specified, or the path option, use d3.stratify
   // to convert tabular data to a hierarchy; otherwise we assume that the data is
@@ -139,7 +139,7 @@ export function createTree(
       d3
         .linkHorizontal()
         .x((d) => d.y)
-        .y((d) => d.x),
+        .y((d) => d.x)
     );
 
   const node = svg

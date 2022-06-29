@@ -1,10 +1,3 @@
-
-
 export default function About() {
-
-
-    return(
-        <>
-        </>
-    )
+  return <></>;
 }

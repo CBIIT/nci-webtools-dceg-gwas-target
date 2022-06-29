@@ -1,27 +1,26 @@
 .required:after {
-    content: '*';
-    margin-left: 0.25rem;
-    color: red;
+  content: "*";
+  margin-left: 0.25rem;
+  color: red;
 }
 
 legend {
-    width: inherit;
+  width: inherit;
 }
 
 legend {
-    font-size: 1rem;
-    position: relative;
-    top: -15px;
-    white-space: nowrap;
+  font-size: 1rem;
+  position: relative;
+  top: -15px;
+  white-space: nowrap;
 }
 
 .font-weight-bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .cover-image {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-  
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}

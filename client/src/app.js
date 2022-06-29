@@ -26,15 +26,15 @@ export default function App() {
       component: Home,
     },
     {
-      route: '/',
-      title: 'Analysis',
+      route: "/",
+      title: "Analysis",
       component: Analysis,
     },
     {
-      route: '/about',
-      title: 'About',
-      component: About
-    }
+      route: "/about",
+      title: "About",
+      component: About,
+    },
   ];
 
   return (
@@ -59,11 +59,9 @@ export default function App() {
             <ErrorBoundary fallback="">
               <Suspense fallback={<Loader>Loading Page</Loader>}>
                 <Routes>
-                  
                   {links.map((link, index) => (
                     <Route exact key={`route-${index}`} path={link.route} element={<link.component />} />
                   ))}
-      
                 </Routes>
               </Suspense>
             </ErrorBoundary>
