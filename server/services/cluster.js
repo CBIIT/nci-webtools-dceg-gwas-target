@@ -1,10 +1,10 @@
-const cluster = require("cluster");
-const numCPUs = require("os").cpus().length;
+import cluster from "cluster";
+import { cpus } from "os";
 
-function forkCluster(numProcesses) {
-  if (!cluster.isMaster) return false;
+export function forkCluster(numProcesses) {
+  if (!cluster.isPrimary) return false;
 
-  if (!numProcesses) numProcesses = numCPUs;
+  if (!numProcesses) numProcesses = cpus().length;
 
   for (let i = 0; i < numProcesses; i++) cluster.fork();
 
@@ -14,5 +14,3 @@ function forkCluster(numProcesses) {
 
   return true;
 }
-
-module.exports = { forkCluster };
