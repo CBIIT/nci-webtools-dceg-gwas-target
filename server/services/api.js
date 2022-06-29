@@ -49,7 +49,7 @@ apiRouter.post("/submit", async (request, response) => {
     });
 
     logger.info(request.body);
-    await runMagma(request);
+    await runMagma(request.body, logger);
     logger.info(`[${request.body.request_id}] Finish /submit`);
     response.status(200).json("Finished Magma");
   } catch (error) {
