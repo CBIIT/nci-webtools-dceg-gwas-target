@@ -3,42 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.2.0",
-    "@testing-library/user-event": "^13.5.0",
-    "aws-sdk": "^2.1140.0",
     "better-sqlite3": "^7.5.0",
-    "compression": "^1.7.4",
     "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "express-zip": "^3.0.0",
     "multer": "^1.4.5-lts.1",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "web-vitals": "^2.1.4",
-    "winston": "^3.6.0",
-    "winston-daily-rotate-file": "^4.6.1"
+    "winston": "^3.6.0"
   },
   "scripts": {
-    "start": "node --require dotenv/config app.js",
-    "test": "react-scripts test"
+    "start": "node --require dotenv/config app.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "type": "module"
 }
