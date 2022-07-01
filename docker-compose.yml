@@ -6,16 +6,7 @@ services:
       dockerfile: docker/backend.dockerfile
       args:
         BASE_IMAGE: "quay.io/centos/centos:stream9"
-    env_file: .env
-    environment:
-      APP_NAME: gwas-target
-      API_PORT: 9000
-      APP_BASE_URL: http://localhost:8080/
-      LOG_LEVEL: debug
-      INPUT_FOLDER: ../efs/input
-      OUTPUT_FOLDER: ../efs/output
-      MAGMA: ../bin
-      DATA_BUCKET: nci-cbiit-dceg-data-nonprod
+    env_file: ./server/.env
   frontend:
     build:
       context: .
