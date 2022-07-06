@@ -2,7 +2,7 @@ import { atom, selector, selectorFamily } from "recoil";
 
 export const defaultFormState = {
   openSidebar: true,
-  analysisInput: "",
+  analysisInput: { value: "refData", label: "Reference Data" },
   rawOnly: false,
   snpType: { value: "g1000_eur", label: "European" },
   snpLocFile: "",
@@ -11,8 +11,8 @@ export const defaultFormState = {
   pvalFile: "",
   geneSetFile: "",
   covarFile: "",
-  sampleSizeOption: "",
-  sampleSize: "",
+  sampleSizeOption: { value: "input", label: "Provide one sample size" },
+  sampleSize: 100,
   queue: true,
   jobName: "",
   email: "",

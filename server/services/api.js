@@ -20,8 +20,15 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const { logger } = req.app.locals;
+    logger.info(req.body.request_id)
+
     logger.debug(`Original filename: ${file.originalname}`);
-    cb(null, file.originalname);
+    if(file.fieldname === 'geneAnalysisBim' || file.fieldname === 'geneAnalysisBed' || file.fieldname === 'geneAnalysisFam'){
+      logger.debug(`New Filename ${req.body.request_id.concat(path.extname(file.originalname))}`)
+      cb(null, req.body.request_id.concat(path.extname(file.originalname)))
+    }
+    else
+      cb(null, file.originalname);
   },
 });
 

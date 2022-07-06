@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import Select from "react-select";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -14,16 +14,44 @@ export default function AnalysisForm({ onSubmit }) {
 
   const [snpLocFile, setSnpLocFile] = useState("");
   const [geneLocFile, setGeneLocFile] = useState("");
-  const [geneAnalysisFile, setGeneAnalysisFile] = useState([]);
+  const [geneAnalysisList, setGeneAnalysisList] = useState([{ name: "g1000_eur.bim" }, { name: "g1000_eur.bed" }, { name: "g1000_eur.fam" }]);
+  const [rawData, setRawData] = useState("")
   const [pvalFile, setPvalFile] = useState("");
   const [geneSetFile, setGeneSetFile] = useState("");
   const [covarFile, setCovarFile] = useState("");
 
-  const [bimFile, setBimFile] = useState("");
-  const [bedFile, setBedFile] = useState("");
-  const [famFile, setFamFile] = useState("");
 
   const [geneAnalysisError, setGeneAnalysisError] = useState("");
+
+  const geneLocRef = useRef()
+  const refDataRef = useRef()
+  const snpRef = useRef()
+
+  function asFileList(files) {
+    let container = new DataTransfer()
+
+    for (let file of files) {
+      container.items.add(file)
+    }
+
+    return container.files;
+  }
+
+  useEffect(() => {
+    geneLocRef.current.files = asFileList([
+      new File([""], "NCBI37.3.gene.loc")
+    ])
+
+    refDataRef.current.files = asFileList([
+      new File([""], "g1000_eur.bim"),
+      new File([""], "g1000_eur.bed"),
+      new File([""], "g1000_eur.fam"),
+    ])
+
+    snpRef.current.files = asFileList([
+      new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
+    ])
+  }, [])
 
   function handleChange(event) {
     console.log(event.target);
@@ -34,6 +62,22 @@ export default function AnalysisForm({ onSubmit }) {
   async function handleSubmit() {
     const requestId = uuidv1();
     mergeForm({ loading: true, requestId: requestId });
+    
+    const type = /(?:\.([^.]+))?$/;
+    var bedFile;
+    var bimFile;
+    var famFile;
+
+    geneAnalysisList.map((e) => {
+      if (e.size) {
+        if (type.exec(e.name)[1] === 'bed')
+          bedFile = e
+        else if (type.exec(e.name)[1] === 'fam')
+          famFile = e
+        else if (type.exec(e.name)[1] === 'bim')
+          bimFile = e
+      }
+    })
 
     const files = await uploadFiles({
       requestId: requestId,
@@ -41,12 +85,12 @@ export default function AnalysisForm({ onSubmit }) {
       snpLocFilename: snpLocFile ? snpLocFile.name : "",
       geneLocFile: geneLocFile,
       geneLocFilename: geneLocFile ? geneLocFile.name : "",
-      geneAnalysisFile1: geneAnalysisFile[0],
-      geneAnalysisFileName1: geneAnalysisFile[0] ? geneAnalysisFile[0].name : "",
-      geneAnalysisFile2: geneAnalysisFile[1],
-      geneAnalysisFileName2: geneAnalysisFile[1] ? geneAnalysisFile[1].name : "",
-      geneAnalysisFile3: geneAnalysisFile[2],
-      geneAnalysisFileName3: geneAnalysisFile[2] ? geneAnalysisFile[2].name : "",
+      geneAnalysisBim: bimFile,
+      geneAnalysisBimName: bimFile ? bimFile.name : "",
+      geneAnalysisBed: bedFile,
+      geneAnalysisBedName: bedFile ? bedFile.name : "",
+      geneAnalysisFam: famFile,
+      geneAnalysisFamName: famFile ? famFile.name : "",
       pvalFile: pvalFile,
       pvalFilename: pvalFile ? pvalFile.name : "",
       geneSetFile: geneSetFile,
@@ -59,9 +103,12 @@ export default function AnalysisForm({ onSubmit }) {
       ...form,
       request_id: requestId.toString(),
       snpLocFile: snpLocFile ? snpLocFile.name : `${form.snpType.value}.bim`,
-      geneLocFile: geneLocFile.name,
-      geneAnalysisFile: geneAnalysisFile.length ? geneAnalysisFile[0].name : form.snpType.value,
-      pvalFile: pvalFile.name,
+      geneLocFile: geneLocFile ? geneLocFile.name : "sample_gene_loc.loc",
+      geneAnalysisBim: bimFile ? bimFile.name : "",
+      geneAnalysisBed: bedFile ? bedFile.name : "",
+      geneAnalysisFam: famFile ? famFile.name : "",
+      geneAnalysisFile: geneAnalysisList.length ? geneAnalysisList[0].name : form.snpType.value,
+      pvalFile: pvalFile ? pvalFile.name : "sample_snp.tsv",
       geneSetFile: geneSetFile.name,
       covarFile: covarFile.name,
     };
@@ -96,9 +143,10 @@ export default function AnalysisForm({ onSubmit }) {
       }
     }
 
-    setGeneAnalysisFile(fileList);
+    setGeneAnalysisList(fileList);
   }
 
+  const test = new File(['content'], "test.txt")
   return (
     <Form>
       <Loader show={form.loading} fullscreen />
@@ -127,6 +175,22 @@ export default function AnalysisForm({ onSubmit }) {
             onChange={(e) => {
               mergeForm({ snpType: e, snpLocFile: "" });
               setSnpLocFile("");
+              console.log(e)
+
+              if (e.value !== 'custom') {
+                refDataRef.current.files = asFileList([
+                  new File([""], `${e.value}.bim`),
+                  new File([""], `${e.value}.bed`),
+                  new File([""], `${e.value}.fam`),
+
+                ])
+                setGeneAnalysisList([{ name: `${e.value}.bim` }, { name: `${e.value}.bed` }, { name: `${e.value}.fam` }])
+                setGeneAnalysisError('')
+              }
+              else{
+                refDataRef.current.files = asFileList([])
+                setGeneAnalysisList([])
+              }
             }}
           />
         </Form.Group>
@@ -134,8 +198,9 @@ export default function AnalysisForm({ onSubmit }) {
         {form.snpType.value === "custom" && (
           <Form.Group className="mb-3">
             <Form.Label className="required">SNP Population File</Form.Label>
-            <input
+            <Form.Control
               type="file"
+              id="snpLoc"
               name="snpLoc"
               className="form-control"
               onChange={(e) => {
@@ -154,24 +219,25 @@ export default function AnalysisForm({ onSubmit }) {
             className="form-control"
             multiple
             max={3}
+            ref={refDataRef}
             accept=".bim,.bed,.fam"
             onChange={(e) => {
-              const fileList = Array.from(geneAnalysisFile).concat(Array.from(e.target.files));
+              const fileList = Array.from(geneAnalysisList).concat(Array.from(e.target.files));
               processRefData(fileList);
             }}
           />
         </Form.Group>
 
-        {console.log(geneAnalysisFile)}
-        {geneAnalysisFile.length ? (
+        {console.log(geneAnalysisList)}
+        {geneAnalysisList.length ? (
           <Form.Group className="mb-3">
-            {Array.from(geneAnalysisFile).map((e, index) => {
+            {Array.from(geneAnalysisList).map((e, index) => {
               return (
                 <div>
                   <span>{`File ${index + 1}: ${e.name}`}</span>
                   <span
                     onClick={() => {
-                      var fileList = Array.from(geneAnalysisFile);
+                      var fileList = Array.from(geneAnalysisList);
                       fileList.splice(index, 1);
                       console.log(fileList);
                       processRefData(fileList);
@@ -199,6 +265,7 @@ export default function AnalysisForm({ onSubmit }) {
             type="file"
             name="geneLoc"
             className="form-control"
+            ref={(geneLocRef)}
             onChange={(e) => {
               setGeneLocFile(e.target.files[0]);
             }}
@@ -232,7 +299,7 @@ export default function AnalysisForm({ onSubmit }) {
               name="geneData"
               className="form-control"
               onChange={(e) => {
-                setGeneAnalysisFile(e.target.files[0]);
+                setRawData(e.target.files[0]);
               }}
             />
           </Form.Group>
@@ -246,6 +313,7 @@ export default function AnalysisForm({ onSubmit }) {
                 type="file"
                 name="pvalFile"
                 className="form-control"
+                ref={snpRef}
                 onChange={(e) => {
                   setPvalFile(e.target.files[0]);
                 }}
@@ -258,7 +326,7 @@ export default function AnalysisForm({ onSubmit }) {
                 name="sampleSizeOption"
                 value={form.sampleSizeOption}
                 options={[
-                  { value: "input", label: "Provide one sample size" },
+                  { value: "input", label: "Provide sample size" },
                   { value: "file", label: "File includes column for sample size" },
                 ]}
                 onChange={(e) => {
@@ -269,7 +337,7 @@ export default function AnalysisForm({ onSubmit }) {
             {form.sampleSizeOption.value === "input" && (
               <Form.Group className="mb-3">
                 <Form.Label className="required">Sample Size</Form.Label>
-                <input type="number" name="sampleSize" className="form-control" onChange={handleChange} />
+                <input type="number" name="sampleSize" className="form-control" value={form.sampleSize} onChange={handleChange} />
               </Form.Group>
             )}
 
