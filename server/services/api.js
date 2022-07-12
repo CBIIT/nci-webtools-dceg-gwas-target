@@ -5,7 +5,9 @@ import { Router, json } from "express";
 import multer from "multer";
 import { runMagma } from "./analysis.js";
 import { withAsync } from "./middleware.js";
-const { INPUT_FOLDER, OUTPUT_FOLDER } = process.env;
+import AWS from "aws-sdk";
+const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET } = process.env;
+
 
 export const apiRouter = Router();
 
@@ -23,7 +25,7 @@ const storage = multer.diskStorage({
     logger.info(req.body.request_id)
 
     logger.debug(`Original filename: ${file.originalname}`);
-    if(file.fieldname === 'geneAnalysisBim' || file.fieldname === 'geneAnalysisBed' || file.fieldname === 'geneAnalysisFam'){
+    if (file.fieldname === 'geneAnalysisBim' || file.fieldname === 'geneAnalysisBed' || file.fieldname === 'geneAnalysisFam') {
       logger.debug(`New Filename ${req.body.request_id.concat(path.extname(file.originalname))}`)
       cb(null, req.body.request_id.concat(path.extname(file.originalname)))
     }
@@ -80,13 +82,27 @@ apiRouter.post(
 apiRouter.post(
   "/fetch-results",
   withAsync(async (request, response) => {
-    const { request_id } = request.body;
+
     const { logger } = request.app.locals;
     logger.info(request.body);
-    logger.info(`[${request_id}] Execute /fetch-results`);
 
-    const resultsFolder = path.resolve(OUTPUT_FOLDER, request_id);
-    response.download(path.resolve(resultsFolder, "gene_analysis.genes.out"));
-    logger.info(`[${request_id}] Finish /fetch-results`);
+    if (!request.submitted) {
+      logger.info(`Execute /fetch-results sample file`);
+      const s3 = new AWS.S3();
+      const filestream = await s3.getObject({
+        Bucket: DATA_BUCKET,
+        Key: `gwastarget/gene_analysis.genes.out`
+      }).createReadStream();
+
+      filestream.pipe(response)
+      logger.info(`Finish /fetch-results sample file`);
+    } 
+    else {
+      const { request_id } = request.body;
+      logger.info(`[${request_id}] Execute /fetch-results`);
+      const resultsFolder = path.resolve(OUTPUT_FOLDER, request_id);
+      response.download(path.resolve(resultsFolder, "gene_analysis.genes.out"));
+      logger.info(`[${request_id}] Finish /fetch-results`);
+    }
   })
 );

@@ -41,17 +41,11 @@ export default function Analysis() {
         <MainPanel>
           <Card className="shadow h-100">
             <Card.Body className="p-0">
-              {!form.submitted ? (
-                <div className="m-2">
-                  Please provide configuration settings for your analysis on the left panel and click Submit.
-                </div>
-              ) : (
-                <div className="m-3">
-                  <button type="button" className="btn btn-primary" onClick={handleDownload}>
-                    Download Gene Analysis
-                  </button>
-                </div>
-              )}
+              <div className="m-3">
+                <button type="button" className="btn btn-primary" onClick={handleDownload}>
+                  {form.submitted ? 'Download Gene Analysis' : 'Download Sample Gene Analysis'}
+                </button>
+              </div>
             </Card.Body>
           </Card>
         </MainPanel>
