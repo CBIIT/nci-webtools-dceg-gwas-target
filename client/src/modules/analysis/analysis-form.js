@@ -5,12 +5,14 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { defaultFormState } from "./analysis.state";
 import { uploadFiles } from "../../services/uploadFiles";
 import Loader from "../common/loader";
-const { v1: uuidv1 } = require("uuid");
+const { v1: uuidv1, validate } = require("uuid");
 const axios = require("axios");
 
 export default function AnalysisForm({ onSubmit }) {
   const [form, setForm] = useState(defaultFormState);
   const mergeForm = (obj) => setForm({ ...form, ...obj });
+  const FILE_SIZE_LIMIT = 100000000;
+  const fileSizeError = "File size cannot exceed 100 MB";
 
   const [snpLocFile, setSnpLocFile] = useState("");
   const [geneLocFile, setGeneLocFile] = useState("");
@@ -20,8 +22,13 @@ export default function AnalysisForm({ onSubmit }) {
   const [geneSetFile, setGeneSetFile] = useState("");
   const [covarFile, setCovarFile] = useState("");
 
-
+  const [snpLocError, setSnpLocError] = useState("");
   const [geneAnalysisError, setGeneAnalysisError] = useState("");
+  const [geneLocError, setGeneLocError] = useState("")
+  const [rawDataError, setRawDataError] = useState("")
+  const [pvalError, setPvalError] = useState("")
+  const [geneSetError, setGeneSetError] = useState("")
+  const [covarError, setCovarError] = useState("")
 
   const geneLocRef = useRef()
   const refDataRef = useRef()
@@ -53,6 +60,12 @@ export default function AnalysisForm({ onSubmit }) {
     ])
   }, [])
 
+  //Disables submit button if there are errors with input
+  function containsErrors() {
+
+    return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
+  }
+
   function handleChange(event) {
     console.log(event.target);
     const { name, value } = event.target;
@@ -62,7 +75,7 @@ export default function AnalysisForm({ onSubmit }) {
   async function handleSubmit() {
     const requestId = uuidv1();
     mergeForm({ loading: true, requestId: requestId });
-    
+
     const type = /(?:\.([^.]+))?$/;
     var bedFile;
     var bimFile;
@@ -114,9 +127,7 @@ export default function AnalysisForm({ onSubmit }) {
     };
 
     try {
-      console.log(params);
       const res = await axios.post("api/submit", params);
-      console.log(res);
       mergeForm({ loading: false });
       onSubmit(params);
     } catch (error) {
@@ -124,7 +135,7 @@ export default function AnalysisForm({ onSubmit }) {
       mergeForm({ loading: false });
     }
   }
-  console.log(form);
+  
   function processRefData(fileList) {
     const type = /(?:\.([^.]+))?$/;
 
@@ -139,7 +150,10 @@ export default function AnalysisForm({ onSubmit }) {
       if (!extensions.includes("bed") || !extensions.includes("fam") || !extensions.includes("bim"))
         setGeneAnalysisError("Please check file types and ensure they are of type .bim,.bed, and .fam");
       else {
-        setGeneAnalysisError("");
+        if (fileList[0].size > FILE_SIZE_LIMIT || fileList[1].size > FILE_SIZE_LIMIT || fileList[2].size > FILE_SIZE_LIMIT)
+          setGeneAnalysisError(fileSizeError)
+        else
+          setGeneAnalysisError("");
       }
     }
 
@@ -175,7 +189,7 @@ export default function AnalysisForm({ onSubmit }) {
             onChange={(e) => {
               mergeForm({ snpType: e, snpLocFile: "" });
               setSnpLocFile("");
-              console.log(e)
+              setSnpLocError("");
 
               if (e.value !== 'custom') {
                 refDataRef.current.files = asFileList([
@@ -187,7 +201,7 @@ export default function AnalysisForm({ onSubmit }) {
                 setGeneAnalysisList([{ name: `${e.value}.bim` }, { name: `${e.value}.bed` }, { name: `${e.value}.fam` }])
                 setGeneAnalysisError('')
               }
-              else{
+              else {
                 refDataRef.current.files = asFileList([])
                 setGeneAnalysisList([])
               }
@@ -204,9 +218,16 @@ export default function AnalysisForm({ onSubmit }) {
               name="snpLoc"
               className="form-control"
               onChange={(e) => {
-                setSnpLocFile(e.target.files[0]);
+                if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                  setSnpLocFile(e.target.files[0]);
+                  setSnpLocError('')
+                }
+                else {
+                  setSnpLocError(fileSizeError)
+                }
               }}
             />
+            {snpLocError ? <div style={{ color: "red" }}>{snpLocError}</div> : <></>}
           </Form.Group>
         )}
 
@@ -267,9 +288,17 @@ export default function AnalysisForm({ onSubmit }) {
             className="form-control"
             ref={(geneLocRef)}
             onChange={(e) => {
-              setGeneLocFile(e.target.files[0]);
+              console.log(e.target.files[0].size)
+              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                setGeneLocFile(e.target.files[0]);
+                setGeneLocError('')
+              }
+              else {
+                setGeneLocError(fileSizeError)
+              }
             }}
           />
+          {geneLocError ? <div style={{ color: "red" }}>{geneLocError}</div> : <></>}
         </Form.Group>
       </fieldset>
 
@@ -299,9 +328,16 @@ export default function AnalysisForm({ onSubmit }) {
               name="geneData"
               className="form-control"
               onChange={(e) => {
-                setRawData(e.target.files[0]);
+                if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                  setRawData(e.target.files[0]);
+                  setRawDataError('')
+                }
+                else {
+                  setRawDataError(fileSizeError)
+                }
               }}
             />
+            {rawDataError ? <div style={{ color: "red" }}>{rawDataError}</div> : <></>}
           </Form.Group>
         )}
 
@@ -315,9 +351,16 @@ export default function AnalysisForm({ onSubmit }) {
                 className="form-control"
                 ref={snpRef}
                 onChange={(e) => {
-                  setPvalFile(e.target.files[0]);
+                  if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                    setPvalFile(e.target.files[0]);
+                    setPvalError('')
+                  }
+                  else {
+                    setPvalError(fileSizeError)
+                  }
                 }}
               />
+              {pvalError ? <div style={{ color: "red" }}>{pvalError}</div> : <></>}
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label className="required">Sample Size Input Type</Form.Label>
@@ -359,9 +402,16 @@ export default function AnalysisForm({ onSubmit }) {
             name="setFile"
             className="form-control"
             onChange={(e) => {
-              setGeneSetFile(e.target.files[0]);
+              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                setGeneSetFile(e.target.files[0]);
+                setGeneSetError('')
+              }
+              else {
+                setGeneSetError(fileSizeError)
+              }
             }}
           />
+          {geneSetError ? <div style={{ color: "red" }}>{geneSetError}</div> : <></>}
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Covar File</Form.Label>
@@ -370,9 +420,16 @@ export default function AnalysisForm({ onSubmit }) {
             name="covarFile"
             className="form-control"
             onChange={(e) => {
-              setCovarFile(e.target.files[0]);
+              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
+                setCovarFile(e.target.files[0]);
+                setCovarError('')
+              }
+              else {
+                setCovarError(fileSizeError)
+              }
             }}
           />
+          {covarError ? <div style={{ color: "red" }}>{covarError}</div> : <></>}
         </Form.Group>
       </fieldset>
       <fieldset className="border px-3 mb-4">
@@ -408,7 +465,7 @@ export default function AnalysisForm({ onSubmit }) {
           Reset
         </button>
 
-        <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+        <button type="button" className="btn btn-primary" disabled={containsErrors()} onClick={handleSubmit}>
           Submit
         </button>
       </div>
