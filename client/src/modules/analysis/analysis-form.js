@@ -63,6 +63,9 @@ export default function AnalysisForm({ onSubmit }) {
   //Disables submit button if there are errors with input
   function containsErrors() {
 
+    if(form.queue)
+      return !form.email || !form.jobName;
+
     return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
   }
 
@@ -135,7 +138,7 @@ export default function AnalysisForm({ onSubmit }) {
       mergeForm({ loading: false });
     }
   }
-  
+
   function processRefData(fileList) {
     const type = /(?:\.([^.]+))?$/;
 
@@ -249,7 +252,6 @@ export default function AnalysisForm({ onSubmit }) {
           />
         </Form.Group>
 
-        {console.log(geneAnalysisList)}
         {geneAnalysisList.length ? (
           <Form.Group className="mb-3">
             {Array.from(geneAnalysisList).map((e, index) => {
