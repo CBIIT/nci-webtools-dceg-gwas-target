@@ -163,7 +163,6 @@ export default function AnalysisForm({ onSubmit }) {
     setGeneAnalysisList(fileList);
   }
 
-  const test = new File(['content'], "test.txt")
   return (
     <Form>
       <Loader show={form.loading} fullscreen />
