@@ -14,17 +14,23 @@ export async function magma(args) {
     linux: "magma",
     darwin: "magma_mac",
   }[platform];
+  if (!exec) throw new Error(`Unsupported platform: ${platform}`);
   return await execFileAsync(exec, args);
 }
 
-export async function downloadS3File(bucket, key, filepath) {
-  const s3 = new AWS.S3();
+export async function downloadS3File(s3, bucket, key, filepath) {
   const params = {
     Bucket: bucket,
     Key: key,
   };
   const data = await s3.getObject(params).promise();
   await fs.promises.writeFile(filepath, data.Body);
+}
+
+export async function mkdirs(dirs) {
+  for (const dir of dirs) {
+    await fs.promises.mkdir(dir, { recursive: true });
+  }
 }
 
 export async function runMagma(params, logger) {
@@ -40,14 +46,7 @@ export async function runMagma(params, logger) {
 
   const inputDir = path.resolve(INPUT_FOLDER, params.request_id);
   const resultDir = path.resolve(OUTPUT_FOLDER, params.request_id);
-
-  if (!fs.existsSync(resultDir)) {
-    fs.mkdirSync(resultDir);
-  }
-
-  if (!fs.existsSync(inputDir)) {
-    fs.mkdirSync(inputDir);
-  }
+  await mkdirs([inputDir, resultDir]);
 
   //Download preset SNP Location files
   if (params.snpType.value !== "custom") {
