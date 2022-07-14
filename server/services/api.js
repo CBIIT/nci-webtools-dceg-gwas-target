@@ -1,12 +1,12 @@
-import { mkdir } from "fs/promises";
 import path from "path";
-import { randomBytes } from "crypto";
-import { Router, json } from "express";
 import multer from "multer";
+import AWS from "aws-sdk";
+import { mkdir } from "fs/promises";
+import { Router, json } from "express";
 import { runMagma } from "./analysis.js";
 import { withAsync } from "./middleware.js";
-import AWS from "aws-sdk";
-const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET } = process.env;
+
+const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET, QUEUE_NAME } = process.env;
 
 
 export const apiRouter = Router();
@@ -44,23 +44,44 @@ apiRouter.get("/ping", (request, response) => {
 
 apiRouter.post(
   "/submit",
-  withAsync(async (request, response) => {
-    const { logger } = request.app.locals;
-    logger.info(`[${request.body.request_id}] Execute /submit`);
-
-    // generate unique id for response
-    const id = randomBytes(16).toString("hex");
-
-    // assign id to body
-    let body = Object.assign(request.body, {
-      id,
+  withAsync(async (req, res) => {
+    const { logger } = req.app.locals;
+    const { request_id } = req.body
+    logger.info(`[${request_id}] Execute /submit`);
+    const sqs = new AWS.SQS();
+    let body = Object.assign(req.body, {
       timestamp: new Date().toLocaleString(),
     });
 
-    logger.info(request.body);
-    await runMagma(body, logger);
-    logger.info(`[${request.body.request_id}] Finish /submit`);
-    response.json("Finished Magma");
+    logger.info(body);
+    
+    if (body.queue) {
+
+      const { QueueUrl } = await sqs.getQueueUrl({
+        QueueName: QUEUE_NAME
+      }).promise();
+
+      const key = path.resolve(INPUT_FOLDER, request_id, 'params.json')
+
+      if (!fs.existsSync(key)) {
+        fs.mkdirSync(key);
+      }
+
+      fs.writeFileSync(key, JSON.stringify(body))
+
+      // enqueue message and send a response with the request id
+      await new AWS.SQS().sendMessage({
+        QueueUrl: QueueUrl,
+        MessageDeduplicationId: request_id,
+        MessageGroupId: request_id,
+        MessageBody: JSON.stringify(key)
+      }).promise();
+    }
+    else
+      await runMagma(body, logger);
+
+    logger.info(`[${request_id}] Finish /submit`);
+    res.json("Finished Magma");
   })
 );
 
@@ -96,7 +117,7 @@ apiRouter.post(
 
       filestream.pipe(response)
       logger.info(`Finish /fetch-results sample file`);
-    } 
+    }
     else {
       const { request_id } = request.body;
       logger.info(`[${request_id}] Execute /fetch-results`);
