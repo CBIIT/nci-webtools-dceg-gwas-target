@@ -190,7 +190,7 @@ export default function AnalysisForm({ onSubmit }) {
               { value: "g1000_subpop", label: "Sub-population definitions" },
             ]}
             onChange={(e) => {
-              mergeForm({ snpType: e, snpLocFile: "" });
+              mergeForm({ snpType: e });
               setSnpLocFile("");
               setSnpLocError("");
 
