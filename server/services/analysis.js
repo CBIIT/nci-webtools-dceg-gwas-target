@@ -164,6 +164,7 @@ export async function runMagma(params, logger) {
       path.resolve(inputDir, params.request_id),
       "--gene-annot",
       path.resolve(resultDir, "annotation.genes.annot"),
+      (params.geneSetFile && params.covarFile) ? '' : '--genes-only',
       "--out",
       path.resolve(resultDir, "gene_analysis"),
     ];
@@ -181,6 +182,7 @@ export async function runMagma(params, logger) {
       `${sampleSizeParam}${params.sampleSize}`,
       "--gene-annot",
       path.resolve(resultDir, "annotation.genes.annot"),
+      (params.geneSetFile && params.covarFile) ? '' : '--genes-only',
       "--out",
       path.resolve(resultDir, "gene_analysis"),
     ];
@@ -188,7 +190,7 @@ export async function runMagma(params, logger) {
 
   logger.info(geneAnalysis);
 
-  logger.info(`[${params.request_id}] Run gene analsyis`);
+  logger.info(`[${params.request_id}] Run gene analysis`);
   await execFileAsync(exec, geneAnalysis);
-  logger.info(`[${params.request_id}] Finish gene analsyis`);
+  logger.info(`[${params.request_id}] Finish gene analysis`);
 }

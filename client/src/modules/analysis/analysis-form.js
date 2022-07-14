@@ -125,8 +125,8 @@ export default function AnalysisForm({ onSubmit }) {
       geneAnalysisFam: famFile ? famFile.name : "",
       geneAnalysisFile: geneAnalysisList.length ? geneAnalysisList[0].name : form.snpType.value,
       pvalFile: pvalFile ? pvalFile.name : "sample_snp.tsv",
-      geneSetFile: geneSetFile.name,
-      covarFile: covarFile.name,
+      geneSetFile: geneSetFile ? geneSetFile.name : "",
+      covarFile: covarFile ? covarFile.name : "",
     };
 
     try {
@@ -251,7 +251,7 @@ export default function AnalysisForm({ onSubmit }) {
             }}
           />
         </Form.Group>
-
+ 
         {geneAnalysisList.length ? (
           <Form.Group className="mb-3">
             {Array.from(geneAnalysisList).map((e, index) => {
