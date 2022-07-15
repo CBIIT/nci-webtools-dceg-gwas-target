@@ -3,7 +3,7 @@ import multer from "multer";
 import AWS from "aws-sdk";
 import { mkdir } from "fs/promises";
 import { Router, json } from "express";
-import { runMagma } from "./analysis.js";
+import { runMagmaAnalysis } from "./analysis.js";
 import { withAsync } from "./middleware.js";
 
 const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET, QUEUE_NAME } = process.env;
@@ -60,28 +60,9 @@ apiRouter.post(
     
     if (body.queue) {
 
-      const { QueueUrl } = await sqs.getQueueUrl({
-        QueueName: QUEUE_NAME
-      }).promise();
-
-      const key = path.resolve(INPUT_FOLDER, request_id, 'params.json')
-
-      if (!fs.existsSync(key)) {
-        fs.mkdirSync(key);
-      }
-
-      fs.writeFileSync(key, JSON.stringify(body))
-
-      // enqueue message and send a response with the request id
-      await new AWS.SQS().sendMessage({
-        QueueUrl: QueueUrl,
-        MessageDeduplicationId: request_id,
-        MessageGroupId: request_id,
-        MessageBody: JSON.stringify(key)
-      }).promise();
     }
     else
-      await runMagma(body, logger);
+      await runMagmaAnalysis(body, logger);
 
     logger.info(`[${request_id}] Finish /submit`);
     res.json("Finished Magma");
