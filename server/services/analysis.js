@@ -7,49 +7,6 @@ import { execFile } from "child_process";
 const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
 const execFileAsync = promisify(execFile);
 
-export async function magma(...args) {
-  const platform = os.platform();
-  const exec = {
-    win32: path.resolve(MAGMA, "magma_win.exe"),
-    linux: "magma",
-    darwin: "magma_mac",
-  }[platform];
-  if (!exec) throw new Error(`Unsupported platform: ${platform}`);
-  return await execFileAsync(exec, args.flat().filter(Boolean));
-}
-
-export async function downloadS3File(s3, bucket, key, filepath) {
-  const params = {
-    Bucket: bucket,
-    Key: key,
-  };
-  const data = await s3.getObject(params).promise();
-  await fs.promises.writeFile(filepath, data.Body);
-}
-
-export async function mkdirs(dirs) {
-  for (const dir of dirs) {
-    await fs.promises.mkdir(dir, { recursive: true });
-  }
-}
-
-export async function runAnnotation({ snpLocFile, geneLocFile, outFile }) {
-  return await magma("--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile);
-}
-
-export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile }) {
-  return await magma(
-    "--bfile",
-    bFile,
-    pvalFile && sampleSize && ["--pval-file", pvalFile, sampleSize],
-    "--gene-annot",
-    geneAnnotFile,
-    genesOnly && "--genes-only",
-    "--out",
-    outFile
-  );
-}
-
 export async function runMagmaAnalysis(params, logger) {
   const s3 = new AWS.S3();
   const id = params.request_id;
@@ -315,4 +272,52 @@ export async function runMagma(params, logger) {
   logger.info(`[${params.request_id}] Run gene analysis`);
   await execFileAsync(exec, geneAnalysis);
   logger.info(`[${params.request_id}] Finish gene analysis`);
+}
+
+/**
+ * Utility Functions
+ * TODO: Move to a separate file
+ */
+
+export async function magma(...args) {
+  const platform = os.platform();
+  const exec = {
+    win32: path.resolve(MAGMA, "magma_win.exe"),
+    linux: "magma",
+    darwin: "magma_mac",
+  }[platform];
+  if (!exec) throw new Error(`Unsupported platform: ${platform}`);
+  return await execFileAsync(exec, args.flat().filter(Boolean));
+}
+
+export async function downloadS3File(s3, bucket, key, filepath) {
+  const params = {
+    Bucket: bucket,
+    Key: key,
+  };
+  const data = await s3.getObject(params).promise();
+  await fs.promises.writeFile(filepath, data.Body);
+}
+
+export async function mkdirs(dirs) {
+  for (const dir of dirs) {
+    await fs.promises.mkdir(dir, { recursive: true });
+  }
+}
+
+export async function runAnnotation({ snpLocFile, geneLocFile, outFile }) {
+  return await magma("--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile);
+}
+
+export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile }) {
+  return await magma(
+    "--bfile",
+    bFile,
+    pvalFile && sampleSize && ["--pval-file", pvalFile, sampleSize],
+    "--gene-annot",
+    geneAnnotFile,
+    genesOnly && "--genes-only",
+    "--out",
+    outFile
+  );
 }
