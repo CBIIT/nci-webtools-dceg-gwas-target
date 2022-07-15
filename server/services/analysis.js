@@ -139,8 +139,8 @@ export async function runMagmaAnalysis(params, logger) {
 
   //Run reference gene analysis
   else {
-    const sampleSize =
-      params.sampleSizeOption.value === "input" ? `N=${params.sampleSize}` : `ncol=${params.sampleSize}`;
+    const sampleSizeKey = params.sampleSizeOption.value === "input" ? "N" : "ncol";
+    const sampleSize = `${sampleSizeKey}=${params.sampleSize}`;
 
     logger.info(`[${params.request_id}] Run reference gene analysis`);
     await runGeneAnalysis({
