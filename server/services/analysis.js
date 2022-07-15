@@ -32,7 +32,7 @@ export async function runMagmaAnalysis(params, logger) {
   //Download sample gene location file
   if (params.geneLocFile === "sample_gene_loc.loc") {
     const filepath = path.resolve(inputDir, "sample_gene_loc.loc");
-    const s3Key = "gwastarget/gene_analysis.genes.loc";
+    const s3Key = "gwastarget/sample_gene_loc.loc";
     logger.info(`[${id}] Download Gene Location file`);
     await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
     logger.info(`[${id}] Finished downloading Gene Location file`);
@@ -320,7 +320,7 @@ export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFi
   return await magma(
     "--bfile",
     bFile,
-    pvalFile && sampleSize && ["--pval-file", pvalFile, sampleSize],
+    pvalFile && sampleSize && ["--pval", pvalFile, sampleSize],
     "--gene-annot",
     geneAnnotFile,
     genesOnly && "--genes-only",
