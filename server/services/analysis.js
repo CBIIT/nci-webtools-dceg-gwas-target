@@ -2,13 +2,14 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import AWS from "aws-sdk";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { promisify } from "util";
 import { execFile } from "child_process";
 const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
 const execFileAsync = promisify(execFile);
 
 export async function runMagmaAnalysis(params, logger) {
-  const s3 = new AWS.S3();
+  const s3 = new S3Client();
   const id = params.request_id;
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
@@ -291,12 +292,18 @@ export async function magma(...args) {
 }
 
 export async function downloadS3File(s3, bucket, key, filepath) {
-  const params = {
-    Bucket: bucket,
-    Key: key,
-  };
-  const data = await s3.getObject(params).promise();
-  await fs.promises.writeFile(filepath, data.Body);
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const response = await s3.send(command);
+  await writeStreamToFile(response.Body, filepath);
+}
+
+function writeStreamToFile(stream, filepath) {
+  return new Promise((resolve, reject) => {
+    stream
+      .pipe(fs.createWriteStream(filepath))
+      .on("error", (err) => reject(err))
+      .on("close", () => resolve());
+  });
 }
 
 export async function mkdirs(dirs) {
