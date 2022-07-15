@@ -7,6 +7,7 @@ import { runMagma } from "./analysis.js";
 import { withAsync } from "./middleware.js";
 
 const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET, QUEUE_NAME } = process.env;
+import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
 
 
 export const apiRouter = Router();
@@ -22,15 +23,17 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const { logger } = req.app.locals;
-    logger.info(req.body.request_id)
+    logger.info(req.body.request_id);
 
     logger.debug(`Original filename: ${file.originalname}`);
-    if (file.fieldname === 'geneAnalysisBim' || file.fieldname === 'geneAnalysisBed' || file.fieldname === 'geneAnalysisFam') {
-      logger.debug(`New Filename ${req.body.request_id.concat(path.extname(file.originalname))}`)
-      cb(null, req.body.request_id.concat(path.extname(file.originalname)))
-    }
-    else
-      cb(null, file.originalname);
+    if (
+      file.fieldname === "geneAnalysisBim" ||
+      file.fieldname === "geneAnalysisBed" ||
+      file.fieldname === "geneAnalysisFam"
+    ) {
+      logger.debug(`New Filename ${req.body.request_id.concat(path.extname(file.originalname))}`);
+      cb(null, req.body.request_id.concat(path.extname(file.originalname)));
+    } else cb(null, file.originalname);
   },
 });
 
@@ -101,21 +104,41 @@ apiRouter.post(
 );
 
 apiRouter.post(
+  "/query-results",
+  withAsync(async (req, res) => {
+    const { request_id, table, columns, conditions, orderBy, offset, limit } = request.body;
+    const databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
+    // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
+    // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
+    const connection = getSqliteConnection(databasePath);
+    const results = await connection
+      .select(columns || "*")
+      .from(table)
+      .where(conditions)
+      .orderBy(orderBy)
+      .offset(offset || 0)
+      .limit(limit || 100000);
+    res.json(results);
+  })
+);
+
+apiRouter.post(
   "/fetch-results",
   withAsync(async (request, response) => {
-
     const { logger } = request.app.locals;
     logger.info(request.body);
 
     if (!request.submitted) {
       logger.info(`Execute /fetch-results sample file`);
       const s3 = new AWS.S3();
-      const filestream = await s3.getObject({
-        Bucket: DATA_BUCKET,
-        Key: `gwastarget/gene_analysis.genes.out`
-      }).createReadStream();
+      const filestream = await s3
+        .getObject({
+          Bucket: DATA_BUCKET,
+          Key: `gwastarget/gene_analysis.genes.out`,
+        })
+        .createReadStream();
 
-      filestream.pipe(response)
+      filestream.pipe(response);
       logger.info(`Finish /fetch-results sample file`);
     }
     else {
