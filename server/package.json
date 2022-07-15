@@ -8,6 +8,7 @@
     "start:dev": "pm2-runtime start pm2.config.json --only dev"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.130.0",
     "aws-sdk": "^2.1164.0",
     "better-sqlite3": "^7.6.1",
     "csv-parse": "^5.3.0",
