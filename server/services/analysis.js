@@ -33,6 +33,125 @@ export async function mkdirs(dirs) {
   }
 }
 
+export async function runAnnotation({ snpLocFile, geneLocFile, outFile }) {
+  return await magma(["--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile]);
+}
+
+export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile }) {
+  return await magma([
+    "--bfile",
+    bFile,
+    ...(pvalFile ? ["--pval-file", pvalFile, sampleSize] : []),
+    "--gene-annot",
+    geneAnnotFile,
+    genesOnly ? "--genes-only" : "",
+    "--out",
+    outFile,
+  ]);
+}
+
+export async function runMagmaAnalysis(params, logger) {
+  const s3 = new AWS.S3();
+  const inputDir = path.resolve(INPUT_FOLDER, params.request_id);
+  const resultDir = path.resolve(OUTPUT_FOLDER, params.request_id);
+  await mkdirs([inputDir, resultDir]);
+
+  if (params.snpType.value !== "custom") {
+    const filepath = path.resolve(inputDir, `${params.snpLocFile}`);
+    logger.info(`SNP Loc File: ${filepath}`);
+
+    //Donwload results if they do no exist
+    if (!fs.existsSync(filepath)) {
+      const s3Key = `gwastarget/${params.snpType.value}/${params.snpLocFile}`;
+      logger.info(`[${params.request_id}] Downloading SNP Loc file: ${s3Key}`);
+      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+      logger.info(`[${params.request_id}] Finished downloading SNP Loc file`);
+    }
+  }
+
+  //Download sample gene location file
+  if (params.geneLocFile === "sample_gene_loc.loc") {
+    const filepath = path.resolve(inputDir, "sample_gene_loc.loc");
+    const s3Key = "gwastarget/gene_analysis.genes.loc";
+    logger.info(`[${params.request_id}] Download Gene Location file`);
+    await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+    logger.info(`[${params.request_id}] Finished downloading Gene Location file`);
+  }
+
+  // run annotation
+  await runAnnotation({
+    snpLocFile: path.resolve(inputDir, params.snpLocFile),
+    geneLocFile: path.resolve(inputDir, params.geneLocFile),
+    outFile: path.resolve(resultDir, "annotation"),
+  });
+  logger.info(`[${params.request_id}] Finished /annotation`);
+
+  //Download sample P-Value File
+  if (params.pvalFile === "sample_snp.tsv") {
+    const filepath = path.resolve(inputDir, "sample_snp.tsv");
+    const s3Key = `gwastarget/sample_snp.tsv`;
+    logger.info(`[${params.request_id}] Downloading P-Value file: ${s3Key}`);
+    await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+    logger.info(`[${params.request_id}] Finished downloading P-Value file`);
+  }
+
+  //Download bim file if user did not upload
+  if (!params.geneAnalysisBim) {
+    const filepath = path.resolve(inputDir, `${params.request_id}.bim`);
+    const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.bim`;
+    logger.info(`[${params.request_id}] Download .bim file: ${s3Key}`);
+    await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+    logger.info(`[${params.request_id}] Finished downloading .bim file`);
+  }
+
+  //Download bed file if user did not upload
+  if (!params.geneAnalysisBed) {
+    const filepath = path.resolve(inputDir, `${params.request_id}.bed`);
+    const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.bed`;
+    logger.info(`[${params.request_id}] Download .bed file: ${s3Key}`);
+    await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+    logger.info(`[${params.request_id}] Finished downloading .bed file`);
+  }
+
+  //Download fam file if user did not upload
+  if (!params.geneAnalysisFam) {
+    const filepath = path.resolve(inputDir, `${params.request_id}.fam`);
+    const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.fam`;
+    logger.info(`[${params.request_id}] Download .fam file`);
+    await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
+    logger.info(`[${params.request_id}] Finished downloading .fam file`);
+  }
+
+  // common gene analysis parameters
+  const geneAnalysisParams = {
+    bFile: path.resolve(inputDir, params.request_id),
+    geneAnnotFile: path.resolve(resultDir, "annotation.genes.annot"),
+    genesOnly: !(params.geneSetFile && params.covarFile),
+    outFile: path.resolve(resultDir, "gene_analysis"),
+  };
+
+  // run raw gene analysis
+  if (params.analysisInput.value === "rawData") {
+    logger.info(`[${params.request_id}] Run raw gene analysis`);
+    await runGeneAnalysis(geneAnalysisParams);
+    logger.info(`[${params.request_id}] Finish raw gene analysis`);
+  }
+
+  //Run reference gene analysis
+  else {
+    const sampleSize =
+      params.sampleSizeOption.value === "input" ? `N=${params.sampleSize}` : `ncol=${params.sampleSize}`;
+
+    logger.info(`[${params.request_id}] Run reference gene analysis`);
+    await runGeneAnalysis({
+      ...geneAnalysisParams,
+      pvalFile: path.resolve(inputDir, params.pvalFile),
+      sampleSize,
+    });
+    logger.info(`[${params.request_id}] Finish reference gene analysis`);
+  }
+}
+
 export async function runMagma(params, logger) {
   logger.info(`[${params.request_id}] Run annotation`);
   const platform = os.platform();
