@@ -77,7 +77,7 @@ export default function AnalysisForm({ onSubmit }) {
 
   async function handleSubmit() {
     const requestId = uuidv1();
-    mergeForm({ loading: true, requestId: requestId });
+    mergeForm({ loading: true, requestId: requestId, timestamp: new Date().toLocaleString()});
 
     const type = /(?:\.([^.]+))?$/;
     var bedFile;
@@ -180,7 +180,6 @@ export default function AnalysisForm({ onSubmit }) {
             name="snpType"
             value={form.snpType}
             options={[
-              { value: "custom", label: "User Population File" },
               { value: "g1000_eur", label: "European" },
               { value: "g1000_afr", label: "African" },
               { value: "g1000_eas", label: "East Asian" },

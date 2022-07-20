@@ -13,6 +13,7 @@ export async function runMagmaAnalysis(params, logger) {
   const id = params.request_id;
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
+
   await mkdirs([inputDir, resultDir]);
   let results = {};
 

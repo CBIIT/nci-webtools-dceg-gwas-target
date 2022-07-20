@@ -1,4 +1,4 @@
-const environmentVariables = ["APP_NAME", "API_PORT", "INPUT_FOLDER", "OUTPUT_FOLDER", "MAGMA", "DATA_BUCKET"];
+const environmentVariables = ["APP_NAME", "API_PORT", "INPUT_FOLDER", "OUTPUT_FOLDER", "MAGMA", "DATA_BUCKET", "WORKER_TYPE"];
 
 export function validateEnvironment(requiredVariables = environmentVariables) {
   for (const key of requiredVariables) {

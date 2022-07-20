@@ -13,6 +13,7 @@ export const defaultFormState = {
   loading: false,
   submitted: false,
   requestId: "",
+  timestamp: "",
 };
 
 export const formState = atom({
