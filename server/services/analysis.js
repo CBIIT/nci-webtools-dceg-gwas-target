@@ -13,9 +13,7 @@ export async function runMagmaAnalysis(params, logger) {
   const id = params.request_id;
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
-
   await mkdirs([inputDir, resultDir]);
-  let results = {};
 
   if (params.snpType.value !== "custom") {
     const filepath = path.resolve(inputDir, `${params.snpLocFile}`);
@@ -40,7 +38,7 @@ export async function runMagmaAnalysis(params, logger) {
   }
 
   // run annotation
-  results.annotation = await runAnnotation({
+  const annotationResults = await runAnnotation({
     snpLocFile: path.resolve(inputDir, params.snpLocFile),
     geneLocFile: path.resolve(inputDir, params.geneLocFile),
     outFile: path.resolve(resultDir, "annotation"),
@@ -99,10 +97,13 @@ export async function runMagmaAnalysis(params, logger) {
 
   // run raw gene analysis
   logger.info(`[${id}] Run gene analysis`);
-  results.geneAnalysis = await runGeneAnalysis(geneAnalysisParams);
+  const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams);
   logger.info(`[${id}] Finish gene analysis`);
 
-  return results;
+  return {
+    annotation: annotationResults,
+    geneAnalysis: geneAnalysisResults,
+  };
 }
 
 export async function runMagma(params, logger) {
