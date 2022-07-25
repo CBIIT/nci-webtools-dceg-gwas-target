@@ -281,13 +281,20 @@ export async function runMagma(params, logger) {
  * TODO: Move to a separate file
  */
 
-export async function magma(...args) {
+export async function magma(args, type = "standard") {
   const platform = os.platform();
   const exec = {
-    win32: path.resolve(MAGMA, "magma_win.exe"),
-    linux: "magma",
-    darwin: "magma_mac",
-  }[platform];
+    standard: {
+      win32: path.resolve(MAGMA, "magma_win.exe"),
+      linux: "magma",
+      darwin: "magma_mac",
+    },
+    enhanced: {
+      win32: path.resolve(MAGMA, "magma_enhanced_win.exe"),
+      linux: "magma_enhanced",
+      darwin: "magma_enhanced_mac",
+    },
+  }[type][platform];
   if (!exec) throw new Error(`Unsupported platform: ${platform}`);
   return await execFileAsync(exec, args.flat().filter(Boolean));
 }
@@ -314,11 +321,11 @@ export async function mkdirs(dirs) {
 }
 
 export async function runAnnotation({ snpLocFile, geneLocFile, outFile }) {
-  return await magma("--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile);
+  return await magma(["--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile]);
 }
 
 export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile }) {
-  return await magma(
+  return await magma([
     "--bfile",
     bFile,
     pvalFile && sampleSize && ["--pval", pvalFile, sampleSize],
@@ -326,6 +333,6 @@ export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFi
     geneAnnotFile,
     genesOnly && "--genes-only",
     "--out",
-    outFile
-  );
+    outFile,
+  ]);
 }
