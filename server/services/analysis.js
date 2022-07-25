@@ -11,6 +11,7 @@ const execFileAsync = promisify(execFile);
 export async function runMagmaAnalysis(params, logger) {
   const s3 = new S3Client();
   const id = params.request_id;
+  const type = params.magmaType || "standard";
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
   await mkdirs([inputDir, resultDir]);
@@ -38,11 +39,13 @@ export async function runMagmaAnalysis(params, logger) {
   }
 
   // run annotation
-  const annotationResults = await runAnnotation({
+  const annotationParams = {
     snpLocFile: path.resolve(inputDir, params.snpLocFile),
     geneLocFile: path.resolve(inputDir, params.geneLocFile),
     outFile: path.resolve(resultDir, "annotation"),
-  });
+  };
+  logger.info(`[${id}] Running annotation: ${JSON.stringify(annotationParams)}`);
+  const annotationResults = await runAnnotation(annotationParams, type);
   logger.info(`[${id}] Finished /annotation`);
 
   //Download sample P-Value File
@@ -96,8 +99,8 @@ export async function runMagmaAnalysis(params, logger) {
   }
 
   // run raw gene analysis
-  logger.info(`[${id}] Run gene analysis`);
-  const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams);
+  logger.info(`[${id}] Run gene analysis: ${JSON.stringify(geneAnalysisParams)}`);
+  const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
   logger.info(`[${id}] Finish gene analysis`);
 
   return {
@@ -321,19 +324,25 @@ export async function mkdirs(dirs) {
   }
 }
 
-export async function runAnnotation({ snpLocFile, geneLocFile, outFile }) {
-  return await magma(["--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile]);
+export async function runAnnotation({ snpLocFile, geneLocFile, outFile }, type = "standard") {
+  return await magma(["--annotate", "--snp-loc", snpLocFile, "--gene-loc", geneLocFile, "--out", outFile], type);
 }
 
-export async function runGeneAnalysis({ bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile }) {
-  return await magma([
-    "--bfile",
-    bFile,
-    pvalFile && sampleSize && ["--pval", pvalFile, sampleSize],
-    "--gene-annot",
-    geneAnnotFile,
-    genesOnly && "--genes-only",
-    "--out",
-    outFile,
-  ]);
+export async function runGeneAnalysis(
+  { bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile },
+  type = "standard"
+) {
+  return await magma(
+    [
+      "--bfile",
+      bFile,
+      pvalFile && sampleSize && ["--pval", pvalFile, sampleSize],
+      "--gene-annot",
+      geneAnnotFile,
+      genesOnly && "--genes-only",
+      "--out",
+      outFile,
+    ],
+    type
+  );
 }
