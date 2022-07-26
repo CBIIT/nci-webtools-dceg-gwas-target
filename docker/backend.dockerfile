@@ -12,7 +12,7 @@ RUN mkdir -p /deploy/server
 
 COPY bin/magma_standard_linux /bin/magma
 
-COPY BIN/magma_enhanced_linux /bin/magma_enhanced
+COPY bin/magma_enhanced_linux /bin/magma_enhanced
 
 RUN chmod +x /bin/magma
 
