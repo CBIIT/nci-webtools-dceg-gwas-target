@@ -115,11 +115,9 @@ export async function runMagmaAnalysis(params, logger) {
       geneAnalysis: geneAnalysisResults,
     };
   } catch (e) {
-    const keys = ["message", "stack", "stdout", "stderr"];
-    await writeStatus({
-      status: "FAILED",
-      ...pick(e, keys),
-    });
+    const keys = ["code", "message", "stack", "stdout", "stderr"];
+    const error = pick(e, keys);
+    await writeStatus({ status: "FAILED", ...error });
     throw e;
   }
 }
