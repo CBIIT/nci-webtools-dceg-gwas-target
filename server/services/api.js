@@ -3,7 +3,7 @@ import multer from "multer";
 import AWS from "aws-sdk";
 import { mkdir } from "fs/promises";
 import { Router, json } from "express";
-import { runMagmaAnalysis } from "./analysis.js";
+import { getJobStatus, runMagmaAnalysis } from "./analysis.js";
 import { withAsync } from "./middleware.js";
 import { EcsWorker, LocalWorker } from "./queue-worker.js";
 
@@ -14,17 +14,14 @@ export const apiRouter = Router();
 
 /**
  * Reads a template, substituting {tokens} with data values
- * @param {string} filepath 
- * @param {object} data 
+ * @param {string} filepath
+ * @param {object} data
  */
- async function readTemplate(filePath, data) {
+async function readTemplate(filePath, data) {
   const template = await fs.promises.readFile(path.resolve(filePath));
 
   // replace {tokens} with data values or removes them if not found
-  return String(template).replace(
-    /{[^{}]+}/g,
-    key => data[key.replace(/[{}]+/g, '')] || ''
-  );
+  return String(template).replace(/{[^{}]+}/g, (key) => data[key.replace(/[{}]+/g, "")] || "");
 }
 
 const storage = multer.diskStorage({
@@ -64,7 +61,7 @@ apiRouter.post(
   "/submit",
   withAsync(async (req, res) => {
     const { logger } = req.app.locals;
-    const { request_id } = req.body
+    const { request_id } = req.body;
     logger.info(`[${request_id}] Execute /submit`);
     const sqs = new AWS.SQS();
     let body = Object.assign(req.body, {
@@ -74,31 +71,28 @@ apiRouter.post(
     logger.info(body);
 
     if (body.queue) {
-
       const worker = {
         local: new LocalWorker({ runMagmaAnalysis }),
-        ecs: new EcsWorker({ runMagmaAnalysis })
-      }[WORKER_TYPE]
+        ecs: new EcsWorker({ runMagmaAnalysis }),
+      }[WORKER_TYPE];
 
       const start = new Date().getTime();
-      worker.dispatch('runMagmaAnalysis', { body: body, logger: logger })
+      worker.dispatch("runMagmaAnalysis", { body: body, logger: logger });
       const end = new Date().getTime();
 
       const time = end - start;
       const minutes = Math.floor(time / 60000);
       var seconds = ((time % 60000) / 1000).toFixed(0);
 
-      var runtime = (minutes > 0 ? minutes + " min " : '') + seconds + " secs"
+      var runtime = (minutes > 0 ? minutes + " min " : "") + seconds + " secs";
 
       const templateData = {
         jobName: body.jobName,
         originalTimestamp: body.timestamp,
         runTime: runtime,
-        resultsUrl: `${BASE_URL}/#/${request_id}`
+        resultsUrl: `${BASE_URL}/#/${request_id}`,
       };
-    }
-    else
-      await runMagmaAnalysis(body, logger);
+    } else await runMagmaAnalysis(body, logger);
 
     logger.info(`[${request_id}] Finish /submit`);
     res.json("Finished Magma");
@@ -117,6 +111,15 @@ apiRouter.post(
       files: req.files,
       body: req.body,
     });
+  })
+);
+
+apiRouter.get(
+  "/job-status/:id",
+  withAsync(async (req, res) => {
+    const { id } = req.params;
+    const status = await getJobStatus(id);
+    res.json(status);
   })
 );
 
@@ -157,8 +160,7 @@ apiRouter.post(
 
       filestream.pipe(response);
       logger.info(`Finish /fetch-results sample file`);
-    }
-    else {
+    } else {
       const { request_id } = request.body;
       logger.info(`[${request_id}] Execute /fetch-results`);
       const resultsFolder = path.resolve(OUTPUT_FOLDER, request_id);

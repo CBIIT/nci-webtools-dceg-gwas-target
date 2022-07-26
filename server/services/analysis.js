@@ -119,6 +119,13 @@ export async function runMagmaAnalysis(params, logger) {
   }
 }
 
+export async function getJobStatus(id) {
+  const resultDir = path.resolve(OUTPUT_FOLDER, id);
+  const statusFilepath = path.resolve(resultDir, "status.json");
+  const status = await readJson(statusFilepath);
+  return status;
+}
+
 export async function runMagma(params, logger) {
   logger.info(`[${params.request_id}] Run annotation`);
   const platform = os.platform();
@@ -336,6 +343,15 @@ export async function mkdirs(dirs) {
 
 export async function writeJson(filepath, data) {
   await fs.promises.writeFile(filepath, JSON.stringify(data));
+}
+
+export async function readJson(filepath) {
+  try {
+    const data = await fs.promises.readFile(filepath, "utf8");
+    return JSON.parse(data);
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function runAnnotation({ snpLocFile, geneLocFile, outFile }, type = "standard") {
