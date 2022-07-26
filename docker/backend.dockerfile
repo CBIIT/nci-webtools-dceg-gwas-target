@@ -12,6 +12,8 @@ RUN mkdir -p /deploy/server
 
 COPY bin/magma_linux /bin/magma
 
+RUN chmod +x /bin/magma
+
 WORKDIR /deploy/server
 
 # use build cache for npm packages
