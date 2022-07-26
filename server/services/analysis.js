@@ -1,10 +1,11 @@
-import fs, { write } from "fs";
+import fs from "fs";
 import os from "os";
 import path from "path";
-import AWS from "aws-sdk";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { promisify } from "util";
 import { execFile } from "child_process";
+import AWS from "aws-sdk";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import pick from "lodash/pick.js";
 const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
 const execFileAsync = promisify(execFile);
 
@@ -114,7 +115,11 @@ export async function runMagmaAnalysis(params, logger) {
       geneAnalysis: geneAnalysisResults,
     };
   } catch (e) {
-    await writeStatus({ status: "FAILED", error: e.message, stack: e.stack });
+    const keys = ["message", "stack", "stdout", "stderr"];
+    await writeStatus({
+      status: "FAILED",
+      ...pick(e, keys),
+    });
     throw e;
   }
 }
