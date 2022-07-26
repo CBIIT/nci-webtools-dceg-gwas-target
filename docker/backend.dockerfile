@@ -10,9 +10,13 @@ RUN dnf -y update \
 
 RUN mkdir -p /deploy/server
 
-COPY bin/magma_linux /bin/magma
+COPY bin/magma_standard_linux /bin/magma
+
+COPY bin/magma_enhanced_linux /bin/magma_enhanced
 
 RUN chmod +x /bin/magma
+
+RUN chmod +x /bin/magma_enhanced
 
 WORKDIR /deploy/server
 
