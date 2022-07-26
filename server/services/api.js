@@ -6,6 +6,7 @@ import { Router, json } from "express";
 import { getJobStatus, runMagmaAnalysis } from "./analysis.js";
 import { withAsync } from "./middleware.js";
 import { EcsWorker, LocalWorker } from "./queue-worker.js";
+import { magma } from "./analysis.js";
 
 const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET, QUEUE_NAME, WORKER_TYPE, BASE_URL } = process.env;
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
@@ -53,9 +54,12 @@ const upload = multer({ storage: storage });
 
 apiRouter.use(json());
 
-apiRouter.get("/ping", (request, response) => {
-  response.json(true);
-});
+apiRouter.get("/ping",
+  withAsync(async (request, response) => {
+    const results = await magma(['--version'])
+    response.json(results);
+  })
+);
 
 apiRouter.post(
   "/submit",
