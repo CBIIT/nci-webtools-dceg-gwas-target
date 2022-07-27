@@ -16,7 +16,7 @@ export default function AnalysisResults({ onDownload }) {
             id: "gene",
             label: "Gene",
             Header: (
-                <b>Patient ID</b>
+                <b>Gene</b>
             ),
         },
         {
@@ -60,9 +60,9 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "N",
-            id: "N",
-            label: "n",
+            accessor: "n",
+            id: "n",
+            label: "N",
             Header: (
                 <b>n</b>
             ),
