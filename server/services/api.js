@@ -135,17 +135,32 @@ apiRouter.post(
     // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
     // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
     const { logger } = req.app.locals;
-    logger.info(req.body)
-    logger.info(databasePath)
     const connection = getSqliteConnection(databasePath);
   
-    const results = await connection
+    var results = await connection
       .select(columns || "*")
       .from(table)
       .offset(offset || 0)
       .limit(limit || 100000);
+
+    results = results.map((e) => {
+      const values = Object.values(e)[0].replace(/'/g,"").split(/\s+/)
+      return({
+        gene: values[0],
+        chr: values[1],
+        start: values[2],
+        stop: values[3],
+        nspns: values[4],
+        nparam: values[5],
+        n: values[6],
+        zstat: values[7],
+        p: values[8]
+      })
+    })
+
     res.json(results);
   })
+  
 );
 
 apiRouter.post(

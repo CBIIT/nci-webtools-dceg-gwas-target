@@ -1,4 +1,5 @@
 import { atom, selector, selectorFamily } from "recoil";
+const axios = require("axios");
 
 export const defaultFormState = {
   openSidebar: true,
@@ -15,6 +16,27 @@ export const defaultFormState = {
   requestId: "",
   timestamp: "",
 };
+
+export const resultsState = selector({
+  key: "results",
+  get: async ({ get }) => {
+    const params = get(formState);
+    if (!params) return null;
+
+    const results = await axios.post("api/query-results", {
+      ...params,
+      "table": "gene",
+      "orderBy": 'P',
+      "columns": "*",
+      "offset": 0,
+      "limit": 10000,
+      "conditions": "P IS NOT NULL"
+    });
+
+    console.log(results)
+    return results
+  }
+})
 
 export const formState = atom({
   key: "explore.formState",
