@@ -7,6 +7,7 @@ import { promisify } from "util";
 import { execFile } from "child_process";
 const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
 const execFileAsync = promisify(execFile);
+import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
 
 export async function runMagmaAnalysis(params, logger) {
   const s3 = new S3Client();
@@ -107,6 +108,16 @@ export async function runMagmaAnalysis(params, logger) {
     logger.info(`[${id}] Run gene analysis: ${JSON.stringify(geneAnalysisParams)}`);
     const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
     logger.info(`[${id}] Finish gene analysis`);
+
+    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out.txt")
+    const databasePath = path.resolve(resultDir, 'results.db')
+
+    if (fs.existsSync(geneAnalyisResults)) {
+      logger.info(`[${id}] Create .db file`);
+      const connection = getSqliteConnection(databasePath)
+      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults, { delimmiter: "\t" })
+      logger.info(`[${id}] Finish creating .db file`);
+    }
 
     await writeStatus({ status: "COMPLETED" });
     return {

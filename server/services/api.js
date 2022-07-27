@@ -126,16 +126,18 @@ apiRouter.get(
 apiRouter.post(
   "/query-results",
   withAsync(async (req, res) => {
-    const { request_id, table, columns, conditions, orderBy, offset, limit } = request.body;
+    const { request_id, table, columns, conditions, orderBy, offset, limit } = req.body;
     const databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
     // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
     // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
+    const { logger } = req.app.locals;
+    logger.info(req.body)
+    logger.info(databasePath)
     const connection = getSqliteConnection(databasePath);
+  
     const results = await connection
       .select(columns || "*")
       .from(table)
-      .where(conditions)
-      .orderBy(orderBy)
       .offset(offset || 0)
       .limit(limit || 100000);
     res.json(results);

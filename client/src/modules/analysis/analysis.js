@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from "react";
 import AnalysisForm from "./analysis-form";
+import AnalysisResults from "./analysis-results";
 import Container from "react-bootstrap/Container";
 import { Card } from "react-bootstrap";
 import { defaultFormState, formState } from "./analysis.state";
@@ -42,9 +43,12 @@ export default function Analysis() {
           <Card className="shadow h-100">
             <Card.Body className="p-0">
               <div className="m-3">
-                <button type="button" className="btn btn-primary" onClick={handleDownload}>
-                  {form.submitted ? 'Download Gene Analysis' : 'Download Sample Gene Analysis'}
+                {!form.submitted ? <button type="button" className="btn btn-primary" onClick={handleDownload}>
+                  Download Sample Gene Analysis
                 </button>
+                  :
+                  <AnalysisResults onDownload={handleDownload} />
+                }
               </div>
             </Card.Body>
           </Card>
