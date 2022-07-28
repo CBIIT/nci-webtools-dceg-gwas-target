@@ -16,11 +16,14 @@ export async function runMagmaAnalysis(params, logger) {
   const type = params.magmaType || "standard";
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
+  const paramsFilepath = path.resolve(inputDir, "params.json");
   const statusFilepath = path.resolve(resultDir, "status.json");
+  const writeParams = writeJson.bind(null, paramsFilepath);
   const writeStatus = writeJson.bind(null, statusFilepath);
   await mkdirs([inputDir, resultDir]);
 
   try {
+    await writeParams(params);
     await writeStatus({ status: "IN_PROGRESS" });
 
     if (params.snpType.value !== "custom") {
@@ -115,8 +118,8 @@ export async function runMagmaAnalysis(params, logger) {
 
     if (fs.existsSync(geneAnalyisResults)) {
       logger.info(`[${id}] Create .db file`);
-      const connection = getSqliteConnection(databasePath)
-      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults, { delimmiter: "\t" })
+      const connection = getSqliteConnection(databasePath);
+      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults, { delimmiter: "\t" });
       logger.info(`[${id}] Finish creating .db file`);
     }
 
