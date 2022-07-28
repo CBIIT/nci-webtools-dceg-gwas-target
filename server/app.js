@@ -4,16 +4,18 @@ import { getLogger } from "./services/logger.js";
 import { apiRouter } from "./services/api.js";
 import { validateEnvironment } from "./services/environment.js";
 import { logErrors, logRequests } from "./services/middleware.js";
-const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER } = process.env;
+const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER, SERVER_TIMEOUT } = process.env;
 
 // ensure that all environment variables are set
 validateEnvironment();
 
 // start app on specified port
+const serverTimeout = +SERVER_TIMEOUT || 1000 * 60 * 15;
 const app = createApp();
-app.listen(API_PORT, () => {
+const server = app.listen(API_PORT, () => {
   app.locals.logger.info(`${APP_NAME} started on port ${API_PORT}`);
 });
+server.setTimeout(serverTimeout);
 
 export function createApp() {
   const app = express();
