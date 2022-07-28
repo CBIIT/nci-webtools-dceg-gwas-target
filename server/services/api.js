@@ -135,6 +135,7 @@ apiRouter.post(
     // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
     // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
     const { logger } = req.app.locals;
+    logger.info(`[${req.body.request_id}] Execute /query-results`);
     const connection = getSqliteConnection(databasePath);
   
     var results = await connection
@@ -157,7 +158,7 @@ apiRouter.post(
         p: values[8]
       })
     })
-
+    logger.info(`[${req.body.request_id}] Finish /query-results`);
     res.json(results);
   })
   
