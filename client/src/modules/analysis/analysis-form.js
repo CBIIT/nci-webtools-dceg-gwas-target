@@ -63,7 +63,7 @@ export default function AnalysisForm({ onSubmit }) {
   //Disables submit button if there are errors with input
   function containsErrors() {
 
-    if(form.queue)
+    if (form.queue)
       return !form.email || !form.jobName;
 
     return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
@@ -77,7 +77,7 @@ export default function AnalysisForm({ onSubmit }) {
 
   async function handleSubmit() {
     const requestId = uuidv1();
-    mergeForm({ loading: true, requestId: requestId, timestamp: new Date().toLocaleString()});
+    mergeForm({ loading: true, requestId: requestId, timestamp: new Date().toLocaleString() });
 
     const type = /(?:\.([^.]+))?$/;
     var bedFile;
@@ -171,6 +171,21 @@ export default function AnalysisForm({ onSubmit }) {
           <a href="javascript:void(0)">Download Sample Data</a>
         </Col>
       </Row>
+      <Form.Group className="mb-3">
+        <Form.Label className="required">Input Data Type</Form.Label>
+        <Select
+          placeholder="No analysis selected"
+          name="magmaType"
+          value={form.magmaType}
+          options={[
+            { value: "enhanced", label: "ABC MAGMA" },
+            { value: "standard", label: "Standard MAGMA" },
+          ]}
+          onChange={(e) => {
+            mergeForm({ magmaType: e });
+          }}
+        />
+      </Form.Group>
       <fieldset className="border px-3 my-4">
         <legend className="legend font-weight-bold">Population</legend>
         <Form.Group className="mb-3">
@@ -249,7 +264,7 @@ export default function AnalysisForm({ onSubmit }) {
             }}
           />
         </Form.Group>
- 
+
         {geneAnalysisList.length ? (
           <Form.Group className="mb-3">
             {Array.from(geneAnalysisList).map((e, index) => {

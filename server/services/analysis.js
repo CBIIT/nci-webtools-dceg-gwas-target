@@ -328,7 +328,7 @@ export async function magma(args, type = "standard") {
       darwin: "magma_mac",
     },
     enhanced: {
-      win32: path.resolve(MAGMA, "magma_enhanced_win.exe"),
+      win32: path.resolve(MAGMA, "magma_win.exe"),
       linux: "magma_enhanced",
       darwin: "magma_enhanced_mac",
     },

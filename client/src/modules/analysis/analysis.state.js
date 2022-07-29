@@ -3,6 +3,7 @@ const axios = require("axios");
 
 export const defaultFormState = {
   openSidebar: true,
+  magmaType: { value: "enhanced", label: "ABC MAGMA" },
   analysisInput: { value: "refData", label: "Reference Data" },
   rawOnly: false,
   snpType: { value: "g1000_eur", label: "European" },
