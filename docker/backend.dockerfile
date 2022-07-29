@@ -21,7 +21,7 @@ RUN chmod +x /bin/magma_enhanced
 WORKDIR /deploy/server
 
 # use build cache for npm packages
-COPY server/package*.json /deploy/server/
+COPY server/package.json /deploy/server/
 
 RUN npm install
 
