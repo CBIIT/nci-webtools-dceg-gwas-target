@@ -11,13 +11,16 @@ const execFileAsync = promisify(execFile);
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
 
 export async function runMagmaAnalysis(params, logger) {
-  const s3 = new S3Client();
+  //const s3 = new S3Client();
   const id = params.request_id;
-  const type = params.magmaType || "standard";
+  const type = params.magmaType.value || "standard";
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
+  const defaultInputDir = path.resolve(INPUT_FOLDER, 'default')
+  const defaultOutputDir = path.resolve(OUTPUT_FOLDER, 'default')
   const paramsFilepath = path.resolve(inputDir, "params.json");
   const statusFilepath = path.resolve(resultDir, "status.json");
+  
   const writeParams = writeJson.bind(null, paramsFilepath);
   const writeStatus = writeJson.bind(null, statusFilepath);
   await mkdirs([inputDir, resultDir]);
@@ -32,20 +35,20 @@ export async function runMagmaAnalysis(params, logger) {
 
       //Donwload results if they do no exist
       if (!fs.existsSync(filepath)) {
-        const s3Key = `gwastarget/${params.snpType.value}/${params.snpLocFile}`;
-        logger.info(`[${id}] Downloading SNP Loc file: ${s3Key}`);
-        await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-        logger.info(`[${id}] Finished downloading SNP Loc file`);
+        const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpLocFile}`)
+        logger.info(`[${id}] Copy SNP Loc file: ${source} to ${filepath}`);
+        fs.copyFileSync(source, filepath)
+        logger.info(`[${id}] Finished copying SNP Loc file`);
       }
     }
 
     //Download sample gene location file
     if (params.geneLocFile === "sample_gene_loc.loc") {
       const filepath = path.resolve(inputDir, "sample_gene_loc.loc");
-      const s3Key = "gwastarget/sample_gene_loc.loc";
-      logger.info(`[${id}] Download Gene Location file`);
-      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-      logger.info(`[${id}] Finished downloading Gene Location file`);
+      const source = path.resolve(defaultInputDir, "sample_gene_loc.loc")
+      logger.info(`[${id}] Copy Gene Location file`);
+      fs.copyFileSync(source, filepath)
+      logger.info(`[${id}] Finished copying Gene Location file`);
     }
 
     // run annotation
@@ -55,43 +58,44 @@ export async function runMagmaAnalysis(params, logger) {
       outFile: path.resolve(resultDir, "annotation"),
     };
     logger.info(`[${id}] Running annotation: ${JSON.stringify(annotationParams)}`);
+    logger.info(type)
     const annotationResults = await runAnnotation(annotationParams, type);
     logger.info(`[${id}] Finished /annotation`);
 
     //Download sample P-Value File
     if (params.pvalFile === "sample_snp.tsv") {
       const filepath = path.resolve(inputDir, "sample_snp.tsv");
-      const s3Key = `gwastarget/sample_snp.tsv`;
-      logger.info(`[${id}] Downloading P-Value file: ${s3Key}`);
-      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-      logger.info(`[${id}] Finished downloading P-Value file`);
+      const source = path.resolve(defaultInputDir, "sample_snp.tsv");
+      logger.info(`[${id}] Copy P-Value file: ${source} to ${filepath}`);
+      fs.copyFileSync(source, filepath)
+      logger.info(`[${id}] Finished copying P-Value file`);
     }
 
     //Download bim file if user did not upload
     if (!params.geneAnalysisBim) {
       const filepath = path.resolve(inputDir, `${id}.bim`);
-      const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.bim`;
-      logger.info(`[${id}] Download .bim file: ${s3Key}`);
-      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-      logger.info(`[${id}] Finished downloading .bim file`);
+      const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.bim`);
+      logger.info(`[${id}] Copy .bim file: ${source} to ${filepath}`);
+      fs.copyFileSync(source, filepath)
+      logger.info(`[${id}] Finished copying .bim file`);
     }
 
     //Download bed file if user did not upload
     if (!params.geneAnalysisBed) {
       const filepath = path.resolve(inputDir, `${id}.bed`);
-      const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.bed`;
-      logger.info(`[${id}] Download .bed file: ${s3Key}`);
-      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-      logger.info(`[${id}] Finished downloading .bed file`);
+      const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.bed`);
+      logger.info(`[${id}] Copy .bed file: ${source} to ${filepath}`);
+      fs.copyFileSync(source, filepath)
+      logger.info(`[${id}] Finished copying .bed file`);
     }
 
     //Download fam file if user did not upload
     if (!params.geneAnalysisFam) {
       const filepath = path.resolve(inputDir, `${id}.fam`);
-      const s3Key = `gwastarget/${params.snpType.value}/${params.snpType.value}.fam`;
-      logger.info(`[${id}] Download .fam file`);
-      await downloadS3File(s3, DATA_BUCKET, s3Key, filepath);
-      logger.info(`[${id}] Finished downloading .fam file`);
+      const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.fam`);
+      logger.info(`[${id}] Copy .fam file: ${source} to ${filepath}`);
+      fs.copyFileSync(source, filepath)
+      logger.info(`[${id}] Finished copying .fam file`);
     }
 
     // common gene analysis parameters
@@ -337,11 +341,11 @@ export async function magma(args, type = "standard") {
   return await execFileAsync(exec, args.flat().filter(Boolean));
 }
 
-export async function downloadS3File(s3, bucket, key, filepath) {
+/*export async function downloadS3File(s3, bucket, key, filepath) {
   const command = new GetObjectCommand({ Bucket: bucket, Key: key });
   const response = await s3.send(command);
   await writeStreamToFile(response.Body, filepath);
-}
+}*/
 
 function writeStreamToFile(stream, filepath) {
   return new Promise((resolve, reject) => {

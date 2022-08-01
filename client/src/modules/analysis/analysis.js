@@ -43,12 +43,7 @@ export default function Analysis() {
           <Card className="shadow h-100">
             <Card.Body className="p-0">
               <div className="m-3">
-                {!form.submitted ? <button type="button" className="btn btn-primary" onClick={handleDownload}>
-                  Download Sample Gene Analysis
-                </button>
-                  :
-                  <AnalysisResults onDownload={handleDownload} />
-                }
+                <AnalysisResults onDownload={handleDownload} />
               </div>
             </Card.Body>
           </Card>

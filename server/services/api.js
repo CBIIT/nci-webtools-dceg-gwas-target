@@ -121,7 +121,11 @@ apiRouter.get(
 
 apiRouter.post("/query-results", async (req, res) => {
   const { request_id, table, columns, conditions, orderBy, offset, limit } = req.body;
-  const databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
+  var databasePath;
+  if (req.submitted) 
+    databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
+  else
+    databasePath = path.resolve(OUTPUT_FOLDER, 'default', "results.db");
   // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
   // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
   const { logger } = req.app.locals;
@@ -158,15 +162,8 @@ apiRouter.post("/fetch-results", async (request, response) => {
 
   if (!request.submitted) {
     logger.info(`Execute /fetch-results sample file`);
-    const s3 = new AWS.S3();
-    const filestream = await s3
-      .getObject({
-        Bucket: DATA_BUCKET,
-        Key: `gwastarget/gene_analysis.genes.out`,
-      })
-      .createReadStream();
-
-    filestream.pipe(response);
+    const sampleResults = path.resolve(OUTPUT_FOLDER, 'default', 'gene_analysis.genes.out');
+    response.download(sampleResults);
     logger.info(`Finish /fetch-results sample file`);
   } else {
     const { request_id } = request.body;
