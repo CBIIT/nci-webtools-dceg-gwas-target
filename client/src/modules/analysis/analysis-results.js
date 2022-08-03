@@ -85,19 +85,6 @@ export default function AnalysisResults({ onDownload }) {
         },
     ]
     console.log(form)
-    async function getData() {
-        const results = await axios.post("api/query-results", {
-            ...form,
-            "table": "gene",
-            "orderBy": 'P',
-            "columns": "*",
-            "offset": 0,
-            "limit": 10000,
-            "conditions": "P IS NOT NULL"
-        });
-        console.log(results)
-        return results
-    }
 
     return (
         <>

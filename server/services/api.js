@@ -121,15 +121,22 @@ apiRouter.get(
 
 apiRouter.post("/query-results", async (req, res) => {
   const { request_id, table, columns, conditions, orderBy, offset, limit } = req.body;
+  const { logger } = req.app.locals;
   var databasePath;
-  if (req.submitted) 
+  logger.info(req.body)
+  if (req.body.submitted){
+    logger.info(`[${req.body.request_id}] Execute /query-results`);
     databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
-  else
+  }
+    
+  else{
+    logger.info(`[DEFAULT] Execute /query-results`);
     databasePath = path.resolve(OUTPUT_FOLDER, 'default', "results.db");
+  }
+
   // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
   // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
-  const { logger } = req.app.locals;
-  logger.info(`[${req.body.request_id}] Execute /query-results`);
+  
   const connection = getSqliteConnection(databasePath);
 
   var results = await connection
@@ -160,7 +167,7 @@ apiRouter.post("/fetch-results", async (request, response) => {
   const { logger } = request.app.locals;
   logger.info(request.body);
 
-  if (!request.submitted) {
+  if (!request.body.submitted) {
     logger.info(`Execute /fetch-results sample file`);
     const sampleResults = path.resolve(OUTPUT_FOLDER, 'default', 'gene_analysis.genes.out');
     response.download(sampleResults);
