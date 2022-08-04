@@ -123,42 +123,25 @@ apiRouter.post("/query-results", async (req, res) => {
   const { request_id, table, columns, conditions, orderBy, offset, limit } = req.body;
   const { logger } = req.app.locals;
   var databasePath;
-  logger.info(req.body)
-  if (req.body.submitted){
+  logger.info(req.body);
+  if (req.body.submitted) {
     logger.info(`[${req.body.request_id}] Execute /query-results`);
     databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
-  }
-    
-  else{
+  } else {
     logger.info(`[DEFAULT] Execute /query-results`);
-    databasePath = path.resolve(OUTPUT_FOLDER, 'default', "results.db");
+    databasePath = path.resolve(OUTPUT_FOLDER, "default", "results.db");
   }
 
   // ensure database file exists (eg: downloaded from s3 bucket) before proceeding
   // ensureLocalFileExists(s3ResultsPath, databasePath); // TODO: implement
-  
-  const connection = getSqliteConnection(databasePath);
 
-  var results = await connection
+  const connection = getSqliteConnection(databasePath);
+  const results = await connection
     .select(columns || "*")
     .from(table)
     .offset(offset || 0)
     .limit(limit || 100000);
 
-  results = results.map((e) => {
-    const values = Object.values(e)[0].replace(/'/g, "").split(/\s+/);
-    return {
-      gene: values[0],
-      chr: values[1],
-      start: values[2],
-      stop: values[3],
-      nspns: values[4],
-      nparam: values[5],
-      n: values[6],
-      zstat: values[7],
-      p: values[8],
-    };
-  });
   logger.info(`[${req.body.request_id}] Finish /query-results`);
   res.json(results);
 });
@@ -169,7 +152,7 @@ apiRouter.post("/fetch-results", async (request, response) => {
 
   if (!request.body.submitted) {
     logger.info(`Execute /fetch-results sample file`);
-    const sampleResults = path.resolve(OUTPUT_FOLDER, 'default', 'gene_analysis.genes.out');
+    const sampleResults = path.resolve(OUTPUT_FOLDER, "default", "gene_analysis.genes.out");
     response.download(sampleResults);
     logger.info(`Finish /fetch-results sample file`);
   } else {
