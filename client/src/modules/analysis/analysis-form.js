@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Row, Col, Form } from "react-bootstrap";
+import { Row, Col, Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Select from "react-select";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { defaultFormState } from "./analysis.state";
@@ -172,7 +172,7 @@ export default function AnalysisForm({ onSubmit }) {
         </Col>
       </Row>
       <Form.Group className="mb-3">
-        <Form.Label className="required">Input Data Type</Form.Label>
+        <Form.Label className="required">Magma Model</Form.Label>
         <Select
           placeholder="No analysis selected"
           name="magmaType"
@@ -377,32 +377,46 @@ export default function AnalysisForm({ onSubmit }) {
               />
               {pvalError ? <div style={{ color: "red" }}>{pvalError}</div> : <></>}
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="required">Sample Size Input Type</Form.Label>
-              <Select
-                placeholder="Select method of inputting sample size"
-                name="sampleSizeOption"
-                value={form.sampleSizeOption}
-                options={[
-                  { value: "input", label: "Provide sample size" },
-                  { value: "file", label: "File includes column for sample size" },
-                ]}
-                onChange={(e) => {
-                  mergeForm({ sampleSizeOption: e });
-                }}
-              />
+            <Form.Group>
+              <Row>
+                <Form.Label className="required col-xl-4 pe-0">Sample Size</Form.Label>
+                <Form.Check
+                  id="custom"
+                  className="col-xl-3 pe-0"
+                  type="radio"
+                  checked={form.sampleSizeOption.value === 'input'}
+                  label={
+                    <span>
+                      Custom
+                    </span>
+                  }
+                  onChange={() => mergeForm({ sampleSizeOption: { value: "input", label: "Custom" } })}
+                />
+                <Form.Check
+                  id="fromFile"
+                  className="col-xl-4"
+                  type="radio"
+                  checked={form.sampleSizeOption.value === 'file'}
+                  label={
+                    <span>
+                      From the file
+                    </span>
+                  }
+                  onChange={() => mergeForm({ sampleSizeOption: { value: "file", label: "File includes column for sample size" } })}
+                />
+
+              </Row>
+
             </Form.Group>
             {form.sampleSizeOption.value === "input" && (
               <Form.Group className="mb-3">
-                <Form.Label className="required">Sample Size</Form.Label>
-                <input type="number" name="sampleSize" className="form-control" value={form.sampleSize} onChange={handleChange} />
+                <input placeholder="Specify sample size" type="number" name="sampleSize" className="form-control" value={form.sampleSize} onChange={handleChange} />
               </Form.Group>
             )}
 
             {form.sampleSizeOption.value === "file" && (
               <Form.Group className="mb-3">
-                <Form.Label className="required">Column Name</Form.Label>
-                <input type="text" name="sampleSize" className="form-control" onChange={handleChange} />
+                <input placeholder="Specify custom name" type="text" name="sampleSize" className="form-control" onChange={handleChange} />
               </Form.Group>
             )}
           </>
