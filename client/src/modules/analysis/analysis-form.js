@@ -293,7 +293,7 @@ export default function AnalysisForm({ onSubmit }) {
         )}
       </fieldset>
       <fieldset className="border px-3 my-4">
-        <legend className="legend font-weight-bold">Gene Location</legend>
+        <legend className="legend font-weight-bold">Annotation</legend>
 
         <Form.Group className="mb-3">
           <Form.Label className="required">Gene Location File</Form.Label>
