@@ -90,12 +90,12 @@ export default function AnalysisResults({ onDownload }) {
         <>
             <Row className="mx-3">
                 <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-                    <a href="javascript:void(0)" onClick={onDownload}>Export Table</a>
+                    <a href="javascript:void(0)" onClick={onDownload}>Export Results</a>
                 </div>
             </Row>
             <Table
                 columns={geneColumns}
-                defaultSort={[{ id: "gene", asec: true }]}
+                defaultSort={[{ id: "p", asec: true }]}
                 data={results ?
                     results.data
                     : []}
