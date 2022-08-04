@@ -9,7 +9,7 @@ export const defaultFormState = {
   snpType: { value: "g1000_eur", label: "European" },
   sampleSizeOption: { value: "input", label: "Provide one sample size" },
   sampleSize: 100,
-  queue: true,
+  queue: false,
   jobName: "",
   email: "",
   loading: false,
