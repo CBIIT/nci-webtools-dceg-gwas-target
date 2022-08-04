@@ -67,6 +67,7 @@ export default function Table({ columns, data, options, defaultSort }) {
       data: useMemo((_) => data, [data]),
       initialState: {
         sortBy: defaultSort,
+        pageSize: 25
       },
       ...options,
     },
