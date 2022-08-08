@@ -153,10 +153,9 @@ export default function AnalysisForm({ onSubmit }) {
       if (!extensions.includes("bed") || !extensions.includes("fam") || !extensions.includes("bim"))
         setGeneAnalysisError("Please check file types and ensure they are of type .bim,.bed, and .fam");
       else {
-        if (fileList[0].size > FILE_SIZE_LIMIT || fileList[1].size > FILE_SIZE_LIMIT || fileList[2].size > FILE_SIZE_LIMIT)
-          setGeneAnalysisError(fileSizeError)
-        else
-          setGeneAnalysisError("");
+        if (fileList[0].size > FILE_SIZE_LIMIT || fileList[1].size > FILE_SIZE_LIMIT || fileList[2].size > FILE_SIZE_LIMIT) {
+          mergeForm({ queue: true })
+        }
       }
     }
 
@@ -234,13 +233,11 @@ export default function AnalysisForm({ onSubmit }) {
               name="snpLoc"
               className="form-control"
               onChange={(e) => {
-                if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                  setSnpLocFile(e.target.files[0]);
-                  setSnpLocError('')
+                if (e.target.files[0].size > FILE_SIZE_LIMIT) {
+                  mergeForm({ queue: true })
                 }
-                else {
-                  setSnpLocError(fileSizeError)
-                }
+
+                setSnpLocFile(e.target.files[0]);
               }}
             />
             {snpLocError ? <div style={{ color: "red" }}>{snpLocError}</div> : <></>}
@@ -293,7 +290,7 @@ export default function AnalysisForm({ onSubmit }) {
         )}
       </fieldset>
       <fieldset className="border px-3 my-4">
-        <legend className="legend font-weight-bold">Annotation</legend>
+        <legend className="legend font-weight-bold">Gene Location</legend>
 
         <Form.Group className="mb-3">
           <Form.Label className="required">Gene Location File</Form.Label>
@@ -304,13 +301,11 @@ export default function AnalysisForm({ onSubmit }) {
             ref={(geneLocRef)}
             onChange={(e) => {
               console.log(e.target.files[0].size)
-              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                setGeneLocFile(e.target.files[0]);
-                setGeneLocError('')
+              if (e.target.files[0].size > FILE_SIZE_LIMIT) {
+                mergeForm({ queue: true })
               }
-              else {
-                setGeneLocError(fileSizeError)
-              }
+
+              setGeneLocFile(e.target.files[0]);
             }}
           />
           {geneLocError ? <div style={{ color: "red" }}>{geneLocError}</div> : <></>}
@@ -343,13 +338,11 @@ export default function AnalysisForm({ onSubmit }) {
               name="geneData"
               className="form-control"
               onChange={(e) => {
-                if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                  setRawData(e.target.files[0]);
-                  setRawDataError('')
+                if (e.target.files[0].size > FILE_SIZE_LIMIT) {
+                  mergeForm({ queue: true })
                 }
-                else {
-                  setRawDataError(fileSizeError)
-                }
+
+                setRawData(e.target.files[0]);
               }}
             />
             {rawDataError ? <div style={{ color: "red" }}>{rawDataError}</div> : <></>}
@@ -367,12 +360,9 @@ export default function AnalysisForm({ onSubmit }) {
                 ref={snpRef}
                 onChange={(e) => {
                   if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                    setPvalFile(e.target.files[0]);
-                    setPvalError('')
+                    mergeForm({ queue: true })
                   }
-                  else {
-                    setPvalError(fileSizeError)
-                  }
+                  setPvalFile(e.target.files[0]);
                 }}
               />
               {pvalError ? <div style={{ color: "red" }}>{pvalError}</div> : <></>}
@@ -416,7 +406,7 @@ export default function AnalysisForm({ onSubmit }) {
 
             {form.sampleSizeOption.value === "file" && (
               <Form.Group className="mb-3">
-                <input placeholder="Specify custom name" type="text" name="sampleSize" className="form-control" onChange={handleChange} />
+                <input placeholder="Specify column name" type="text" name="sampleSize" className="form-control" onChange={handleChange} />
               </Form.Group>
             )}
           </>
@@ -432,30 +422,24 @@ export default function AnalysisForm({ onSubmit }) {
             className="form-control"
             onChange={(e) => {
               if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                setGeneSetFile(e.target.files[0]);
-                setGeneSetError('')
+                mergeForm({ queue: true })
               }
-              else {
-                setGeneSetError(fileSizeError)
-              }
+              setGeneSetFile(e.target.files[0]);
             }}
           />
           {geneSetError ? <div style={{ color: "red" }}>{geneSetError}</div> : <></>}
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Covar File</Form.Label>
+          <Form.Label>Covariate File</Form.Label>
           <input
             type="file"
             name="covarFile"
             className="form-control"
             onChange={(e) => {
               if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                setCovarFile(e.target.files[0]);
-                setCovarError('')
+                mergeForm({ queue: true })
               }
-              else {
-                setCovarError(fileSizeError)
-              }
+              setCovarFile(e.target.files[0]);
             }}
           />
           {covarError ? <div style={{ color: "red" }}>{covarError}</div> : <></>}
