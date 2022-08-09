@@ -12,7 +12,7 @@ export default function AnalysisResults({ onDownload }) {
     console.log(results)
     const geneColumns = [
         {
-            accessor: "gene",
+            accessor: "GENE",
             id: "gene",
             label: "Gene",
             Header: (
@@ -20,7 +20,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "chr",
+            accessor: "CHR",
             id: "chr",
             label: "Chr",
             Header: (
@@ -28,7 +28,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "start",
+            accessor: "START",
             id: "start",
             label: "Start",
             Header: (
@@ -36,7 +36,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "stop",
+            accessor: "STOP",
             id: "stop",
             label: "Stop",
             Header: (
@@ -44,7 +44,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "nspns",
+            accessor: "NSPNS",
             id: "nspns",
             label: "NSPNS",
             Header: (
@@ -52,7 +52,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "nparam",
+            accessor: "NPARAM",
             id: "nparam",
             label: "NPARAM",
             Header: (
@@ -60,7 +60,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "n",
+            accessor: "N",
             id: "n",
             label: "N",
             Header: (
@@ -68,7 +68,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "zstat",
+            accessor: "ZSTAT",
             id: "zstat",
             label: "ZSTAT",
             Header: (
@@ -76,7 +76,7 @@ export default function AnalysisResults({ onDownload }) {
             ),
         },
         {
-            accessor: "p",
+            accessor: "P",
             id: "p",
             label: "P",
             Header: (

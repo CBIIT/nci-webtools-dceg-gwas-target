@@ -10,6 +10,7 @@ export async function createSqliteTableFromFile(connection, table, filepath, par
   const tableDef = getTableDef(header);
   return await createSqliteTable(connection, table, tableDef, parser);
 }
+
 export function getSqliteConnection(filepath, options = {}) {
   return knex({
     client: "better-sqlite3",
@@ -21,9 +22,19 @@ export function getSqliteConnection(filepath, options = {}) {
   });
 }
 
+export function createDelimiters(character, maxLength) {
+  const delimiters = [];
+  for (let i = maxLength; i > 0; i--) {
+    const delimiter = character.repeat(i);
+    delimiters.push(delimiter);
+  }
+  return delimiters;
+}
+
 export function getDelimitedFileParser(filepath, options = {}) {
   const parseOptions = {
-    delimiter: "\t",
+    delimiter: createDelimiters(" ", 100),
+    trim: true,
     cast: true,
     cast_date: true,
     columns: true,

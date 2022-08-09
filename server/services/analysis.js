@@ -117,7 +117,7 @@ export async function runMagmaAnalysis(params, logger) {
     const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
     logger.info(`[${id}] Finish gene analysis`);
 
-    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out")
+    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out.txt")
     const databasePath = path.resolve(resultDir, 'results.db')
 
     if (fs.existsSync(geneAnalyisResults)) {
