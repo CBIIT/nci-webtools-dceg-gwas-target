@@ -139,6 +139,7 @@ apiRouter.post("/query-results", async (req, res) => {
   const results = await connection
     .select(columns || "*")
     .from(table)
+    .orderBy(orderBy)
     .offset(offset || 0)
     .limit(limit || 100000);
 

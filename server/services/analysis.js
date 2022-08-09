@@ -16,11 +16,11 @@ export async function runMagmaAnalysis(params, logger) {
   const type = params.magmaType.value || "standard";
   const inputDir = path.resolve(INPUT_FOLDER, id);
   const resultDir = path.resolve(OUTPUT_FOLDER, id);
-  const defaultInputDir = path.resolve(INPUT_FOLDER, "default");
-  const defaultOutputDir = path.resolve(OUTPUT_FOLDER, "default");
+  const defaultInputDir = path.resolve(INPUT_FOLDER, 'default')
+  const defaultOutputDir = path.resolve(OUTPUT_FOLDER, 'default')
   const paramsFilepath = path.resolve(inputDir, "params.json");
   const statusFilepath = path.resolve(resultDir, "status.json");
-
+  
   const writeParams = writeJson.bind(null, paramsFilepath);
   const writeStatus = writeJson.bind(null, statusFilepath);
   await mkdirs([inputDir, resultDir]);
@@ -53,18 +53,12 @@ export async function runMagmaAnalysis(params, logger) {
 
     // run annotation
     const annotationParams = {
-      snpLocFile:
-        params.snpType.value !== "custom"
-          ? path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpLocFile}`)
-          : path.resolve(inputDir, params.snpLocFile),
-      geneLocFile:
-        params.geneLocFile === "sample_gene_loc.loc"
-          ? path.resolve(defaultInputDir, "sample_gene_loc.loc")
-          : path.resolve(inputDir, params.geneLocFile),
+      snpLocFile: params.snpType.value !== "custom" ?  path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpLocFile}`) : path.resolve(inputDir, params.snpLocFile),
+      geneLocFile: params.geneLocFile === "sample_gene_loc.loc" ? path.resolve(defaultInputDir, "sample_gene_loc.loc") : path.resolve(inputDir, params.geneLocFile),
       outFile: path.resolve(resultDir, "annotation"),
     };
     logger.info(`[${id}] Running annotation: ${JSON.stringify(annotationParams)}`);
-    logger.info(type);
+    logger.info(type)
     const annotationResults = await runAnnotation(annotationParams, type);
     logger.info(`[${id}] Finished /annotation`);
 
@@ -73,7 +67,7 @@ export async function runMagmaAnalysis(params, logger) {
       const filepath = path.resolve(inputDir, "sample_snp.tsv");
       const source = path.resolve(defaultInputDir, "sample_snp.tsv");
       logger.info(`[${id}] Copy P-Value file: ${source} to ${filepath}`);
-      fs.copyFileSync(source, filepath);
+      fs.copyFileSync(source, filepath)
       logger.info(`[${id}] Finished copying P-Value file`);
     }
 
@@ -82,7 +76,7 @@ export async function runMagmaAnalysis(params, logger) {
       const filepath = path.resolve(inputDir, `${id}.bim`);
       const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.bim`);
       logger.info(`[${id}] Copy .bim file: ${source} to ${filepath}`);
-      fs.copyFileSync(source, filepath);
+      fs.copyFileSync(source, filepath)
       logger.info(`[${id}] Finished copying .bim file`);
     }
 
@@ -91,7 +85,7 @@ export async function runMagmaAnalysis(params, logger) {
       const filepath = path.resolve(inputDir, `${id}.bed`);
       const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.bed`);
       logger.info(`[${id}] Copy .bed file: ${source} to ${filepath}`);
-      fs.copyFileSync(source, filepath);
+      fs.copyFileSync(source, filepath)
       logger.info(`[${id}] Finished copying .bed file`);
     }
 
@@ -100,7 +94,7 @@ export async function runMagmaAnalysis(params, logger) {
       const filepath = path.resolve(inputDir, `${id}.fam`);
       const source = path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpType.value}.fam`);
       logger.info(`[${id}] Copy .fam file: ${source} to ${filepath}`);
-      fs.copyFileSync(source, filepath);
+      fs.copyFileSync(source, filepath)
       logger.info(`[${id}] Finished copying .fam file`);
     }
 
@@ -114,10 +108,7 @@ export async function runMagmaAnalysis(params, logger) {
 
     if (params.analysisInput.value !== "rawData") {
       const sampleSizeKey = params.sampleSizeOption.value === "input" ? "N" : "ncol";
-      geneAnalysisParams.pvalFile =
-        params.pvalFile === "sample_snp.tsv"
-          ? path.resolve(defaultInputDir, "sample_snp.tsv")
-          : path.resolve(inputDir, params.pvalFile);
+      geneAnalysisParams.pvalFile = params.pvalFile === "sample_snp.tsv" ? path.resolve(defaultInputDir, "sample_snp.tsv") : path.resolve(inputDir, params.pvalFile);
       geneAnalysisParams.sampleSize = `${sampleSizeKey}=${params.sampleSize}`;
     }
 
@@ -126,13 +117,13 @@ export async function runMagmaAnalysis(params, logger) {
     const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
     logger.info(`[${id}] Finish gene analysis`);
 
-    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out");
-    const databasePath = path.resolve(resultDir, "results.db");
+    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out.txt")
+    const databasePath = path.resolve(resultDir, 'results.db')
 
     if (fs.existsSync(geneAnalyisResults)) {
       logger.info(`[${id}] Create .db file`);
       const connection = getSqliteConnection(databasePath);
-      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults);
+      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults, { delimmiter: "\t" });
       logger.info(`[${id}] Finish creating .db file`);
     }
 
