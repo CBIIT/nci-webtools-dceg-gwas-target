@@ -32,7 +32,7 @@ export default function AnalysisResults({ onDownload }) {
             id: "start",
             label: "Start",
             Header: (
-                <b>Start</b>
+                <b>Start (HG19)</b>
             ),
         },
         {
@@ -40,15 +40,15 @@ export default function AnalysisResults({ onDownload }) {
             id: "stop",
             label: "Stop",
             Header: (
-                <b>Stop</b>
+                <b>Stop (HG19)</b>
             ),
         },
         {
-            accessor: "NSPNS",
-            id: "nspns",
-            label: "NSPNS",
+            accessor: "NSNPS",
+            id: "nsnps",
+            label: "NSNPS",
             Header: (
-                <b>NSPNS</b>
+                <b>NSNPS</b>
             ),
         },
         {
@@ -82,6 +82,10 @@ export default function AnalysisResults({ onDownload }) {
             Header: (
                 <b>P</b>
             ),
+            sort: true,
+            sortType: (a, b) => {
+                return a.original.P - b.original.P
+            },
         },
     ]
     console.log(form)
