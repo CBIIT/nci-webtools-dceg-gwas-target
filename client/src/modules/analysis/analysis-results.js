@@ -32,7 +32,7 @@ export default function AnalysisResults({ onDownload }) {
             id: "start",
             label: "Start",
             Header: (
-                <b>Start (HG19)</b>
+                <b>Start (hg19)</b>
             ),
         },
         {
@@ -40,7 +40,7 @@ export default function AnalysisResults({ onDownload }) {
             id: "stop",
             label: "Stop",
             Header: (
-                <b>Stop (HG19)</b>
+                <b>Stop (hg19)</b>
             ),
         },
         {
