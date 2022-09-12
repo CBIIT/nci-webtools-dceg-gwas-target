@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs";
 import multer from "multer";
 import AWS from "aws-sdk";
 import { mkdir } from "fs/promises";
@@ -124,7 +125,8 @@ apiRouter.post("/query-results", async (req, res) => {
   const { logger } = req.app.locals;
   var databasePath;
   logger.info(req.body);
-  if (req.body.submitted) {
+  if (request_id && fs.existsSync(path.resolve(OUTPUT_FOLDER, request_id, "results.db"))) {
+
     logger.info(`[${req.body.request_id}] Execute /query-results`);
     databasePath = path.resolve(OUTPUT_FOLDER, request_id, "results.db");
   } else {

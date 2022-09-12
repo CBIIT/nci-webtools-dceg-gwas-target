@@ -8,8 +8,6 @@ const axios = require("axios");
 export default function AnalysisResults({ onDownload }) {
     const [form, setForm] = useRecoilState(formState);
     const results = useRecoilValue(resultsState)
-
-    console.log(results)
     const geneColumns = [
         {
             accessor: "GENE",
@@ -88,7 +86,6 @@ export default function AnalysisResults({ onDownload }) {
             },
         },
     ]
-    console.log(form)
 
     return (
         <>

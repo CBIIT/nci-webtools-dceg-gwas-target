@@ -59,8 +59,9 @@ export default function App() {
             <ErrorBoundary fallback="">
               <Suspense fallback={<Loader>Loading Page</Loader>}>
                 <Routes>
+                  <Route key={`route-${1}`} path={"/:id"} element={<Analysis />} />
                   {links.map((link, index) => (
-                    <Route exact key={`route-${index}`} path={link.route} element={<link.component />} />
+                    <Route key={`route-${index}`} path={link.route} element={<link.component />} />
                   ))}
                 </Routes>
               </Suspense>

@@ -1,4 +1,5 @@
 import { atom, selector, selectorFamily } from "recoil";
+
 const axios = require("axios");
 
 export const defaultFormState = {
@@ -14,7 +15,7 @@ export const defaultFormState = {
   email: "",
   loading: false,
   submitted: false,
-  requestId: "",
+  request_id: "",
   timestamp: "",
 };
 

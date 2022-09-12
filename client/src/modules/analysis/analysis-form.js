@@ -5,6 +5,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { defaultFormState } from "./analysis.state";
 import { uploadFiles } from "../../services/uploadFiles";
 import Loader from "../common/loader";
+
 const { v1: uuidv1, validate } = require("uuid");
 const axios = require("axios");
 
@@ -58,6 +59,7 @@ export default function AnalysisForm({ onSubmit }) {
     snpRef.current.files = asFileList([
       new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
     ])
+    
   }, [])
 
   //Disables submit button if there are errors with input
@@ -77,7 +79,7 @@ export default function AnalysisForm({ onSubmit }) {
 
   async function handleSubmit() {
     const requestId = uuidv1();
-    mergeForm({ loading: true, requestId: requestId, timestamp: new Date().toLocaleString() });
+    mergeForm({ loading: true, request_id: requestId, timestamp: new Date().toLocaleString() });
 
     const type = /(?:\.([^.]+))?$/;
     var bedFile;

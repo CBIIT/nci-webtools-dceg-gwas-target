@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import AnalysisForm from "./analysis-form";
 import AnalysisResults from "./analysis-results";
 import Container from "react-bootstrap/Container";
@@ -7,13 +7,19 @@ import { defaultFormState, formState } from "./analysis.state";
 import { SidebarContainer, SidebarPanel, MainPanel } from "../components/sidebar-container";
 import { useRecoilState } from "recoil";
 import { saveAs } from "file-saver";
+import { useParams } from "react-router-dom";
 const axios = require("axios");
+
 
 export default function Analysis() {
   const [form, setForm] = useRecoilState(formState);
   const mergeForm = (obj) => setForm({ ...form, ...obj });
   const [_openSidebar, _setOpenSidebar] = useState(true);
-  console.log(form);
+  const { id } = useParams()
+
+  const _loadResults = useCallback(loadResults, [id])
+  useEffect(_ => { _loadResults(id) }, [id, _loadResults]);
+
   useEffect(() => {
     _setOpenSidebar(form.openSidebar);
   }, [form.openSidebar]);
@@ -28,6 +34,12 @@ export default function Analysis() {
     setForm({ ...event, loading: false, submitted: true });
     console.log("submit", event);
   }
+
+  function loadResults(id){
+    if (!id) return;
+    mergeForm({ request_id: id })
+  }
+
 
   return (
     <Container className="my-4">
