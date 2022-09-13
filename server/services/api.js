@@ -101,7 +101,7 @@ apiRouter.post("/submit", async (req, res) => {
     const userEmailResults = await email.sendMail({
       from: ADMIN_EMAIL,
       to: body.email,
-      subject: 'SparrpowR Simulation Results - ' + body.jobName + " - " + body.timestamp + " UTC",
+      subject: 'GWASTarget Results - ' + body.jobName + " - " + body.timestamp + " UTC",
       html: await readTemplate(path.resolve("templates", "user-success-email.html"), templateData),
     });
 
