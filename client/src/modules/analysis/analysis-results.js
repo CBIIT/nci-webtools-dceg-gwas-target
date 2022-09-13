@@ -89,18 +89,25 @@ export default function AnalysisResults({ onDownload }) {
 
     return (
         <>
-            <Row className="mx-3">
-                <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-                    <a href="javascript:void(0)" onClick={onDownload}>Export Results</a>
+            {form.submitted && form.email ?
+                <div>
+                    Your job is being processed, an email will be sent with a link to your results when the calculations have been complete.
+                </div> :
+                <div>
+                    <Row className="mx-3">
+                        <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+                            <a href="javascript:void(0)" onClick={onDownload}>Export Results</a>
+                        </div>
+                    </Row>
+                    <Table
+                        columns={geneColumns}
+                        defaultSort={[{ id: "p", asec: true }]}
+                        data={results ?
+                            results.data
+                            : []}
+                    />
                 </div>
-            </Row>
-            <Table
-                columns={geneColumns}
-                defaultSort={[{ id: "p", asec: true }]}
-                data={results ?
-                    results.data
-                    : []}
-            />
+            }
         </>
     )
 }

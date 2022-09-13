@@ -37,7 +37,7 @@ export default function Analysis() {
 
   function loadResults(id){
     if (!id) return;
-    mergeForm({ request_id: id })
+    mergeForm({ request_id: id, submitted: false })
   }
 
 

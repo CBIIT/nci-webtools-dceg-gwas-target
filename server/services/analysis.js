@@ -114,16 +114,19 @@ export async function runMagmaAnalysis(params, logger) {
 
     // run raw gene analysis
     logger.info(`[${id}] Run gene analysis: ${JSON.stringify(geneAnalysisParams)}`);
-    const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
+    var geneAnalysisResults;
+    
+    geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
+
     logger.info(`[${id}] Finish gene analysis`);
 
-    const geneAnalyisResults = path.resolve(resultDir, "gene_analysis.genes.out")
+    const geneAnalysisPath = path.resolve(resultDir, "gene_analysis.genes.out")
     const databasePath = path.resolve(resultDir, 'results.db')
 
-    if (fs.existsSync(geneAnalyisResults)) {
+    if (fs.existsSync(geneAnalysisPath)) {
       logger.info(`[${id}] Create .db file`);
       const connection = getSqliteConnection(databasePath);
-      await createSqliteTableFromFile(connection, "gene", geneAnalyisResults, { delimmiter: "\t" });
+      await createSqliteTableFromFile(connection, "gene", geneAnalysisPath, { delimmiter: "\t" });
       logger.info(`[${id}] Finish creating .db file`);
     }
 

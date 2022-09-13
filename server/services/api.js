@@ -9,10 +9,11 @@ import { getJobStatus, runMagmaAnalysis } from "./analysis.js";
 import { withAsync } from "./middleware.js";
 import { EcsWorker, LocalWorker } from "./queue-worker.js";
 import { magma } from "./analysis.js";
-
-const { INPUT_FOLDER, OUTPUT_FOLDER, DATA_BUCKET, QUEUE_NAME, WORKER_TYPE, BASE_URL } = process.env;
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
 
+const { INPUT_FOLDER, OUTPUT_FOLDER, ADMIN_EMAIL, SMTP_HOST, SMTP_PORT, WORKER_TYPE, BASE_URL } = process.env;
+
+import NodeMailer from 'nodemailer';
 export const apiRouter = Router();
 
 /**
@@ -65,35 +66,45 @@ apiRouter.post("/submit", async (req, res) => {
   const { logger } = req.app.locals;
   const { request_id } = req.body;
   logger.info(`[${request_id}] Execute /submit`);
-  const sqs = new AWS.SQS();
+
+
+
   let body = Object.assign(req.body, {
     timestamp: new Date().toLocaleString(),
   });
 
   logger.info(body);
 
-  if (body.queue) {
+  if (body.email) {
+
+    const email = NodeMailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT
+    });
+
     const worker = {
       local: new LocalWorker({ runMagmaAnalysis }),
       ecs: new EcsWorker({ runMagmaAnalysis }),
     }[WORKER_TYPE];
 
-    const start = new Date().getTime();
     worker.dispatch("runMagmaAnalysis", { body: body, logger: logger });
-    const end = new Date().getTime();
-
-    const time = end - start;
-    const minutes = Math.floor(time / 60000);
-    var seconds = ((time % 60000) / 1000).toFixed(0);
-
-    var runtime = (minutes > 0 ? minutes + " min " : "") + seconds + " secs";
 
     const templateData = {
       jobName: body.jobName,
       originalTimestamp: body.timestamp,
-      runTime: runtime,
       resultsUrl: `${BASE_URL}/#/${request_id}`,
     };
+
+    // send user success email
+    logger.info(`Sending user success email`);
+
+    const userEmailResults = await email.sendMail({
+      from: ADMIN_EMAIL,
+      to: body.email,
+      subject: 'SparrpowR Simulation Results - ' + body.jobName + " - " + body.timestamp + " UTC",
+      html: await readTemplate(path.resolve("templates", "user-success-email.html"), templateData),
+    });
+
   } else await runMagmaAnalysis(body, logger);
 
   logger.info(`[${request_id}] Finish /submit`);
