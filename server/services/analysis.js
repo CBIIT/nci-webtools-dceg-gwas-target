@@ -6,9 +6,22 @@ import { execFile } from "child_process";
 import AWS from "aws-sdk";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import pick from "lodash/pick.js";
-const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET } = process.env;
+import NodeMailer from 'nodemailer';
+const { INPUT_FOLDER, OUTPUT_FOLDER, MAGMA, DATA_BUCKET, ADMIN_EMAIL, SMTP_HOST, SMTP_PORT, BASE_URL } = process.env;
 const execFileAsync = promisify(execFile);
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
+
+/**
+ * Reads a template, substituting {tokens} with data values
+ * @param {string} filepath
+ * @param {object} data
+ */
+ async function readTemplate(filePath, data) {
+  const template = await fs.promises.readFile(path.resolve(filePath));
+
+  // replace {tokens} with data values or removes them if not found
+  return String(template).replace(/{[^{}]+}/g, (key) => data[key.replace(/[{}]+/g, "")] || "");
+}
 
 export async function runMagmaAnalysis(params, logger) {
   //const s3 = new S3Client();
@@ -128,6 +141,29 @@ export async function runMagmaAnalysis(params, logger) {
       const connection = getSqliteConnection(databasePath);
       await createSqliteTableFromFile(connection, "gene", geneAnalysisPath, { delimmiter: "\t" });
       logger.info(`[${id}] Finish creating .db file`);
+    }
+
+    if (params.email) {
+      const email = NodeMailer.createTransport({
+        host: SMTP_HOST,
+        port: SMTP_PORT
+      });
+
+      const templateData = {
+        jobName: params.jobName,
+        originalTimestamp: params.timestamp,
+        resultsUrl: `${BASE_URL}/#/${id}`,
+      };
+  
+      // send user success email
+      logger.info(`Sending user success email`);
+  
+      const userEmailResults = await email.sendMail({
+        from: ADMIN_EMAIL,
+        to: params.email,
+        subject: 'GWASTarget Results - ' + params.jobName + " - " + params.timestamp + " UTC",
+        html: await readTemplate(path.resolve("templates", "user-success-email.html"), templateData),
+      });
     }
 
     await writeStatus({ status: "COMPLETED" });

@@ -89,22 +89,6 @@ apiRouter.post("/submit", async (req, res) => {
 
     worker.dispatch("runMagmaAnalysis", { body: body, logger: logger });
 
-    const templateData = {
-      jobName: body.jobName,
-      originalTimestamp: body.timestamp,
-      resultsUrl: `${BASE_URL}/#/${request_id}`,
-    };
-
-    // send user success email
-    logger.info(`Sending user success email`);
-
-    const userEmailResults = await email.sendMail({
-      from: ADMIN_EMAIL,
-      to: body.email,
-      subject: 'GWASTarget Results - ' + body.jobName + " - " + body.timestamp + " UTC",
-      html: await readTemplate(path.resolve("templates", "user-success-email.html"), templateData),
-    });
-
   } else await runMagmaAnalysis(body, logger);
 
   logger.info(`[${request_id}] Finish /submit`);
