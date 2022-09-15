@@ -90,7 +90,7 @@ export default function AnalysisResults({ onDownload }) {
     return (
         <>
             {form.submitted && form.email ?
-                <div>
+                <div className="alert alert-success">
                     Your job is being processed, an email will be sent with a link to your results when the calculations have been complete.
                 </div> :
                 <div>
