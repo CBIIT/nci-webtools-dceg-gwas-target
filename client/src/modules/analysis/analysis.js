@@ -35,6 +35,12 @@ export default function Analysis() {
     console.log("submit", event);
   }
 
+  function handleReset(event){
+    setForm(defaultFormState)
+    console.log(form)
+    console.log("reset", event);
+  }
+
   function loadResults(id){
     if (!id) return;
     mergeForm({ request_id: id, submitted: false })
@@ -47,7 +53,7 @@ export default function Analysis() {
         <SidebarPanel>
           <Card className="shadow">
             <Card.Body>
-              <AnalysisForm onSubmit={handleSubmit} />
+              <AnalysisForm onSubmit={handleSubmit} onReset={handleReset}/>
             </Card.Body>
           </Card>
         </SidebarPanel>

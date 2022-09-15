@@ -9,7 +9,7 @@ import Loader from "../common/loader";
 const { v1: uuidv1, validate } = require("uuid");
 const axios = require("axios");
 
-export default function AnalysisForm({ onSubmit }) {
+export default function AnalysisForm({ onSubmit, onReset }) {
   const [form, setForm] = useState(defaultFormState);
   const mergeForm = (obj) => setForm({ ...form, ...obj });
   const FILE_SIZE_LIMIT = 100000000;
@@ -70,6 +70,36 @@ export default function AnalysisForm({ onSubmit }) {
 
     return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
   }
+
+  function handleReset(event){
+    event.preventDefault();
+    mergeForm(defaultFormState)
+
+    geneLocRef.current.files = asFileList([
+      new File([""], "NCBI37.3.gene.loc")
+    ])
+
+    refDataRef.current.files = asFileList([
+      new File([""], "g1000_eur.bim"),
+      new File([""], "g1000_eur.bed"),
+      new File([""], "g1000_eur.fam"),
+    ])
+
+    snpRef.current.files = asFileList([
+      new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
+    ])
+
+    setGeneLocFile("")
+    setGeneAnalysisList([{ name: "g1000_eur.bim" }, { name: "g1000_eur.bed" }, { name: "g1000_eur.fam" }])
+    setPvalFile("")
+    setRawData("")
+    setGeneSetFile("")
+    setCovarFile("")
+
+    onReset();
+    console.log(form)
+  }
+  console.log(form)
 
   function handleChange(event) {
     console.log(event.target);
@@ -448,19 +478,18 @@ export default function AnalysisForm({ onSubmit }) {
         </Form.Group>
       </fieldset>
       <fieldset className="border px-3 mb-4">
-        <legend className="legend font-weight-bold">Queue</legend>
+        <legend className="legend font-weight-bold">Async Job</legend>
         <Form>
           <Form.Check
             type="checkbox"
             name="queue"
-            label="Submit Job to Queue"
+            label="Use Async Processing"
             checked={form.queue}
             onChange={() => mergeForm({ queue: !form.queue })}
           />
         </Form>
         <i style={{ fontSize: "14px" }}>
-          Use queue for a long-running job, your request will be enqueued and results will be sent to email address
-          specified below when ready.
+          Use Async Processing for a long-running job, your results will be sent to the email address specified below when ready.
         </i>
         {form.queue && (
           <div>
@@ -476,7 +505,7 @@ export default function AnalysisForm({ onSubmit }) {
         )}
       </fieldset>
       <div className="text-end">
-        <button type="reset" className="btn btn-outline-danger mx-1">
+        <button type="reset" className="btn btn-outline-danger mx-1" onClick={handleReset}>
           Reset
         </button>
 
