@@ -16,7 +16,7 @@ import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
  * @param {string} filepath
  * @param {object} data
  */
- async function readTemplate(filePath, data) {
+async function readTemplate(filePath, data) {
   const template = await fs.promises.readFile(path.resolve(filePath));
 
   // replace {tokens} with data values or removes them if not found
@@ -33,7 +33,8 @@ export async function runMagmaAnalysis(params, logger) {
   const defaultOutputDir = path.resolve(OUTPUT_FOLDER, 'default')
   const paramsFilepath = path.resolve(inputDir, "params.json");
   const statusFilepath = path.resolve(resultDir, "status.json");
-  
+  const start = new Date().getTime();
+
   const writeParams = writeJson.bind(null, paramsFilepath);
   const writeStatus = writeJson.bind(null, statusFilepath);
   await mkdirs([inputDir, resultDir]);
@@ -66,7 +67,7 @@ export async function runMagmaAnalysis(params, logger) {
 
     // run annotation
     const annotationParams = {
-      snpLocFile: params.snpType.value !== "custom" ?  path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpLocFile}`) : path.resolve(inputDir, params.snpLocFile),
+      snpLocFile: params.snpType.value !== "custom" ? path.resolve(defaultInputDir, `${params.snpType.value}/${params.snpLocFile}`) : path.resolve(inputDir, params.snpLocFile),
       geneLocFile: params.geneLocFile === "sample_gene_loc.loc" ? path.resolve(defaultInputDir, "sample_gene_loc.loc") : path.resolve(inputDir, params.geneLocFile),
       outFile: path.resolve(resultDir, "annotation"),
     };
@@ -128,7 +129,7 @@ export async function runMagmaAnalysis(params, logger) {
     // run raw gene analysis
     logger.info(`[${id}] Run gene analysis: ${JSON.stringify(geneAnalysisParams)}`);
     var geneAnalysisResults;
-    
+
     geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, type);
 
     logger.info(`[${id}] Finish gene analysis`);
@@ -143,21 +144,30 @@ export async function runMagmaAnalysis(params, logger) {
       logger.info(`[${id}] Finish creating .db file`);
     }
 
+    const end = new Date().getTime();
+
     if (params.email) {
       const email = NodeMailer.createTransport({
         host: SMTP_HOST,
         port: SMTP_PORT
       });
 
+      const time = end - start;
+      const minutes = Math.floor(time / 60000);
+      var seconds = ((time % 60000) / 1000).toFixed(0);
+
+      var runtime = (minutes > 0 ? minutes + " min " : '') + seconds + " secs"
+
       const templateData = {
         jobName: params.jobName,
         originalTimestamp: params.timestamp,
         resultsUrl: `${BASE_URL}/#/${id}`,
+        runtime: runtime
       };
-  
+
       // send user success email
       logger.info(`Sending user success email`);
-  
+
       const userEmailResults = await email.sendMail({
         from: ADMIN_EMAIL,
         to: params.email,
