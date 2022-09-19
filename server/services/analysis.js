@@ -182,6 +182,26 @@ export async function runMagmaAnalysis(params, logger) {
       geneAnalysis: geneAnalysisResults,
     };
   } catch (e) {
+
+    if(params.email){
+      const email = NodeMailer.createTransport({
+        host: SMTP_HOST,
+        port: SMTP_PORT
+      });
+
+      const templateData = {
+        jobName: params.jobName,
+        originalTimestamp: params.timestamp,
+      };
+
+      const userEmailResults = await email.sendMail({
+        from: ADMIN_EMAIL,
+        to: params.email,
+        subject: 'GWASTarget Error - ' + params.jobName + " - " + params.timestamp + " UTC",
+        html: await readTemplate(path.resolve("templates", "user-failure-email.html"), templateData),
+      });
+    }
+
     const keys = ["code", "message", "stack", "stdout", "stderr"];
     const error = pick(e, keys);
     await writeStatus({ status: "FAILED", ...error });
