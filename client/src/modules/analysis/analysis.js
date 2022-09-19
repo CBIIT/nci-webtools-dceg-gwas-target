@@ -27,7 +27,8 @@ export default function Analysis() {
   async function handleDownload() {
     const res = await axios.post("api/fetch-results", form);
     const blob = new Blob([res.data], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "genes.txt");
+    
+    saveAs(blob, `GWASTarget-GeneAnalysis-${form.magmaType.label}.txt`);
   }
 
   function handleSubmit(event) {
