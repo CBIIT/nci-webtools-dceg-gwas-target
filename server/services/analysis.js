@@ -184,6 +184,14 @@ export async function runMagmaAnalysis(params, logger) {
   } catch (e) {
 
     if(params.email){
+      const end = new Date().getTime();
+
+      const time = end - start;
+      const minutes = Math.floor(time / 60000);
+      var seconds = ((time % 60000) / 1000).toFixed(0);
+
+      var runtime = (minutes > 0 ? minutes + " min " : '') + seconds + " secs"
+
       const email = NodeMailer.createTransport({
         host: SMTP_HOST,
         port: SMTP_PORT
@@ -192,12 +200,13 @@ export async function runMagmaAnalysis(params, logger) {
       const templateData = {
         jobName: params.jobName,
         originalTimestamp: params.timestamp,
+        runtime: runtime
       };
 
       const userEmailResults = await email.sendMail({
         from: ADMIN_EMAIL,
         to: params.email,
-        subject: 'GWASTarget Error - ' + params.jobName + " - " + params.timestamp + " UTC",
+        subject: `GWASTarget Error ${TIER != "prod" ? TIER : ""} - ${params.jobName} - ${params.timestamp} UTC`,
         html: await readTemplate(path.resolve("templates", "user-failure-email.html"), templateData),
       });
     }
