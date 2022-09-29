@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Row, Col, Form, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { Row, Col, Form, Button, OverlayTrigger, Tooltip, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Select from "react-select";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { defaultFormState } from "./analysis.state";
@@ -59,7 +59,7 @@ export default function AnalysisForm({ onSubmit, onReset }) {
     snpRef.current.files = asFileList([
       new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
     ])
-    
+
   }, [])
 
   //Disables submit button if there are errors with input
@@ -71,7 +71,7 @@ export default function AnalysisForm({ onSubmit, onReset }) {
     return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
   }
 
-  function handleReset(event){
+  function handleReset(event) {
     event.preventDefault();
     mergeForm(defaultFormState)
 
@@ -509,9 +509,12 @@ export default function AnalysisForm({ onSubmit, onReset }) {
           Reset
         </button>
 
-        <button type="button" className="btn btn-primary" disabled={containsErrors()} onClick={handleSubmit}>
-          Submit
-        </button>
+        <OverlayTrigger
+          overlay={containsErrors() ? <Tooltip>Missing Required Parameters</Tooltip> : <></>}>
+          <Button variant="primary" type="submit" disabled={containsErrors()} onClick={handleSubmit}>
+            Submit
+          </Button>
+        </OverlayTrigger>
       </div>
     </Form>
   );
