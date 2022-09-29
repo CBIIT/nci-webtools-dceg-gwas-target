@@ -22,17 +22,17 @@ export default function App() {
   const links = [
     {
       route: "/home",
-      title: "Home",
+      title: <b>HOME</b>,
       component: Home,
     },
     {
       route: "/",
-      title: "Analysis",
+      title: <b>ANALYSIS</b>,
       component: Analysis,
     },
     {
       route: "/about",
-      title: "About",
+      title: <b>ABOUT</b>,
       component: About,
     },
   ];
@@ -47,7 +47,7 @@ export default function App() {
               <Navbar.Collapse id="app-navbar">
                 <Nav className="d-flex w-100">
                   {links.map((link, index) => (
-                    <NavLink key={`navlink-${index}`} to={link.route} className="nav-link">
+                    <NavLink key={`navlink-${index}`} to={link.route} className="nav-link px-3">
                       {link.title}
                     </NavLink>
                   ))}
