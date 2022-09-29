@@ -511,7 +511,7 @@ export default function AnalysisForm({ onSubmit, onReset }) {
 
         <OverlayTrigger
           overlay={containsErrors() ? <Tooltip>Missing Required Parameters</Tooltip> : <></>}>
-          <Button variant="primary" type="submit" disabled={containsErrors()} onClick={handleSubmit}>
+          <Button variant="primary" disabled={containsErrors()} onClick={handleSubmit}>
             Submit
           </Button>
         </OverlayTrigger>
