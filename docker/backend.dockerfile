@@ -8,24 +8,38 @@ RUN dnf -y update \
       nodejs \
  && dnf clean all
 
-RUN mkdir -p /deploy/server
-
 COPY bin/magma_standard_linux /bin/magma
-
-COPY bin/magma_enhanced_linux /bin/magma_enhanced
 
 RUN chmod +x /bin/magma
 
+COPY bin/magma_enhanced_linux /bin/magma_enhanced
+
 RUN chmod +x /bin/magma_enhanced
 
-WORKDIR /deploy/server
+ARG UID=1000
+
+ARG GID=1000
+
+ARG USER=user
+
+RUN groupadd --gid ${GID} ${USER}
+
+RUN useradd --uid ${UID} --gid ${GID} -s /bin/bash ${USER}
+
+RUN mkdir -p /server
+
+WORKDIR /server
+
+RUN chown -R ${UID}:${GID} ./
+
+USER ${USER}
 
 # use build cache for npm packages
-COPY server/package.json /deploy/server/
+COPY --chown=${UID} server/package.json server/package-lock.json ./
 
 RUN npm install
 
 # copy the rest of the application
-COPY server /deploy/server
+COPY --chown=${UID} server ./
 
 CMD npm start
