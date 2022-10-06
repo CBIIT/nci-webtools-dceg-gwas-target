@@ -15,7 +15,7 @@ export default function Home() {
               Perform gene analysis and generalized gene set analysis of GWAS data using MAGMA
             </p>
             <div className="d-flex justify-content-center">
-              <NavLink className=" btn btn-outline-secondary" to="analysis">
+              <NavLink className=" btn btn-outline-secondary" to="/">
                 Perform Analysis
               </NavLink>
             </div>
