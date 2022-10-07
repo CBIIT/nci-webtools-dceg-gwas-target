@@ -10,7 +10,6 @@ import { withAsync } from "./middleware.js";
 import { EcsWorker, LocalWorker } from "./queue-worker.js";
 import { magma } from "./analysis.js";
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
-import Archiver from 'archiver';
 
 const { INPUT_FOLDER, OUTPUT_FOLDER, ADMIN_EMAIL, SMTP_HOST, SMTP_PORT, WORKER_TYPE, BASE_URL } = process.env;
 
