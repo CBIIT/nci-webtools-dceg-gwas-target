@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Row, Col, Form, Button, OverlayTrigger, Tooltip, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Select from "react-select";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { defaultFormState } from "./analysis.state";
 import { uploadFiles } from "../../services/uploadFiles";
 import Loader from "../common/loader";
+import { useParams } from "react-router-dom";
+import { saveAs } from "file-saver";
 
 const { v1: uuidv1, validate } = require("uuid");
 const axios = require("axios");
@@ -31,6 +33,10 @@ export default function AnalysisForm({ onSubmit, onReset }) {
   const [geneSetError, setGeneSetError] = useState("")
   const [covarError, setCovarError] = useState("")
 
+  const { id } = useParams()
+  const _loadResults = useCallback(loadResults, [id])
+  useEffect(_ => { _loadResults(id) }, [id, _loadResults]);
+
   const geneLocRef = useRef()
   const refDataRef = useRef()
   const snpRef = useRef()
@@ -43,6 +49,34 @@ export default function AnalysisForm({ onSubmit, onReset }) {
     }
 
     return container.files;
+  }
+
+  async function loadResults(id) {
+    if (!id) return;
+    const response = await axios.post("api/fetch-params", { request_id: id })
+    const data = response.data
+
+    geneLocRef.current.files = asFileList([
+      new File([""], data.geneLocFile === "sample_gene_loc.loc" ? "NCBI37.3.gene.loc" : data.geneLocFile)
+    ])
+
+    snpRef.current.files = asFileList([
+      new File([""], data.pvalFile === "sample_snp.tsv" ? "PGC3_SCZ_wave3_public.v2.tsv" : data.pvalFile)
+    ])
+
+    const bimFile = data.geneAnalysisBim ? data.geneAnalysisBim : `${data.snpType.value}.bim`;
+    const bedFile = data.geneAnalysisBed ? data.geneAnalysisBed : `${data.snpType.value}.bed`;
+    const famFile = data.geneAnalysisFam ? data.geneAnalysisFam : `${data.snpType.value}.fam`;
+
+    refDataRef.current.files = asFileList([
+      new File([""], bimFile),
+      new File([""], bedFile),
+      new File([""], famFile),
+    ])
+
+    setGeneAnalysisList([{ name: bimFile }, { name: bedFile }, { name: famFile }])
+
+    mergeForm(data)
   }
 
   useEffect(() => {
@@ -71,6 +105,21 @@ export default function AnalysisForm({ onSubmit, onReset }) {
     return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
   }
 
+  async function handleSample() {
+
+    mergeForm({ loading: true })
+    try {
+      const results = await axios.post("api/fetch-sample", form, { responseType: "arraybuffer" });
+      const blob = new Blob([results.data], { type: "application/zip" });
+      saveAs(blob, "sample.zip");
+      mergeForm({ loading: false })
+    } catch (error) {
+      mergeForm({ loading: false })
+      console.log(error);
+
+    }
+  }
+
   function handleReset(event) {
     event.preventDefault();
     mergeForm(defaultFormState)
@@ -97,9 +146,7 @@ export default function AnalysisForm({ onSubmit, onReset }) {
     setCovarFile("")
 
     onReset();
-    console.log(form)
   }
-  console.log(form)
 
   function handleChange(event) {
     console.log(event.target);
@@ -173,8 +220,10 @@ export default function AnalysisForm({ onSubmit, onReset }) {
 
   function processRefData(fileList) {
     const type = /(?:\.([^.]+))?$/;
-
-    if (fileList.length !== 3) setGeneAnalysisError("Please submit 3 files (.bim,.bed,.fam)");
+    console.log(fileList.length !== 3)
+    if (fileList.length !== 3) {
+      setGeneAnalysisError("Please submit 3 files (.bim,.bed,.fam)");
+    }
     else {
       const extensions = [
         type.exec(fileList[0].name)[1],
@@ -188,6 +237,8 @@ export default function AnalysisForm({ onSubmit, onReset }) {
         if (fileList[0].size > FILE_SIZE_LIMIT || fileList[1].size > FILE_SIZE_LIMIT || fileList[2].size > FILE_SIZE_LIMIT) {
           mergeForm({ queue: true })
         }
+
+        setGeneAnalysisError("");
       }
     }
 
@@ -199,7 +250,7 @@ export default function AnalysisForm({ onSubmit, onReset }) {
       <Loader show={form.loading} fullscreen />
       <Row className="mb-2 justify-content-end">
         <Col className="d-flex justify-content-end" xl={6}>
-          <a href="javascript:void(0)">Download Sample Data</a>
+          <a href="javascript:void(0)" onClick={handleSample}>Download Sample Data</a>
         </Col>
       </Row>
       <Form.Group className="mb-3">
@@ -304,7 +355,6 @@ export default function AnalysisForm({ onSubmit, onReset }) {
                     onClick={() => {
                       var fileList = Array.from(geneAnalysisList);
                       fileList.splice(index, 1);
-                      console.log(fileList);
                       processRefData(fileList);
                     }}
                     style={{ color: "red", cursor: "pointer" }}>
