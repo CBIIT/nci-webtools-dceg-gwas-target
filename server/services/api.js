@@ -10,6 +10,7 @@ import { withAsync } from "./middleware.js";
 import { EcsWorker, LocalWorker } from "./queue-worker.js";
 import { magma } from "./analysis.js";
 import { createSqliteTableFromFile, getSqliteConnection } from "./database.js";
+import Archiver from 'archiver';
 
 const { INPUT_FOLDER, OUTPUT_FOLDER, ADMIN_EMAIL, SMTP_HOST, SMTP_PORT, WORKER_TYPE, BASE_URL } = process.env;
 
@@ -66,7 +67,6 @@ apiRouter.post("/submit", async (req, res) => {
   const { logger } = req.app.locals;
   const { request_id } = req.body;
   logger.info(`[${request_id}] Execute /submit`);
-
 
 
   let body = Object.assign(req.body, {
@@ -148,7 +148,7 @@ apiRouter.post("/fetch-results", async (request, response) => {
   const { logger } = request.app.locals;
   logger.info(request.body);
 
-  if (!request.body.submitted) {
+  if (!request.body.request_id) {
     logger.info(`Execute /fetch-results sample file`);
     const sampleResults = path.resolve(OUTPUT_FOLDER, "default", "gene_analysis.genes.out");
     response.download(sampleResults);
@@ -161,3 +161,24 @@ apiRouter.post("/fetch-results", async (request, response) => {
     logger.info(`[${request_id}] Finish /fetch-results`);
   }
 });
+
+apiRouter.post('/fetch-params', async(request, response) => {
+  const { logger } = request.app.locals;
+  const { request_id } = request.body;
+
+  if (request_id && fs.existsSync(path.resolve(INPUT_FOLDER, request_id, "params.json"))) {
+    logger.info(`[${request_id}] Execute /fetch-params`);
+    const data = fs.readFileSync(path.resolve(INPUT_FOLDER, request_id, "params.json"))
+    logger.info(`[${request_id}] Finish /fetch-params`);
+    response.json(JSON.parse(data))
+  }
+})
+
+apiRouter.post('/fetch-sample', async (request, response) => {
+  const { logger } = request.app.locals;
+  logger.info("Execute /fetch-sample sample file")
+
+  const defualtFolder = path.resolve(INPUT_FOLDER, "default");
+  logger.info("Finish /fetch-sample sample file")
+  response.download(path.resolve(defualtFolder, "sample.zip"))
+})
