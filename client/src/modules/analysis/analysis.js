@@ -42,9 +42,11 @@ export default function Analysis() {
     console.log("reset", event);
   }
 
-  function loadResults(id){
+  async function loadResults(id){
     if (!id) return;
-    mergeForm({ request_id: id, submitted: false })
+    const params = await axios.post("api/fetch-params", { request_id: id })
+    console.log(params)
+    mergeForm(params.data)
   }
 
 
