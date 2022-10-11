@@ -150,6 +150,7 @@ apiRouter.post("/fetch-results", async (request, response) => {
   if (!request.body.request_id) {
     logger.info(`Execute /fetch-results sample file`);
     const sampleResults = path.resolve(OUTPUT_FOLDER, "default", "gene_analysis.genes.out");
+    logger.info(sampleResults)
     response.download(sampleResults);
     logger.info(`Finish /fetch-results sample file`);
   } else {
@@ -177,7 +178,8 @@ apiRouter.post('/fetch-sample', async (request, response) => {
   const { logger } = request.app.locals;
   logger.info("Execute /fetch-sample sample file")
 
-  const defualtFolder = path.resolve(INPUT_FOLDER, "default");
+  const defaultFolder = path.resolve(INPUT_FOLDER, 'default');
+  logger.info(defaultFolder)
   logger.info("Finish /fetch-sample sample file")
-  response.download(path.resolve(defualtFolder, "sample.zip"))
+  response.download(path.resolve(defaultFolder, 'sample.zip'))
 })
