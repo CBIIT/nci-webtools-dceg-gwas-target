@@ -69,6 +69,12 @@ export default function AnalysisForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} onReset={onReset} disabled={loading}>
+      <div className="text-end">
+        <a download href={`${process.env.PUBLIC_URL}/api/data/input/default/example.zip`}>
+          Download Example Data
+        </a>
+      </div>
+
       <Form.Group className="mb-4" controlId="magmaType">
         <Form.Label className="required">Magma Model</Form.Label>
         <Form.Select required {...register("magmaType", { required: true })}>
