@@ -1,11 +1,11 @@
-FROM quay.io/centos/centos:stream8
+FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
- && curl -fsSL https://rpm.nodesource.com/setup_18.x | bash - \
  && dnf -y install \
     httpd \
     make \
     nodejs \
+    npm \
  && dnf clean all
 
 RUN mkdir -p /deploy/client

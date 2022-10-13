@@ -1,31 +1,23 @@
-FROM quay.io/centos/centos:stream8
+FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
- && curl -fsSL https://rpm.nodesource.com/setup_18.x | bash - \
  && dnf -y install \
-      make \
-      gcc-c++ \
-      nodejs \
+    make \
+    gcc-c++ \
+    nodejs \
+    npm \
  && dnf clean all
 
-RUN mkdir -p /deploy/server
+RUN mkdir -p /server
 
-COPY bin/magma_standard_linux /bin/magma
-
-COPY bin/magma_enhanced_linux /bin/magma_enhanced
-
-RUN chmod +x /bin/magma
-
-RUN chmod +x /bin/magma_enhanced
-
-WORKDIR /deploy/server
+WORKDIR /server
 
 # use build cache for npm packages
-COPY server/package.json /deploy/server/
+COPY server/package.json server/package-lock.json /server/
 
 RUN npm install
 
 # copy the rest of the application
-COPY server /deploy/server
+COPY server /server
 
 CMD npm start
