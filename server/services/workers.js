@@ -1,0 +1,71 @@
+import path from "path";
+import ECS, { ECSClient, RunTaskCommand } from "@aws-sdk/client-ecs";
+import { runMagma } from "./magma.js";
+import { readJson } from "./utils.js";
+import { createLogger } from "./logger.js";
+
+export function getWorkerCommand(id) {
+  return ["node", ["--require", "dotenv/config", "worker.js", id]];
+}
+
+export function getWorker(workerType = "local") {
+  switch (workerType) {
+    case "local":
+      return runLocalWorker;
+    case "fargate":
+      return runFargateWorker;
+    default:
+      throw new Error(`Unknown worker type: ${workerType}`);
+  }
+}
+
+/**
+ * Executes a worker process locally.
+ * @param {string} id
+ * @param {string} cwd
+ * @returns
+ */
+export async function runLocalWorker(id, env = process.env) {
+  const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, "params.json");
+  const params = await readJson(paramsFilePath);
+  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  return await runMagma(params, logger);
+}
+
+/**
+ * Executes a worker process in an AWS Fargate task.
+ * @param {string} id
+ * @param {string} env
+ * @returns {Promise<ECS.RunTaskCommandOutput>} task output
+ */
+export async function runFargateWorker(id, env = process.env) {
+  const { CLUSTER_NAME, SUBNET_IDS, SECURITY_GROUP_IDS, WORKER_TASK_NAME } = env;
+  const client = new ECSClient();
+  const workerCommand = ["node", "--require", "dotenv/config", "worker.js", id];
+  const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
+  const taskCommand = new RunTaskCommand({
+    cluster: CLUSTER_NAME,
+    count: 1,
+    launchType: "FARGATE",
+    networkConfiguration: {
+      awsvpcConfiguration: {
+        securityGroups: SECURITY_GROUP_IDS.split(","),
+        subnets: SUBNET_IDS.split(","),
+      },
+    },
+    taskDefinition: WORKER_TASK_NAME,
+    overrides: {
+      containerOverrides: [
+        {
+          name: "worker",
+          command: workerCommand,
+        },
+      ],
+    },
+  });
+  const response = await client.send(taskCommand);
+  logger.info("Submitted Fargate RunTask command");
+  logger.info(workerCommand);
+  logger.info(response);
+  return response;
+}
