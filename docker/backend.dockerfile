@@ -20,4 +20,6 @@ RUN npm install
 # copy the rest of the application
 COPY server /server
 
+RUN chmod -R +x /server/bin
+
 CMD npm start
