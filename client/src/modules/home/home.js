@@ -2,6 +2,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -20,9 +21,9 @@ export default function Home() {
                     <p className="lead text-light">
                       Perform gene analysis and generalized gene set analysis of GWAS data using MAGMA
                     </p>
-                    <Button size="lg" variant="outline-light">
+                    <Link to="/analysis" className="btn btn-lg btn-outline-light text-decoration-none">
                       Run Analysis
-                    </Button>
+                    </Link>
                   </div>
                 </div>
               </Col>
