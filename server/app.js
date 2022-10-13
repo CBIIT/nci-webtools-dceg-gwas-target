@@ -1,23 +1,40 @@
+import http from "http";
 import express from "express";
-import fs from "fs";
-import { getLogger } from "./services/logger.js";
-import { apiRouter } from "./services/api.js";
+import { createLogger } from "./services/logger.js";
+import { createApi } from "./services/api.js";
 import { validateEnvironment } from "./services/environment.js";
-import { logErrors, logRequests } from "./services/middleware.js";
-const { APP_NAME, API_PORT, LOG_LEVEL, INPUT_FOLDER, OUTPUT_FOLDER, SERVER_TIMEOUT } = process.env;
+import { isMainModule } from "./services/utils.js";
 
-// ensure that all environment variables are set
-validateEnvironment();
+// if this module is the main module, start the app
+if (isMainModule(import.meta)) {
+  const env = process.env;
+  validateEnvironment(env);
+  main(env);
+}
 
-// start app on specified port
-const serverTimeout = +SERVER_TIMEOUT || 1000 * 60 * 15;
-const app = createApp();
-const server = app.listen(API_PORT, () => {
-  app.locals.logger.info(`${APP_NAME} started on port ${API_PORT}`);
-});
-server.setTimeout(serverTimeout);
+/**
+ * Creates and starts an express app given a specified environment.
+ * @param {object} env
+ * @returns {http.Server} a node http server
+ */
+export function main(env) {
+  const { APP_PORT, APP_NAME, SERVER_TIMEOUT } = env;
+  const serverTimeout = +SERVER_TIMEOUT || 1000 * 60 * 15;
+  const app = createApp(env);
+  const server = app.listen(APP_PORT, () => {
+    app.locals.logger.info(`${APP_NAME} started on port ${APP_PORT}`);
+  });
+  server.setTimeout(serverTimeout);
+  return server;
+}
 
-export function createApp() {
+/**
+ * Creates an express app given a specified environment.
+ * @param {object} env
+ * @returns {express.Application} an Express app
+ */
+export function createApp(env) {
+  const { APP_NAME, LOG_LEVEL } = env;
   const app = express();
 
   // if behind a proxy, use the first x-forwarded-for address as the client's ip address
@@ -26,12 +43,8 @@ export function createApp() {
   app.set("x-powered-by", false);
 
   // register services as app locals
-  app.locals.logger = getLogger(APP_NAME, LOG_LEVEL);
-  app.use(logRequests());
-  app.use("/api", apiRouter);
-  app.use(logErrors);
-
-  for (const folder of [INPUT_FOLDER, OUTPUT_FOLDER]) fs.mkdirSync(folder, { recursive: true });
+  app.locals.logger = createLogger(APP_NAME, LOG_LEVEL);
+  app.use("/api", createApi(env));
 
   return app;
 }
