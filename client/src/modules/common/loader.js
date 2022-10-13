@@ -5,7 +5,7 @@ export default function Loader({
   show = false,
   children = "Loading",
   fullscreen = false,
-  className = "o-75 bg-white",
+  className = "opacity-75 bg-white",
 }) {
   return !show ? null : (
     <div

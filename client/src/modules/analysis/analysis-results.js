@@ -1,113 +1,93 @@
+import { useEffect } from "react";
+import { useParams, redirect } from "react-router-dom";
+import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
+import AnalysisResultsTable from "./analysis-results-table";
+import { useRecoilState, useRecoilValue, useRecoilRefresher_UNSTABLE as useRecoilRefresher } from "recoil";
+import { statusSelector, loadingState, manifestSelector, paramsSelector, resultsSelector } from "./analysis.state";
 
-import { formState, resultsState } from "./analysis.state";
-import { useRecoilState, useRecoilValue } from "recoil";
-import Table from "../components/table";
-import { Row } from "react-bootstrap";
-const axios = require("axios");
+export default function AnalysisResults() {
+  const id = useParams().id || "default";
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const params = useRecoilValue(paramsSelector(id));
+  const status = useRecoilValue(statusSelector(id));
+  const manifest = useRecoilValue(manifestSelector(id));
+  const results = useRecoilValue(resultsSelector(id));
+  const refreshStatus = useRecoilRefresher(statusSelector(id));
+  const refreshManifest = useRecoilRefresher(manifestSelector(id));
+  const refreshResults = useRecoilRefresher(resultsSelector(id));
+  const isDone = ["COMPLETED", "FAILED"].includes(status?.status);
 
-export default function AnalysisResults({ onDownload }) {
-    const [form, setForm] = useRecoilState(formState);
-    const results = useRecoilValue(resultsState)
-    const geneColumns = [
-        {
-            accessor: "GENE",
-            id: "gene",
-            label: "Gene",
-            Header: (
-                <b>Gene</b>
-            ),
-        },
-        {
-            accessor: "CHR",
-            id: "chr",
-            label: "Chr",
-            Header: (
-                <b>Chr</b>
-            ),
-        },
-        {
-            accessor: "START",
-            id: "start",
-            label: "Start",
-            Header: (
-                <b>Start (hg19)</b>
-            ),
-        },
-        {
-            accessor: "STOP",
-            id: "stop",
-            label: "Stop",
-            Header: (
-                <b>Stop (hg19)</b>
-            ),
-        },
-        {
-            accessor: "NSNPS",
-            id: "nsnps",
-            label: "NSNPS",
-            Header: (
-                <b>NSNPS</b>
-            ),
-        },
-        {
-            accessor: "NPARAM",
-            id: "nparam",
-            label: "NPARAM",
-            Header: (
-                <b>NPARAM</b>
-            ),
-        },
-        {
-            accessor: "N",
-            id: "n",
-            label: "N",
-            Header: (
-                <b>n</b>
-            ),
-        },
-        {
-            accessor: "ZSTAT",
-            id: "zstat",
-            label: "ZSTAT",
-            Header: (
-                <b>ZSTAT</b>
-            ),
-        },
-        {
-            accessor: "P",
-            id: "p",
-            label: "P",
-            Header: (
-                <b>P</b>
-            ),
-            sort: true,
-            sortType: (a, b) => {
-                return a.original.P - b.original.P
-            },
-        },
-    ]
+  useEffect(() => {
+    const interval = setInterval(refreshStatus, 1000 * 60);
+    if (isDone) clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [isDone, refreshStatus]);
 
-    return (
+  useEffect(() => {
+    if (isDone) {
+      refreshManifest();
+      refreshResults();
+    }
+  }, [isDone, refreshManifest, refreshResults]);
+
+  return (
+    <div>
+      {status.status === "COMPLETED" && (
         <>
-            {form.submitted && form.email ?
-                <div className="alert alert-success">
-                    Your job is being processed, an email will be sent with a link to your results when the calculations have been complete.
-                </div> :
-                <div>
-                    <Row className="mx-3">
-                        <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-                            <a href="javascript:void(0)" onClick={onDownload}>Export Results</a>
-                        </div>
-                    </Row>
-                    <Table
-                        columns={geneColumns}
-                        defaultSort={[{ id: "p", asec: true }]}
-                        data={results ?
-                            results.data
-                            : []}
-                    />
-                </div>
-            }
+          <div className="text-end mb-3">
+            <a
+              href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${manifest.geneAnalysisFile}`}
+              download={`${params.magmaType}_${manifest.geneAnalysisFile}`}>
+              Download Results
+            </a>
+          </div>
+          <AnalysisResultsTable results={results} />
         </>
-    )
+      )}
+      {status.status === "FAILED" && (
+        <>
+          <Alert variant="danger">
+            <Alert.Heading className="mb-3">Analysis Failed</Alert.Heading>
+            <p>
+              Your analysis failed with the following error: {status?.error?.message || "INTERNAL ERROR"}. Please
+              contact the site administrator for assistance if this issue persists.
+            </p>
+          </Alert>
+        </>
+      )}
+      {status.status === "SUBMITTED" && (
+        <>
+          <Alert variant="info">
+            <Alert.Heading className="mb-3 d-flex align-items-center">
+              Analysis submitted
+              <Spinner animation="border" role="status" size="sm" className="mx-2">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </Alert.Heading>
+            <p>
+              Your analysis has been submitted.
+              {params.sendNotification && <span> You will receive an email once it is complete.</span>}
+            </p>
+          </Alert>
+        </>
+      )}
+      {status.status === "IN_PROGRESS" && (
+        <>
+          <Alert variant="info">
+            <Alert.Heading className="mb-3 d-flex align-items-center">
+              Analysis in progress
+              <Spinner animation="border" role="status" size="sm" className="mx-2">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </Alert.Heading>
+            <p>
+              Your analysis is currently in progress.
+              {params.sendNotification && <span> You will receive an email once it is complete.</span>}
+            </p>
+          </Alert>
+        </>
+      )}
+    </div>
+  );
 }
