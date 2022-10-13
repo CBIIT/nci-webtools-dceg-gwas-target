@@ -1,8 +1,17 @@
-import { createReadStream } from "fs";
+import { createReadStream, existsSync } from "fs";
 import { format } from "util";
 import { parse } from "csv-parse";
-
 import knex from "knex";
+
+export async function createDatabaseFromFiles(tables, databaseFile) {
+  const connection = getSqliteConnection(databaseFile);
+  for (const { name, file } of tables) {
+    if (existsSync(file)) {
+      const delimiter = ["\t", ...createDelimiters(" ", 100)];
+      await createSqliteTableFromFile(connection, name, file, { delimiter });
+    }
+  }
+}
 
 export async function createSqliteTableFromFile(connection, table, filepath, parseOptions = {}) {
   const parser = getDelimitedFileParser(filepath, parseOptions);
