@@ -1,73 +1,54 @@
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense } from "react";
+import { useRecoilValue } from "recoil";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import AnalysisForm from "./analysis-form";
 import AnalysisResults from "./analysis-results";
-import Container from "react-bootstrap/Container";
-import { Card } from "react-bootstrap";
-import { defaultFormState, formState } from "./analysis.state";
-import { SidebarContainer, SidebarPanel, MainPanel } from "../components/sidebar-container";
-import { useRecoilState } from "recoil";
-import { saveAs } from "file-saver";
-import { useParams } from "react-router-dom";
-const axios = require("axios");
-
+import ErrorBoundary from "../common/error-boundary";
+import Loader from "../common/loader";
+import { loadingState } from "./analysis.state";
+const semibold = ({ children }) => <span className="fw-semibold">{children}</span>;
 
 export default function Analysis() {
-  const [form, setForm] = useRecoilState(formState);
-  const mergeForm = (obj) => setForm({ ...form, ...obj });
-  const [_openSidebar, _setOpenSidebar] = useState(true);
-  const { id } = useParams()
-
-  const _loadResults = useCallback(loadResults, [id])
-  useEffect(_ => { _loadResults(id) }, [id, _loadResults]);
-
-  useEffect(() => {
-    _setOpenSidebar(form.openSidebar);
-  }, [form.openSidebar]);
-
-  async function handleDownload() {
-    const res = await axios.post("api/fetch-results", form);
-    const blob = new Blob([res.data], { type: "text/plain;charset=utf-8" });
-    
-    saveAs(blob, `GWASTarget-GeneAnalysis-${form.magmaType.label}.txt`);
-  }
-
-  function handleSubmit(event) {
-    setForm({ ...event, loading: false, submitted: true });
-    console.log("submit", event);
-  }
-
-  function handleReset(event){
-    setForm(defaultFormState)
-    console.log(form)
-    console.log("reset", event);
-  }
-
-  function loadResults(id){
-    if (!id) return;
-    mergeForm({ request_id: id, submitted: false })
-  }
-
+  const loading = useRecoilValue(loadingState);
 
   return (
-    <Container className="my-4">
-      <SidebarContainer collapsed={!_openSidebar} onCollapsed={(collapsed) => mergeForm({ openSidebar: !collapsed })}>
-        <SidebarPanel>
-          <Card className="shadow">
-            <Card.Body>
-              <AnalysisForm onSubmit={handleSubmit} onReset={handleReset}/>
-            </Card.Body>
-          </Card>
-        </SidebarPanel>
-        <MainPanel>
-          <Card className="shadow h-100">
-            <Card.Body className="p-0">
-              <div className="m-3">
-                <AnalysisResults onDownload={handleDownload} />
-              </div>
-            </Card.Body>
-          </Card>
-        </MainPanel>
-      </SidebarContainer>
+    <Container className="py-5">
+      <Loader fullscreen show={loading} />
+      <Row>
+        <Col md={4}>
+          <div className="shadow p-4 rounded" style={{ minHeight: "400px" }}>
+            <ErrorBoundary
+              fallback={
+                <strong>
+                  An internal error occured when loading form parameters. If this issue persists, please contact the
+                  site administrator.
+                </strong>
+              }>
+              <Suspense fallback={<strong>Loading</strong>}>
+                <AnalysisForm />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        </Col>
+
+        <Col md={8}>
+          <div className="shadow p-4 rounded" style={{ minHeight: "400px" }}>
+            <ErrorBoundary
+              fallback={
+                <strong>
+                  An internal error occured when loading results. If this issue persists, please contact the site
+                  administrator.
+                </strong>
+              }>
+              <Suspense fallback={<strong>Loading</strong>}>
+                <AnalysisResults />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 }
