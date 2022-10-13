@@ -20,5 +20,5 @@ export async function main(argv = process.argv, env = process.env) {
   const params = await readJson(paramsFilePath);
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   logger.log({ params });
-  return await runMagma(params, console);
+  return await runMagma(params, console, env);
 }

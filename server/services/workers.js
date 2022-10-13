@@ -29,7 +29,7 @@ export async function runLocalWorker(id, env = process.env) {
   const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, "params.json");
   const params = await readJson(paramsFilePath);
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
-  return await runMagma(params, logger);
+  return await runMagma(params, logger, env);
 }
 
 /**
