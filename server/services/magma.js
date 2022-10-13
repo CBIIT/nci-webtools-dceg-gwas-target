@@ -10,7 +10,7 @@ import { execFileAsync, readJson, writeJson, mkdirs, coalesceFilePaths, copyFile
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
-export async function runMagma(params, logger) {
+export async function runMagma(params, logger, env = process.env) {
   const id = params?.id || "default";
   const paths = await getPaths(params);
   const submittedTime = new Date();
