@@ -17,4 +17,4 @@ services:
     links:
       - backend:backend
     ports:
-      - "8080:80"
+      - "3000:80"
