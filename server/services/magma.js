@@ -11,12 +11,15 @@ import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
 export async function runMagma(params, logger, env = process.env) {
-  const id = params?.id || "default";
-  const paths = await getPaths(params);
+  const id = params.id;
+  const paths = await getPaths(params, env);
   const submittedTime = new Date();
   logger.info(paths);
 
   try {
+    if (!id) throw new Error("Missing id");
+    if (!validator.isUUID(id)) throw new Error("Invalid id");
+
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
     await writeJson(paths.statusFile, { id, status: "IN_PROGRESS" });
