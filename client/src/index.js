@@ -1,14 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { reportWebVitals, sendToGoogleAnalytics } from "./reportWebVitals";
-import App from "./app";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RecoilRoot } from "recoil";
+import { reportWebVitals } from "./reportWebVitals";
+import { routes } from "./routes";
+import "./styles/main.scss";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("root")
+const root = createRoot(document.getElementById("root"));
+const router = createBrowserRouter(routes, { basename: process.env.PUBLIC_URL });
+
+root.render(
+  <StrictMode>
+    <RecoilRoot>
+      <RouterProvider router={router} />
+    </RecoilRoot>
+  </StrictMode>
 );
 
-document.querySelector("[react-cloak]").removeAttribute("react-cloak");
-reportWebVitals(sendToGoogleAnalytics, console.debug);
+reportWebVitals(console.log);

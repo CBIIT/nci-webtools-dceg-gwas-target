@@ -1,46 +1,79 @@
+import axios from "axios";
 import { atom, selector, selectorFamily } from "recoil";
 
-const axios = require("axios");
+export const loadingState = atom({
+  key: "analysis.loadingState",
+  default: false,
+});
 
-export const defaultFormState = {
-  openSidebar: true,
-  magmaType: { value: "enhanced", label: "ABC MAGMA" },
-  analysisInput: { value: "refData", label: "Reference Data" },
-  rawOnly: false,
-  snpType: { value: "g1000_eur", label: "European" },
-  sampleSizeOption: { value: "input", label: "Provide one sample size" },
-  sampleSize: 100,
-  queue: false,
-  jobName: "",
-  email: "",
-  loading: false,
-  submitted: false,
-  request_id: "",
-  timestamp: "",
-};
+export const statusSelector = selectorFamily({
+  key: "analysis.statusSelector",
+  get:
+    (id = "default") =>
+    async ({ get }) => {
+      try {
+        const endpoint = `${process.env.PUBLIC_URL}/api/data/output/${id}/status.json`;
+        const response = await axios.get(endpoint);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
+});
 
-export const resultsState = selector({
-  key: "results",
-  get: async ({ get }) => {
-    const params = get(formState);
-    if (!params) return null;
+export const paramsSelector = selectorFamily({
+  key: "analysis.paramsSelector",
+  get:
+    (id = "default") =>
+    async ({ get }) => {
+      try {
+        const endpoint = `${process.env.PUBLIC_URL}/api/data/input/${id}/params.json`;
+        const response = await axios.get(endpoint);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
+});
 
-    const results = await axios.post("api/query-results", {
-      ...params,
-      "table": "gene",
-      "orderBy": 'P',
-      "columns": "*",
-      "offset": 0,
-      "limit": 10000,
-      "conditions": "P IS NOT NULL"
-    });
+export const resultsSelector = selectorFamily({
+  key: "analysis.resultsSelector",
+  get:
+    (id = "default") =>
+    async ({ get }) => {
+      try {
+        const endpoint = `${process.env.PUBLIC_URL}/api/query/${id}`;
+        const geneAnalysisResponse = await axios.post(endpoint, {
+          table: "gene_analysis",
+          orderBy: "P",
+          limit: -1,
+        });
+        return {
+          geneAnalysis: geneAnalysisResponse.data,
+        };
+      } catch (error) {
+        console.error(error);
+        return {
+          geneAnalysis: [],
+        };
+      }
+    },
+});
 
-    console.log(results)
-    return results
-  }
-})
-
-export const formState = atom({
-  key: "explore.formState",
-  default: defaultFormState,
+export const manifestSelector = selectorFamily({
+  key: "analysis.manifestSelector",
+  get:
+    (id = "default") =>
+    async ({ get }) => {
+      try {
+        const endpoint = `${process.env.PUBLIC_URL}/api/data/output/${id}/manifest.json`;
+        const response = await axios.get(endpoint);
+        return response.data;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    },
 });

@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>GWASTarget Error</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
 
-<body>
-    Dear GWASTarget User, <br>
+  <body>
+    Dear GWASTarget User, <br />
     <p>
-        The job you submitted to GWASTarget failed to be processed. Please correct your settings and resubmit or contact us at NCIGWASTargetWebAdmin@mail.nih.gov for more information or if you have any questions.
+      The job you submitted to GWASTarget could not be processed due to an error. Please ensure that any files or
+      parameters provided are in the correct format and resubmit your job. For further assistance, contact us at
+      NCIGWASTargetWebAdmin@mail.nih.gov
     </p>
-    <ul style="list-style-type:none;">
-        <li href="{jobName}">Job Name: {jobName}</li>
-        <li href="{originalTimestamp}">Submitted Time: {originalTimestamp} UTC</li>
-        <li href="{runtime}">Execution Time: {runtime}</li>
+    <b>Job Information</b>
+    <ul style="list-style-type: none">
+      <li>Job Name: <%- jobName %></li>
+      <li>Submitted Time: <%- submittedAt %></li>
+      <li>Execution Time: <%- executionTime %> seconds</li>
     </ul>
-    <p>
-        Respectfully, <br>
-        GWASTarget Web Tool
-    </p>
-</body>
 
+    <b>Error:</b><br />
+    <pre><%= error %></pre>
+
+    <p>
+      Respectfully, <br />
+      GWASTarget Web Tool
+    </p>
+  </body>
 </html>

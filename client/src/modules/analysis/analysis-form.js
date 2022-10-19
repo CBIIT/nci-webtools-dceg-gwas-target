@@ -1,570 +1,276 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Row, Col, Form, Button, OverlayTrigger, Tooltip, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
-import Select from "react-select";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { defaultFormState } from "./analysis.state";
-import { uploadFiles } from "../../services/uploadFiles";
-import Loader from "../common/loader";
-import { useParams } from "react-router-dom";
-import { saveAs } from "file-saver";
+import axios from "axios";
+import mapValues from "lodash/mapValues";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useForm } from "react-hook-form";
+import { useParams, redirect, useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import FileInput from "../common/file-input";
+import { defaultFormState } from "./analysis-form.state";
+import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
+import { paramsSelector, loadingState } from "./analysis.state";
+import { useEffect } from "react";
 
-const { v1: uuidv1, validate } = require("uuid");
-const axios = require("axios");
+export default function AnalysisForm() {
+  const { handleSubmit, register, reset, setValue, watch, formState, control } = useForm({
+    mode: "onChange",
+    defaultValues: defaultFormState,
+  });
+  const { id } = useParams();
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const params = useRecoilValue(paramsSelector(id));
+  const navigate = useNavigate();
 
-export default function AnalysisForm({ onSubmit, onReset }) {
-  const [form, setForm] = useState(defaultFormState);
-  const mergeForm = (obj) => setForm({ ...form, ...obj });
-  const FILE_SIZE_LIMIT = 100000000;
-  const fileSizeError = "File size cannot exceed 100 MB";
+  useEffect(() => reset(params), [reset, params]);
 
-  const [snpLocFile, setSnpLocFile] = useState("");
-  const [geneLocFile, setGeneLocFile] = useState("");
-  const [geneAnalysisList, setGeneAnalysisList] = useState([{ name: "g1000_eur.bim" }, { name: "g1000_eur.bed" }, { name: "g1000_eur.fam" }]);
-  const [rawData, setRawData] = useState("")
-  const [pvalFile, setPvalFile] = useState("");
-  const [geneSetFile, setGeneSetFile] = useState("");
-  const [covarFile, setCovarFile] = useState("");
-
-  const [snpLocError, setSnpLocError] = useState("");
-  const [geneAnalysisError, setGeneAnalysisError] = useState("");
-  const [geneLocError, setGeneLocError] = useState("")
-  const [rawDataError, setRawDataError] = useState("")
-  const [pvalError, setPvalError] = useState("")
-  const [geneSetError, setGeneSetError] = useState("")
-  const [covarError, setCovarError] = useState("")
-
-  const { id } = useParams()
-  const _loadResults = useCallback(loadResults, [id])
-  useEffect(_ => { _loadResults(id) }, [id, _loadResults]);
-
-  const geneLocRef = useRef()
-  const refDataRef = useRef()
-  const snpRef = useRef()
-
-  function asFileList(files) {
-    let container = new DataTransfer()
-
-    for (let file of files) {
-      container.items.add(file)
-    }
-
-    return container.files;
-  }
-
-  async function loadResults(id) {
-    if (!id) return;
-    const response = await axios.post("api/fetch-params", { request_id: id })
-    const data = response.data
-
-    geneLocRef.current.files = asFileList([
-      new File([""], data.geneLocFile === "sample_gene_loc.loc" ? "NCBI37.3.gene.loc" : data.geneLocFile)
-    ])
-
-    snpRef.current.files = asFileList([
-      new File([""], data.pvalFile === "sample_snp.tsv" ? "PGC3_SCZ_wave3_public.v2.tsv" : data.pvalFile)
-    ])
-
-    const bimFile = data.geneAnalysisBim ? data.geneAnalysisBim : `${data.snpType.value}.bim`;
-    const bedFile = data.geneAnalysisBed ? data.geneAnalysisBed : `${data.snpType.value}.bed`;
-    const famFile = data.geneAnalysisFam ? data.geneAnalysisFam : `${data.snpType.value}.fam`;
-
-    refDataRef.current.files = asFileList([
-      new File([""], bimFile),
-      new File([""], bedFile),
-      new File([""], famFile),
-    ])
-
-    setGeneAnalysisList([{ name: bimFile }, { name: bedFile }, { name: famFile }])
-
-    mergeForm(data)
-  }
-
-  useEffect(() => {
-    geneLocRef.current.files = asFileList([
-      new File([""], "NCBI37.3.gene.loc")
-    ])
-
-    refDataRef.current.files = asFileList([
-      new File([""], "g1000_eur.bim"),
-      new File([""], "g1000_eur.bed"),
-      new File([""], "g1000_eur.fam"),
-    ])
-
-    snpRef.current.files = asFileList([
-      new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
-    ])
-
-  }, [])
-
-  //Disables submit button if there are errors with input
-  function containsErrors() {
-
-    if (form.queue)
-      return !form.email || !form.jobName;
-
-    return snpLocError || geneAnalysisError || geneLocError || rawDataError || pvalError || geneSetError || covarError;
-  }
-
-  async function handleSample() {
-
-    mergeForm({ loading: true })
-    try {
-      const results = await axios.post("api/fetch-sample", form, { responseType: "arraybuffer" });
-      const blob = new Blob([results.data], { type: "application/zip" });
-      saveAs(blob, "sample.zip");
-      mergeForm({ loading: false })
-    } catch (error) {
-      mergeForm({ loading: false })
-      console.log(error);
-
-    }
-  }
-
-  function handleReset(event) {
-    event.preventDefault();
-    mergeForm(defaultFormState)
-
-    geneLocRef.current.files = asFileList([
-      new File([""], "NCBI37.3.gene.loc")
-    ])
-
-    refDataRef.current.files = asFileList([
-      new File([""], "g1000_eur.bim"),
-      new File([""], "g1000_eur.bed"),
-      new File([""], "g1000_eur.fam"),
-    ])
-
-    snpRef.current.files = asFileList([
-      new File([""], "PGC3_SCZ_wave3_public.v2.tsv")
-    ])
-
-    setGeneLocFile("")
-    setGeneAnalysisList([{ name: "g1000_eur.bim" }, { name: "g1000_eur.bed" }, { name: "g1000_eur.fam" }])
-    setPvalFile("")
-    setRawData("")
-    setGeneSetFile("")
-    setCovarFile("")
-
-    onReset();
-  }
+  const genotypeDataSource = watch("genotypeDataSource");
+  const sampleSizeType = watch("sampleSizeType");
+  const sendNotification = watch("sendNotification");
 
   function handleChange(event) {
-    console.log(event.target);
-    const { name, value } = event.target;
-    mergeForm({ [name]: value });
+    const { name, value, checked } = event.target;
+
+    switch (name) {
+      case "sendNotification":
+        if (!checked) {
+          setValue("jobName", null);
+          setValue("email", null);
+        }
+        break;
+      case "snpPopulation":
+        const referenceDataFiles =
+          value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
+        setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
+        break;
+    }
   }
 
-  async function handleSubmit() {
-    const requestId = uuidv1();
-    mergeForm({ loading: true, request_id: requestId, timestamp: new Date().toLocaleString() });
-
-    const type = /(?:\.([^.]+))?$/;
-    var bedFile;
-    var bimFile;
-    var famFile;
-
-    geneAnalysisList.map((e) => {
-      if (e.size) {
-        if (type.exec(e.name)[1] === 'bed')
-          bedFile = e
-        else if (type.exec(e.name)[1] === 'fam')
-          famFile = e
-        else if (type.exec(e.name)[1] === 'bim')
-          bimFile = e
-      }
-    })
-
-    const files = await uploadFiles({
-      requestId: requestId,
-      snpLocFile: snpLocFile,
-      snpLocFilename: snpLocFile ? snpLocFile.name : "",
-      geneLocFile: geneLocFile,
-      geneLocFilename: geneLocFile ? geneLocFile.name : "",
-      geneAnalysisBim: bimFile,
-      geneAnalysisBimName: bimFile ? bimFile.name : "",
-      geneAnalysisBed: bedFile,
-      geneAnalysisBedName: bedFile ? bedFile.name : "",
-      geneAnalysisFam: famFile,
-      geneAnalysisFamName: famFile ? famFile.name : "",
-      pvalFile: pvalFile,
-      pvalFilename: pvalFile ? pvalFile.name : "",
-      geneSetFile: geneSetFile,
-      geneSetFileName: geneSetFile ? geneSetFile.name : "",
-      covarFile: covarFile,
-      covarFileName: covarFile ? covarFile.name : "",
-    });
-
-    const params = {
-      ...form,
-      request_id: requestId.toString(),
-      snpLocFile: snpLocFile ? snpLocFile.name : `${form.snpType.value}.bim`,
-      geneLocFile: geneLocFile ? geneLocFile.name : "sample_gene_loc.loc",
-      geneAnalysisBim: bimFile ? bimFile.name : "",
-      geneAnalysisBed: bedFile ? bedFile.name : "",
-      geneAnalysisFam: famFile ? famFile.name : "",
-      geneAnalysisFile: geneAnalysisList.length ? geneAnalysisList[0].name : form.snpType.value,
-      pvalFile: pvalFile ? pvalFile.name : "sample_snp.tsv",
-      geneSetFile: geneSetFile ? geneSetFile.name : "",
-      covarFile: covarFile ? covarFile.name : "",
-    };
-
+  async function onSubmit(data) {
     try {
-      const res = await axios.post("api/submit", params);
-      mergeForm({ loading: false });
-      onSubmit(params);
+      setLoading(true);
+      const previousId = id;
+      const newId = uuidv4();
+      await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
+      const params = { ...mapValues(data, getFileNames), previousId };
+      await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, params);
+      navigate(`/analysis/${newId}`);
     } catch (error) {
       console.log(error);
-      mergeForm({ loading: false });
+    } finally {
+      setLoading(false);
     }
   }
 
-  function processRefData(fileList) {
-    const type = /(?:\.([^.]+))?$/;
-    console.log(fileList.length !== 3)
-    if (fileList.length !== 3) {
-      setGeneAnalysisError("Please submit 3 files (.bim,.bed,.fam)");
-    }
-    else {
-      const extensions = [
-        type.exec(fileList[0].name)[1],
-        type.exec(fileList[1].name)[1],
-        type.exec(fileList[2].name)[1],
-      ];
-      console.log(extensions);
-      if (!extensions.includes("bed") || !extensions.includes("fam") || !extensions.includes("bim"))
-        setGeneAnalysisError("Please check file types and ensure they are of type .bim,.bed, and .fam");
-      else {
-        if (fileList[0].size > FILE_SIZE_LIMIT || fileList[1].size > FILE_SIZE_LIMIT || fileList[2].size > FILE_SIZE_LIMIT) {
-          mergeForm({ queue: true })
-        }
-
-        setGeneAnalysisError("");
-      }
-    }
-
-    setGeneAnalysisList(fileList);
+  function onReset(event) {
+    event.preventDefault();
+    reset(defaultFormState);
   }
 
   return (
-    <Form>
-      <Loader show={form.loading} fullscreen />
-      <Row className="mb-2 justify-content-end">
-        <Col className="d-flex justify-content-end" xl={6}>
-          <a href="javascript:void(0)" onClick={handleSample}>Download Sample Data</a>
-        </Col>
-      </Row>
-      <Form.Group className="mb-3">
+    <Form onSubmit={handleSubmit(onSubmit)} onReset={onReset} disabled={loading}>
+      <div className="text-end">
+        <a download href={`${process.env.PUBLIC_URL}/api/data/input/default/example.zip`}>
+          Download Example Data
+        </a>
+      </div>
+
+      <Form.Group className="mb-4" controlId="magmaType">
         <Form.Label className="required">Magma Model</Form.Label>
-        <Select
-          placeholder="No analysis selected"
-          name="magmaType"
-          value={form.magmaType}
-          options={[
-            { value: "enhanced", label: "ABC MAGMA" },
-            { value: "standard", label: "Standard MAGMA" },
-          ]}
-          onChange={(e) => {
-            mergeForm({ magmaType: e });
-          }}
-        />
+        <Form.Select required {...register("magmaType", { required: true })}>
+          <option value="" hidden>
+            Select an option
+          </option>
+          <option value="standard">Standard MAGMA</option>
+          <option value="enhanced">ABC MAGMA</option>
+        </Form.Select>
       </Form.Group>
-      <fieldset className="border px-3 my-4">
-        <legend className="legend font-weight-bold">Population</legend>
-        <Form.Group className="mb-3">
+
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+        <legend className="legend fw-bold bg-light">Population</legend>
+
+        <Form.Group className="mb-3" controlId="snpPopulation">
           <Form.Label className="required">SNP Population</Form.Label>
-          <Select
-            placeholder="No Population Selected"
-            name="snpType"
-            value={form.snpType}
-            options={[
-              { value: "g1000_eur", label: "European" },
-              { value: "g1000_afr", label: "African" },
-              { value: "g1000_eas", label: "East Asian" },
-              { value: "g1000_sas", label: "South Asian" },
-              { value: "g1000_amr", label: "Middle/South American" },
-              { value: "g1000_subpop", label: "Sub-population definitions" },
-            ]}
-            onChange={(e) => {
-              mergeForm({ snpType: e });
-              setSnpLocFile("");
-              setSnpLocError("");
-
-              if (e.value !== 'custom') {
-                refDataRef.current.files = asFileList([
-                  new File([""], `${e.value}.bim`),
-                  new File([""], `${e.value}.bed`),
-                  new File([""], `${e.value}.fam`),
-
-                ])
-                setGeneAnalysisList([{ name: `${e.value}.bim` }, { name: `${e.value}.bed` }, { name: `${e.value}.fam` }])
-                setGeneAnalysisError('')
-              }
-              else {
-                refDataRef.current.files = asFileList([])
-                setGeneAnalysisList([])
-              }
-            }}
-          />
+          <Form.Select required {...register("snpPopulation", { required: true, onChange: handleChange })}>
+            <option value="" hidden>
+              Select an option
+            </option>
+            <option value="g1000_eur">European</option>
+            <option value="g1000_afr">African</option>
+            <option value="g1000_eas">East Asian</option>
+            <option value="g1000_sas">South Asian</option>
+            <option value="g1000_amr">Middle/South American</option>
+            <option value="other">Other</option>
+          </Form.Select>
         </Form.Group>
 
-        {form.snpType.value === "custom" && (
-          <Form.Group className="mb-3">
-            <Form.Label className="required">SNP Population File</Form.Label>
-            <Form.Control
-              type="file"
-              id="snpLoc"
-              name="snpLoc"
-              className="form-control"
-              onChange={(e) => {
-                if (e.target.files[0].size > FILE_SIZE_LIMIT) {
-                  mergeForm({ queue: true })
-                }
-
-                setSnpLocFile(e.target.files[0]);
-              }}
-            />
-            {snpLocError ? <div style={{ color: "red" }}>{snpLocError}</div> : <></>}
-          </Form.Group>
-        )}
-
-        <Form.Group className="mb-3">
-          <Form.Label className="required">Reference Data File</Form.Label>
-          <input
-            id="refData"
-            type="file"
-            name="refData"
-            className="form-control"
+        <Form.Group className="mb-3" controlId="referenceDataFiles">
+          <Form.Label className="required">Reference Data Files</Form.Label>
+          <FileInput
+            control={control}
+            rules={{ required: true, validate: { plink: isValidPlinkDataset } }}
+            name="referenceDataFiles"
             multiple
-            max={3}
-            ref={refDataRef}
-            accept=".bim,.bed,.fam"
-            onChange={(e) => {
-              const fileList = Array.from(geneAnalysisList).concat(Array.from(e.target.files));
-              processRefData(fileList);
-            }}
+            required
+            accept=".bim,.bed,.fam,.synonyms"
           />
+          <Form.Text className="text-danger">{formState.errors?.referenceDataFiles?.message}</Form.Text>
         </Form.Group>
-
-        {geneAnalysisList.length ? (
-          <Form.Group className="mb-3">
-            {Array.from(geneAnalysisList).map((e, index) => {
-              return (
-                <div>
-                  <span>{`File ${index + 1}: ${e.name}`}</span>
-                  <span
-                    onClick={() => {
-                      var fileList = Array.from(geneAnalysisList);
-                      fileList.splice(index, 1);
-                      processRefData(fileList);
-                    }}
-                    style={{ color: "red", cursor: "pointer" }}>
-                    {" "}
-                    x
-                  </span>
-                </div>
-              );
-            })}
-
-            {geneAnalysisError ? <div style={{ color: "red" }}>{geneAnalysisError}</div> : <></>}
-          </Form.Group>
-        ) : (
-          <></>
-        )}
       </fieldset>
-      <fieldset className="border px-3 my-4">
-        <legend className="legend font-weight-bold">Gene Location</legend>
 
-        <Form.Group className="mb-3">
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+        <legend className="legend fw-bold bg-light">Gene Location</legend>
+
+        <Form.Group className="mb-3" controlId="geneLocationFile">
           <Form.Label className="required">Gene Location File</Form.Label>
-          <input
-            type="file"
-            name="geneLoc"
-            className="form-control"
-            ref={(geneLocRef)}
-            onChange={(e) => {
-              console.log(e.target.files[0].size)
-              if (e.target.files[0].size > FILE_SIZE_LIMIT) {
-                mergeForm({ queue: true })
-              }
-
-              setGeneLocFile(e.target.files[0]);
-            }}
+          <FileInput
+            control={control}
+            rules={{ required: true }}
+            name="geneLocationFile"
+            required
+            accept=".loc,.tsv,.txt"
           />
-          {geneLocError ? <div style={{ color: "red" }}>{geneLocError}</div> : <></>}
         </Form.Group>
       </fieldset>
 
-      <fieldset className="border px-3 mb-4">
-        <legend className="legend font-weight-bold">Gene Analysis</legend>
-        <Form.Group className="mb-3">
-          <Form.Label className="required">Input Data Type</Form.Label>
-          <Select
-            placeholder="No analysis selected"
-            name="analysisInput"
-            value={form.analysisInput}
-            options={[
-              { value: "rawData", label: "Raw Data" },
-              { value: "refData", label: "Reference Data" },
-            ]}
-            onChange={(e) => {
-              mergeForm({ analysisInput: e });
-            }}
-          />
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+        <legend className="legend fw-bold bg-light">Gene Analysis</legend>
+
+        <Form.Group className="mb-3" controlId="genotypeDataSource">
+          <Form.Label className="required">Genotype Data Source</Form.Label>
+          <Form.Select name="genotypeDataSource" required {...register("genotypeDataSource", { required: true })}>
+            <option value="" hidden>
+              Select an option
+            </option>
+            <option value="rawData">Raw Data</option>
+            <option value="referenceData">Reference Data</option>
+          </Form.Select>
         </Form.Group>
 
-        {form.analysisInput.value === "rawData" && (
-          <Form.Group className="mb-3">
-            <Form.Label className="required">Raw Data File</Form.Label>
-            <input
-              type="file"
-              name="geneData"
-              className="form-control"
-              onChange={(e) => {
-                if (e.target.files[0].size > FILE_SIZE_LIMIT) {
-                  mergeForm({ queue: true })
-                }
-
-                setRawData(e.target.files[0]);
-              }}
+        <div className={genotypeDataSource === "rawData" ? "d-block" : "d-none"}>
+          <Form.Group className="mb-3" controlId="rawGenotypeDataFiles">
+            <Form.Label className="required">Raw Data Files</Form.Label>
+            <FileInput
+              name="rawGenotypeDataFiles"
+              multiple
+              accept=".bim,.bed,.fam,.synonyms"
+              control={control}
+              rules={{ required: genotypeDataSource === "rawData", validate: { plink: isValidPlinkDataset } }}
             />
-            {rawDataError ? <div style={{ color: "red" }}>{rawDataError}</div> : <></>}
+            <Form.Text className="text-danger">{formState.errors?.rawGenotypeDataFiles?.message}</Form.Text>
           </Form.Group>
-        )}
+        </div>
 
-        {form.analysisInput.value === "refData" && (
-          <>
-            <Form.Group className="mb-3">
-              <Form.Label className="required">SNP P-Value File</Form.Label>
-              <input
-                type="file"
-                name="pvalFile"
-                className="form-control"
-                ref={snpRef}
-                onChange={(e) => {
-                  if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                    mergeForm({ queue: true })
-                  }
-                  setPvalFile(e.target.files[0]);
-                }}
+        <div className={genotypeDataSource === "referenceData" ? "d-block" : "d-none"}>
+          <Form.Group className="mb-3" controlId="snpPValuesFile">
+            <Form.Label className="required">SNP P-Values File</Form.Label>
+            <FileInput
+              name="snpPValuesFile"
+              accept=".txt,.tsv"
+              control={control}
+              rules={{ required: genotypeDataSource === "referenceData" }}
+            />
+          </Form.Group>
+
+          <Form.Group className="d-flex flex-wrap justify-content-between">
+            <Form.Label className="required">Sample Size</Form.Label>
+            <div>
+              <Form.Check
+                inline
+                label="Constant"
+                value="constant"
+                name="sampleSizeType"
+                type="radio"
+                id="sample-size-constant"
+                {...register("sampleSizeType")}
               />
-              {pvalError ? <div style={{ color: "red" }}>{pvalError}</div> : <></>}
-            </Form.Group>
-            <Form.Group>
-              <Row>
-                <Form.Label className="required col-xl-4 pe-0">Sample Size</Form.Label>
-                <Form.Check
-                  id="custom"
-                  className="col-xl-3 pe-0"
-                  type="radio"
-                  checked={form.sampleSizeOption.value === 'input'}
-                  label={
-                    <span>
-                      Custom
-                    </span>
-                  }
-                  onChange={() => mergeForm({ sampleSizeOption: { value: "input", label: "Custom" } })}
-                />
-                <Form.Check
-                  id="fromFile"
-                  className="col-xl-4"
-                  type="radio"
-                  checked={form.sampleSizeOption.value === 'file'}
-                  label={
-                    <span>
-                      From the file
-                    </span>
-                  }
-                  onChange={() => mergeForm({ sampleSizeOption: { value: "file", label: "File includes column for sample size" } })}
-                />
+              <Form.Check
+                inline
+                className="me-0"
+                label="File column"
+                value="fileColumn"
+                name="sampleSizeType"
+                type="radio"
+                id="sample-size-file-column"
+                {...register("sampleSizeType")}
+              />
+            </div>
+          </Form.Group>
 
-              </Row>
-
-            </Form.Group>
-            {form.sampleSizeOption.value === "input" && (
-              <Form.Group className="mb-3">
-                <input placeholder="Specify sample size" type="number" name="sampleSize" className="form-control" value={form.sampleSize} onChange={handleChange} />
-              </Form.Group>
-            )}
-
-            {form.sampleSizeOption.value === "file" && (
-              <Form.Group className="mb-3">
-                <input placeholder="Specify column name" type="text" name="sampleSize" className="form-control" onChange={handleChange} />
-              </Form.Group>
-            )}
-          </>
-        )}
+          <Form.Group className="mb-3">
+            <Form.Control
+              className={sampleSizeType === "constant" ? "d-block" : "d-none"}
+              aria-label="Sample Size"
+              placeholder="Sample Size"
+              {...register("sampleSize", { required: sampleSizeType === "constant" })}
+            />
+            <Form.Control
+              className={sampleSizeType === "fileColumn" ? "d-block" : "d-none"}
+              aria-label="Sample Size Column"
+              placeholder="Sample Size Column"
+              {...register("sampleSizeColumn", { required: sampleSizeType === "fileColumn" })}
+            />
+          </Form.Group>
+        </div>
       </fieldset>
-      <fieldset className="border px-3 mb-4">
-        <legend className="legend font-weight-bold">Gene-set Analysis</legend>
-        <Form.Group className="mb-3">
+
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+        <legend className="legend fw-bold bg-light">Gene Set Analysis</legend>
+
+        <Form.Group className="mb-3" controlId="geneSetFile">
           <Form.Label>Gene Set File</Form.Label>
-          <input
-            type="file"
-            name="setFile"
-            className="form-control"
-            onChange={(e) => {
-              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                mergeForm({ queue: true })
-              }
-              setGeneSetFile(e.target.files[0]);
-            }}
-          />
-          {geneSetError ? <div style={{ color: "red" }}>{geneSetError}</div> : <></>}
+          <FileInput name="geneSetFile" control={control} />
         </Form.Group>
-        <Form.Group className="mb-3">
+
+        <Form.Group className="mb-3" controlId="covariateFile">
           <Form.Label>Covariate File</Form.Label>
-          <input
-            type="file"
-            name="covarFile"
-            className="form-control"
-            onChange={(e) => {
-              if (e.target.files[0].size < FILE_SIZE_LIMIT) {
-                mergeForm({ queue: true })
-              }
-              setCovarFile(e.target.files[0]);
-            }}
-          />
-          {covarError ? <div style={{ color: "red" }}>{covarError}</div> : <></>}
+          <FileInput name="covariateFile" control={control} />
         </Form.Group>
       </fieldset>
-      <fieldset className="border px-3 mb-4">
-        <legend className="legend font-weight-bold">Async Job</legend>
-        <Form>
+
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+        <legend className="legend fw-bold bg-light">Notifications</legend>
+
+        <Form.Group className="mb-3">
           <Form.Check
             type="checkbox"
-            name="queue"
-            label="Use Async Processing"
-            checked={form.queue}
-            onChange={() => mergeForm({ queue: !form.queue })}
+            label="Send notification once complete"
+            name="sendNotification"
+            id="sendNotification"
+            {...register("sendNotification", { onChange: handleChange })}
           />
-        </Form>
-        <i style={{ fontSize: "14px" }}>
-          Use Async Processing for a long-running job, your results will be sent to the email address specified below when ready.
-        </i>
-        {form.queue && (
-          <div>
-            <Form.Group className="my-3">
-              <Form.Label className="required">Job Name</Form.Label>
-              <input type="text" name="jobName" className="form-control" onChange={handleChange} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="required">Email</Form.Label>
-              <input type="email" name="email" className="form-control" onChange={handleChange} />
-            </Form.Group>
-          </div>
-        )}
-      </fieldset>
-      <div className="text-end">
-        <button type="reset" className="btn btn-outline-danger mx-1" onClick={handleReset}>
-          Reset
-        </button>
+        </Form.Group>
 
-        <OverlayTrigger
-          overlay={containsErrors() ? <Tooltip>Missing Required Parameters</Tooltip> : <></>}>
-          <Button variant="primary" disabled={containsErrors()} onClick={handleSubmit}>
-            Submit
-          </Button>
-        </OverlayTrigger>
+        <div className={sendNotification ? "d-block" : "d-block"}>
+          <Form.Group className="mb-3" controlId="jobName">
+            <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
+            <Form.Control
+              name="jobName"
+              required={sendNotification}
+              disabled={!sendNotification}
+              {...register("jobName", { required: sendNotification })}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="email">
+            <Form.Label className={sendNotification && "required"}>Email</Form.Label>
+            <Form.Control
+              name="email"
+              type="email"
+              required={sendNotification}
+              {...register("email", { required: sendNotification, disabled: !sendNotification })}
+            />
+          </Form.Group>
+        </div>
+      </fieldset>
+
+      <div className="text-end">
+        <Button type="reset" variant="outline-danger" className="me-1">
+          Reset
+        </Button>
+        <Button type="submit" variant="primary">
+          Submit
+        </Button>
       </div>
     </Form>
   );
