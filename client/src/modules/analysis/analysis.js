@@ -17,7 +17,7 @@ export default function Analysis() {
     <Container className="py-5">
       <Loader fullscreen show={loading} />
       <Row>
-        <Col md={4}>
+        <Col lg={4}>
           <div className="shadow p-4 rounded" style={{ minHeight: "400px" }}>
             <ErrorBoundary
               fallback={
@@ -33,7 +33,7 @@ export default function Analysis() {
           </div>
         </Col>
 
-        <Col md={8}>
+        <Col lg={8}>
           <div className="shadow p-4 rounded" style={{ minHeight: "400px" }}>
             <ErrorBoundary
               fallback={
