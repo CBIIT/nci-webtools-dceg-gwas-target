@@ -13,13 +13,17 @@ export function handleValidationErrors(request, response, next) {
   }
 }
 
-export function errorFormatter(error) {
-  return { error: error.message };
-}
-
 export function requestFormatter(request) {
   const parts = [request.method, request.path, formatObject(request.query), formatObject(request.body)];
   return parts.join(" ");
+}
+
+export function fileFormatter(request) {
+  return formatObject(request.files);
+}
+
+export function errorFormatter(error) {
+  return { error: error.message };
 }
 
 export function logRequests(formatter = requestFormatter) {
@@ -28,10 +32,6 @@ export function logRequests(formatter = requestFormatter) {
     logger.info(formatter(request));
     next();
   };
-}
-
-export function fileFormatter(request) {
-  return formatObject(request.files);
 }
 
 export function logFiles(formatter = fileFormatter) {
