@@ -107,8 +107,8 @@ export async function runMagma(params, logger, env = process.env) {
 export async function magma(args, type = "standard", cwd = process.cwd()) {
   const platform = os.platform();
   const ext = platform === "win32" ? ".exe" : "";
-  const exec = type === "enhanced" ? "magma_enhanced" : "magma";
-  const execPath = path.join("bin", platform, exec + ext);
+  const exec = "magma" + ext;
+  const execPath = path.join("bin", platform, exec);
   try {
     await stat(path.resolve(execPath));
   } catch (e) {
