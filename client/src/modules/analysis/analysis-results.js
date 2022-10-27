@@ -32,7 +32,7 @@ export default function AnalysisResults() {
   }, [isDone, refreshManifest, refreshResults]);
 
   if (!status) {
-    return <strong>Loading</strong>;
+    return null;
   }
 
   return (
