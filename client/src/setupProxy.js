@@ -3,10 +3,13 @@ const package = require("../package.json");
 
 module.exports = function (app) {
   app.use(
-    "/api",
+    `${package.homepage}/api`,
     createProxyMiddleware({
       target: package.proxy,
       changeOrigin: true,
+      pathRewrite: {
+        [`^${package.homepage}/api`]: "/api",
+      },
     })
   );
 };

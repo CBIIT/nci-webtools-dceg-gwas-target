@@ -65,7 +65,7 @@ export default function AnalysisResultsTable({ results }) {
 
   return (
     <>
-      <Table striped hover>
+      <Table striped hover responsive>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

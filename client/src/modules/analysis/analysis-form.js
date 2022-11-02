@@ -32,6 +32,13 @@ export default function AnalysisForm() {
     const { name, value, checked } = event.target;
 
     switch (name) {
+      case "magmaType":
+        const geneLocationFile = {
+          standard: "NCBI37.3.gene.loc",
+          enhanced: "ABC_genes_mrg_disjoint.txt",
+        }[value];
+        setValue("geneLocationFile", geneLocationFile);
+        break;
       case "sendNotification":
         if (!checked) {
           setValue("jobName", null);
@@ -77,7 +84,7 @@ export default function AnalysisForm() {
 
       <Form.Group className="mb-4" controlId="magmaType">
         <Form.Label className="required">Magma Model</Form.Label>
-        <Form.Select required {...register("magmaType", { required: true })}>
+        <Form.Select required {...register("magmaType", { required: true, onChange: handleChange })}>
           <option value="" hidden>
             Select an option
           </option>
