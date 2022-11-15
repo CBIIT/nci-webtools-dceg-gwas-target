@@ -246,12 +246,12 @@ export default function AnalysisForm() {
             id="sendNotification"
             {...register("sendNotification", { onChange: handleChange })}
           />
-          <i style={{ fontSize: "14px" }}>
+          <i style={{ fontSize: "14px", color: "#4C4E52" }}>
             Check this for a long-running job and your results will be sent to the email address specified below when ready.
           </i>
         </Form.Group>
 
-        <div className={sendNotification ? "d-block" : "d-block"}>
+        {sendNotification && <div className={sendNotification ? "d-block" : "d-block"}>
           <Form.Group className="mb-3" controlId="jobName">
             <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
             <Form.Control
@@ -271,7 +271,7 @@ export default function AnalysisForm() {
               {...register("email", { required: sendNotification, disabled: !sendNotification })}
             />
           </Form.Group>
-        </div>
+        </div>}
       </fieldset>
 
       <div className="text-end">

@@ -43,7 +43,10 @@ export default function Home() {
                 target gene prediction models.
               </p>
               <p>
-                Breeze C, Park B, Chen B, Chen K, Berndt S (2022) https://analysistools-cancer.gov/gwas-target/ 
+                GWASTarget was developed by <a href="https://dceg.cancer.gov/fellowship-training/fellowship-experience/meet-fellows/oeeb/breeze-charles" target="_blank">Charles Breeze</a> in collaboration with NCI's Center for Biomedical Informatics and Information Technology (CBIIT). Support comes from the Division of Cancer Epidemiology and Genetics Informatics Tool Challenge.
+              </p>
+              <p>
+                <p>Questions or comments? Contact Charles Breeze via <a href="mailto:c.breeze@ucl.ac.uk" target="_blank">c.breeze@ucl.ac.uk</a></p>
               </p>
             </Col>
           </Row>

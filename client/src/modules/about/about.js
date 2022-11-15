@@ -8,7 +8,8 @@ export default function About() {
       <Row>
         <Col>
           <article className="shadow p-4 rounded">
-            <h1 className="text-primary h3 mb-4">About</h1>
+            <h1 className="text-primary h3 mb-4">About GWASTarget ABC MAGMA</h1>
+            <hr/>
             <p>
               GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across hundreds of tissues and epigenomic datasets alongside issue-specific chromatin conformation capture and target gene prediction models.
             </p>
@@ -21,13 +22,14 @@ export default function About() {
             <p>
               This enhanced, annotated data is then incorporated into a cumulative analysis tool that takes into account distribution of effect sizes and p-values for all SNPs included, building a comprehensive, robust set of high-priority target genes. Results may be further evaluated via gene set analysis to prioritize systems-level pathways for further laboratory analysis.
             </p>
-            <span>
-              Charles Breeze: <a href="mailto:c.breeze@ucl.ac.u" target="_blank">c.breeze@ucl.ac.uk</a>
-            </span>
-            <br/>
-            <span>
-              Breeze C, Park B, Chen B, Chen K, Berndt S (2022) https://analysistools-cancer.gov/gwas-target/
-            </span>
+            <b>Credits</b>
+            <p>
+            Charles Breeze, Sonja Berndt at 
+            the <a href="https://dceg.cancer.gov/" target="_blank">Division of Cancer Epidemiology and Genetics (DCEG)</a>
+            , <a href="https://www.cancer.gov/" target="_blank">National Cancer Institute (NCI)</a>
+            , <a href="https://www.nih.gov/" target="_blank">National Institutes of Health (NIH)</a>; Brian Park, Ben Chen, Kai-Ling Chen and staff at NCI's Center for Biomedical Informatics and Information Technology (CBIIT).
+            </p>
+            <p>Questions or comments? Contact Charles Breeze via <a href="mailto:c.breeze@ucl.ac.uk" target="_blank">c.breeze@ucl.ac.uk</a></p>
           </article>
         </Col>
       </Row>
