@@ -22,7 +22,8 @@ legend {
   white-space: nowrap;
 }
 
-[disabled] {
+[disabled],
+:disabled {
   cursor: not-allowed;
 }
 
