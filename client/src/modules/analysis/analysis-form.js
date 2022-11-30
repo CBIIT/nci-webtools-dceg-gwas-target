@@ -52,7 +52,7 @@ export default function AnalysisForm() {
         break;
     }
   }
-
+  console.log(process.env)
   async function onSubmit(data) {
     try {
       setLoading(true);
