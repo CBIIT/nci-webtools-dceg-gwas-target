@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
