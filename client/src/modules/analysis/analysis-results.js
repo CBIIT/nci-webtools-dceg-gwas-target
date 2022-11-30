@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useParams, redirect } from "react-router-dom";
+import { useCallback, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
 import AnalysisResultsTable from "./analysis-results-table";
@@ -18,21 +18,20 @@ export default function AnalysisResults() {
   const refreshResults = useRecoilRefresher(resultsSelector(id));
   const isDone = ["COMPLETED", "FAILED"].includes(status?.status);
 
+  const refreshState = useCallback(() => {
+    refreshStatus();
+    refreshManifest();
+    refreshResults();
+  }, [refreshStatus, refreshManifest, refreshResults]);
+
   useEffect(() => {
-    const interval = setInterval(refreshStatus, 1000 * 60);
+    const interval = setInterval(refreshState, 1000 * 60);
     if (isDone) clearInterval(interval);
     return () => clearInterval(interval);
-  }, [isDone, refreshStatus]);
-
-  useEffect(() => {
-    if (isDone) {
-      refreshManifest();
-      refreshResults();
-    }
-  }, [isDone, refreshManifest, refreshResults]);
+  }, [isDone, refreshState]);
 
   if (!status) {
-    return <strong>Loading</strong>;
+    return null;
   }
 
   return (
@@ -65,9 +64,11 @@ export default function AnalysisResults() {
           <Alert variant="info">
             <Alert.Heading className="mb-3 d-flex align-items-center">
               Analysis submitted
-              <Spinner animation="border" role="status" size="sm" className="mx-2">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
+              {!params.sendNotification && (
+                <Spinner animation="border" role="status" size="sm" className="mx-2">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              )}
             </Alert.Heading>
             <p>
               Your analysis has been submitted.
@@ -81,9 +82,11 @@ export default function AnalysisResults() {
           <Alert variant="info">
             <Alert.Heading className="mb-3 d-flex align-items-center">
               Analysis in progress
-              <Spinner animation="border" role="status" size="sm" className="mx-2">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
+              {!params.sendNotification && (
+                <Spinner animation="border" role="status" size="sm" className="mx-2">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              )}
             </Alert.Heading>
             <p>
               Your analysis is currently in progress.
