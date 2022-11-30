@@ -14,38 +14,47 @@ export const geneAnalysisColumns = [
   {
     header: "GENE",
     accessorKey: "GENE",
+    className: "text-nowrap",
   },
   {
     header: "CHR",
     accessorKey: "CHR",
+    className: "text-nowrap text-end",
   },
   {
     header: "START (hg19)",
     accessorKey: "START",
+    className: "text-nowrap text-end",
   },
   {
     header: "STOP (hg19)",
     accessorKey: "STOP",
+    className: "text-nowrap text-end",
   },
   {
     header: "NSNPS",
     accessorKey: "NSNPS",
+    className: "text-nowrap text-end",
   },
   {
     header: "NPARAM",
     accessorKey: "NPARAM",
+    className: "text-nowrap text-end",
   },
   {
     header: "N",
     accessorKey: "N",
+    className: "text-nowrap text-end",
   },
   {
     header: "ZSTAT",
     accessorKey: "ZSTAT",
+    className: "text-nowrap text-end",
   },
   {
     header: "P",
     accessorKey: "P",
+    className: "text-nowrap text-end",
   },
 ];
 
@@ -70,7 +79,7 @@ export default function AnalysisResultsTable({ results }) {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan} className="text-nowrap">
+                <th key={header.id} colSpan={header.colSpan} className={header.column.columnDef.className}>
                   {header.isPlaceholder ? null : (
                     <div
                       className={header.column.getCanSort() ? "cursor-pointer" : ""}
@@ -91,7 +100,9 @@ export default function AnalysisResultsTable({ results }) {
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                <td key={cell.id} className={cell.column.columnDef.className}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
               ))}
             </tr>
           ))}
