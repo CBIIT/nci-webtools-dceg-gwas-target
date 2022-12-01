@@ -18,6 +18,10 @@ RUN npm install
 
 COPY client /deploy/client/
 
+ARG REACT_APP_GTAG
+
+ENV REACT_APP_GTAG ${REACT_APP_GTAG}
+
 RUN npm run build \
  && cp -r /deploy/client/build /var/www/html/gwas-target
 

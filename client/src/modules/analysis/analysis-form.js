@@ -52,7 +52,6 @@ export default function AnalysisForm() {
         break;
     }
   }
-
   async function onSubmit(data) {
     try {
       setLoading(true);
