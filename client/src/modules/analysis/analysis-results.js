@@ -41,7 +41,7 @@ export default function AnalysisResults() {
           <div className="text-end mb-3">
             <a
               href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${manifest.geneAnalysisFile}`}
-              download={`${params.magmaType}_${manifest.geneAnalysisFile}`}>
+              download={`${params.magmaType === "enhanced" ? "ABC MAGMA" : "Standard Magma"}_${manifest.geneAnalysisFile}`}>
               Download Results
             </a>
           </div>
