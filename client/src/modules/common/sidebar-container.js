@@ -34,8 +34,8 @@ export function SidebarContainer({
   let mainPanel = children.find((c) => c.type === MainPanel);
 
   // determine css classes for panel containers
-  let sidebarPanelClass = sidebarPanel.props.className || "col-md-4";
-  let mainPanelClass = mainPanel.props.className || "col-md-8";
+  let sidebarPanelClass = sidebarPanel.props.className || "col-xl-4";
+  let mainPanelClass = mainPanel.props.className || "col-xl-8";
 
   // assign collapsed prop to internal _collapsed state
   let [_collapsed, _setCollapsed] = useState(collapsed || false);

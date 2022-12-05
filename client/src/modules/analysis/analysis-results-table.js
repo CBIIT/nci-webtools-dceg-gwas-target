@@ -116,6 +116,7 @@ export default function AnalysisResultsTable({ results }) {
         <div className="d-flex">
           <Form.Select
             size="sm"
+            aria-label="table-pagination"
             className="me-1"
             value={table.getState().pagination.pageSize}
             onChange={(e) => {
