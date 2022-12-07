@@ -109,16 +109,17 @@ export default function AnalysisResultsTable({ results }) {
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between">
-        <div>
+      <div className="row d-flex justify-content-between">
+        <div className="col-xl-3">
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </div>
-        <div className="d-flex">
+        <div className="d-flex row col-xl-5">
           <Form.Select
             size="sm"
             aria-label="table-pagination"
             className="me-1"
             value={table.getState().pagination.pageSize}
+            style={{maxWidth: "300px"}}
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}>
