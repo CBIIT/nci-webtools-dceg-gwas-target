@@ -22,7 +22,8 @@ legend {
   white-space: nowrap;
 }
 
-[disabled] {
+[disabled],
+:disabled {
   cursor: not-allowed;
 }
 
@@ -102,6 +103,17 @@ legend {
   border-right: none;
 }
 
-:root{
-  font-size: 1.20rem;
+:root {
+  font-size: 1.2rem;
+}
+
+.table {
+  font-variant: tabular-nums;
+}
+
+.table-responsive {
+  margin-bottom: $spacer;
+  .table {
+    margin-bottom: 0;
+  }
 }

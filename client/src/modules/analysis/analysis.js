@@ -15,9 +15,8 @@ export default function Analysis() {
   const loading = useRecoilValue(loadingState);
   const [_openSidebar, _setOpenSidebar] = useState(true);
 
-
   return (
-    <Container className="py-5" style={{ maxWidth: "75%" }}>
+    <Container className="py-5">
       <Loader fullscreen show={loading} />
       <Row>
         <SidebarContainer collapsed={!_openSidebar} onCollapsed={() => _setOpenSidebar(!_openSidebar)}>

@@ -14,38 +14,47 @@ export const geneAnalysisColumns = [
   {
     header: "GENE",
     accessorKey: "GENE",
+    className: "text-nowrap",
   },
   {
     header: "CHR",
     accessorKey: "CHR",
+    className: "text-nowrap text-end",
   },
   {
     header: "START (hg19)",
     accessorKey: "START",
+    className: "text-nowrap text-end",
   },
   {
     header: "STOP (hg19)",
     accessorKey: "STOP",
+    className: "text-nowrap text-end",
   },
   {
     header: "NSNPS",
     accessorKey: "NSNPS",
+    className: "text-nowrap text-end",
   },
   {
     header: "NPARAM",
     accessorKey: "NPARAM",
+    className: "text-nowrap text-end",
   },
   {
     header: "N",
     accessorKey: "N",
+    className: "text-nowrap text-end",
   },
   {
     header: "ZSTAT",
     accessorKey: "ZSTAT",
+    className: "text-nowrap text-end",
   },
   {
     header: "P",
     accessorKey: "P",
+    className: "text-nowrap text-end",
   },
 ];
 
@@ -70,7 +79,7 @@ export default function AnalysisResultsTable({ results }) {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan} className="text-nowrap">
+                <th key={header.id} colSpan={header.colSpan} className={header.column.columnDef.className}>
                   {header.isPlaceholder ? null : (
                     <div
                       className={header.column.getCanSort() ? "cursor-pointer" : ""}
@@ -91,22 +100,26 @@ export default function AnalysisResultsTable({ results }) {
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                <td key={cell.id} className={cell.column.columnDef.className}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
               ))}
             </tr>
           ))}
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between">
-        <div>
+      <div className="d-flex justify-content-between align-items-center">
+        <small>
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-        </div>
-        <div className="d-flex">
+        </small>
+        <div className="d-flex col-xs-12">
           <Form.Select
             size="sm"
+            aria-label="table-pagination"
             className="me-1"
             value={table.getState().pagination.pageSize}
+            style={{ maxWidth: "300px" }}
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}>
@@ -116,22 +129,26 @@ export default function AnalysisResultsTable({ results }) {
               </option>
             ))}
           </Form.Select>
-          <Pagination className="mb-0">
+          <Pagination className="mb-0" size="sm">
             <Pagination.First onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
-              First
+              <span className="d-none d-md-inline-block">First</span>
+              <span className="d-inline-block d-md-none">&lt;&lt;</span>
             </Pagination.First>
             <Pagination.Prev onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-              Previous
+              <span className="d-none d-md-inline-block">Previous</span>
+              <span className="d-inline-block d-md-none">&lt;</span>
             </Pagination.Prev>
 
             <Pagination.Next onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-              Next
+              <span className="d-none d-md-inline-block">Next</span>
+              <span className="d-inline-block d-md-none">&gt;</span>
             </Pagination.Next>
 
             <Pagination.Last
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}>
-              Last
+              <span className="d-none d-md-inline-block">Last</span>
+              <span className="d-inline-block d-md-none">&gt;&gt;</span>
             </Pagination.Last>
           </Pagination>
         </div>
