@@ -1,6 +1,7 @@
 import os from "os";
 import path from "path";
 import { stat } from "fs/promises";
+import { readdir, unlinkSync } from "fs";
 import { cpus } from "os";
 import { setTimeout } from "timers/promises";
 import mapValues from "lodash/mapValues.js";
@@ -63,6 +64,19 @@ export async function runMagma(params, logger, env = process.env) {
     // write success status
     const status = { id, status: "COMPLETED" };
     await writeJson(paths.statusFile, status);
+    readdir(paths.inputFolder, (err, files) => {
+      if (err) {
+        console.log(err);
+      }
+
+      files.forEach((file) => {
+        const fileDir = path.join(paths.inputFolder, file);
+
+        if (file !== 'params.json') {
+          unlinkSync(fileDir);
+        }
+      });
+    });
 
     // send success notification if email was provided
     if (params.email) {
@@ -90,6 +104,20 @@ export async function runMagma(params, logger, env = process.env) {
     logger.error(error);
     const status = { id, status: "FAILED", error: { ...error } };
     await writeJson(paths.statusFile, status);
+    readdir(paths.inputFolder, (err, files) => {
+      if (err) {
+        console.log(err);
+      }
+
+      files.forEach((file) => {
+        const fileDir = path.join(paths.inputFolder, file);
+
+        if (file !== 'params.json') {
+          unlinkSync(fileDir);
+        }
+      });
+    });
+
 
     if (params.email) {
       await sendNotification(params.email, `Analysis Failed - ${params.jobName}`, "templates/user-failure-email.html", {
@@ -259,9 +287,9 @@ export async function getPaths(params, env = process.env) {
   const snpLocFile =
     params.snpPopulation === "other"
       ? path.resolve(
-          inputFolder,
-          params.referenceDataFiles.find((f) => f.toLowerCase().endsWith(".bim"))
-        )
+        inputFolder,
+        params.referenceDataFiles.find((f) => f.toLowerCase().endsWith(".bim"))
+      )
       : path.resolve(defaultInputFolder, params.snpPopulation, params.snpPopulation + ".bim");
 
   // geneLocFile should be a text file containing gene locations
