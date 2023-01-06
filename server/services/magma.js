@@ -64,22 +64,26 @@ export async function runMagma(params, logger, env = process.env) {
     // write success status
     const status = { id, status: "COMPLETED" };
     await writeJson(paths.statusFile, status);
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
-      }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          unlinkSync(fileDir);
-        }
-      });
-    });
-
+    
     // send success notification if email was provided
     if (params.email) {
+
+      //delete input files
+      readdir(paths.inputFolder, (err, files) => {
+        if (err) {
+          console.log(err);
+        }
+  
+        files.forEach((file) => {
+          const fileDir = path.join(paths.inputFolder, file);
+  
+          if (file !== 'params.json') {
+            unlinkSync(fileDir);
+          }
+        });
+      });
+
+      
       await sendNotification(
         params.email,
         `Analysis Complete - ${params.jobName}`,
@@ -104,6 +108,7 @@ export async function runMagma(params, logger, env = process.env) {
     logger.error(error);
     const status = { id, status: "FAILED", error: { ...error } };
     await writeJson(paths.statusFile, status);
+    //delete input files
     readdir(paths.inputFolder, (err, files) => {
       if (err) {
         console.log(err);
