@@ -109,7 +109,7 @@ export default function AnalysisResultsTable({ results }) {
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between align-items-center">
+      <div className="d-flex flex-wrap justify-content-between align-items-center">
         <small>
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </small>
