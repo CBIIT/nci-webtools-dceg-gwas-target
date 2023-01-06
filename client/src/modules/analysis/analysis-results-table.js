@@ -113,13 +113,12 @@ export default function AnalysisResultsTable({ results }) {
         <small>
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </small>
-        <div className="d-flex">
+        <div className="d-flex flex-wrap">
           <Form.Select
             size="sm"
             aria-label="table-pagination"
-            className="me-1 pe-4"
+            className="w-auto me-1"
             value={table.getState().pagination.pageSize}
-            style={{ maxWidth: "300px" }}
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}>
