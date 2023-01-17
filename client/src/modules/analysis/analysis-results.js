@@ -53,9 +53,11 @@ export default function AnalysisResults() {
           <Alert variant="danger">
             <Alert.Heading className="mb-3">Analysis Failed</Alert.Heading>
             <p>
-              Your analysis failed with the following error: {status?.error?.message || "INTERNAL ERROR"}. Please
-              contact the site administrator for assistance if this issue persists.
+              Your analysis failed due to the following error. Please contact the site administrator for assistance if this issue persists. 
             </p>
+            <pre>
+              {status?.error?.stdout.split('\n').filter(e => /ERROR/.test(e)) || 'INTERNAL ERROR'}
+            </pre>
           </Alert>
         </>
       )}
