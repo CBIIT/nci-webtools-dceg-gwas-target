@@ -53,13 +53,16 @@ export default function AnalysisForm() {
     }
   }
   async function onSubmit(data) {
+    
     try {
       setLoading(true);
       const previousId = id;
       const newId = uuidv4();
       await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
-      const params = { ...mapValues(data, getFileNames), previousId };
-      await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, params);
+      const submitParams = { ...mapValues(data, getFileNames), previousId };
+      console.log(params)
+      console.log(submitParams)
+      await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
     } catch (error) {
       console.log(error);
