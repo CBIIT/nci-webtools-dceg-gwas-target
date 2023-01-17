@@ -18,8 +18,11 @@ export function createApi(env) {
 
   // register middleware
   const router = Router();
+
   router.use(express.json());
   router.use(logRequests());
+
+  // serve static files under /data
   router.use("/data", express.static(env.DATA_FOLDER));
 
   router.get("/ping", async (req, res) => {
@@ -35,12 +38,7 @@ export function createApi(env) {
   });
 
   router.post("/query/:id", async (req, res) => {
-    try {
-      res.json(await query({ ...req.body, id: req.params.id }, process.env))
-    } catch(e) {
-      logger.error(e);
-      res.status(500).json([]);
-    }
+    res.json(await query({ ...req.body, id: req.params.id }, process.env))
   });
   router.use(logErrors());
   return router;

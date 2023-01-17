@@ -46,6 +46,6 @@ export function logErrors(formatter = errorFormatter) {
   return (error, request, response, next) => {
     const { logger } = request.app.locals;
     logger.error(formatObject(error));
-    response.status(500).json(formatter(error));
+    response.status(400).json({error: "An error occurred processing your request. Please try again later."});
   };
 }
