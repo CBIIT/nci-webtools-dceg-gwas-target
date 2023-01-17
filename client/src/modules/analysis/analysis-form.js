@@ -53,6 +53,7 @@ export default function AnalysisForm() {
     }
   }
   async function onSubmit(data) {
+    console.log(params)
     try {
       setLoading(true);
       const previousId = id;
