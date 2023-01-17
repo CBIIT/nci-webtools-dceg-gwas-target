@@ -21,14 +21,27 @@ export function createApi(env) {
   router.use(express.json());
   router.use(logRequests());
   router.use("/data", express.static(env.DATA_FOLDER));
-  router.get("/ping", async (req, res) => res.json(await ping(req.query)));
-  router.post("/upload/:id", validate, handleValidationErrors, upload.any(), logFiles(), (req, res) =>
+
+  router.get("/ping", async (req, res) => {
+    res.json(await ping(req.query))
+  });
+
+  router.post("/upload/:id", validate, handleValidationErrors, upload.any(), logFiles(), (req, res) => {
     res.json({ id: req.params.id })
-  );
-  router.post("/submit/:id", validate, handleValidationErrors, async (req, res) =>
+  });
+
+  router.post("/submit/:id", validate, handleValidationErrors, async (req, res) => {
     res.json(await submit({ ...req.body, id: req.params.id }))
-  );
-  router.post("/query/:id", async (req, res) => res.json(await query({ ...req.body, id: req.params.id })));
+  });
+
+  router.post("/query/:id", async (req, res) => {
+    try {
+      res.json(await query({ ...req.body, id: req.params.id }, process.env))
+    } catch(e) {
+      logger.error(e);
+      res.status(500).json([]);
+    }
+  });
   router.use(logErrors());
   return router;
 }
