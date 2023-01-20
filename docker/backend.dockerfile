@@ -12,6 +12,13 @@ RUN mkdir -p /server
 
 WORKDIR /server
 
+# install bedtools
+ARG BEDTOOLS_VERSION=2.30.0
+
+RUN curl -LO https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary \
+ && mv bedtools.static.binary /bin/bedtools \
+ && chmod +x /bin/bedtools
+
 # use build cache for npm packages
 COPY server/package.json server/package-lock.json /server/
 
