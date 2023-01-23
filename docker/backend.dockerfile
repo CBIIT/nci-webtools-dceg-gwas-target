@@ -15,8 +15,9 @@ WORKDIR /server
 # install bedtools
 ARG BEDTOOLS_VERSION=2.30.0
 
-RUN curl -LO https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary \
- && mv bedtools.static.binary /bin/bedtools \
+ARG BEDTOOLS_URL=https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary
+
+RUN curl -L -o /bin/bedtools ${BEDTOOLS_URL} \
  && chmod +x /bin/bedtools
 
 # use build cache for npm packages
