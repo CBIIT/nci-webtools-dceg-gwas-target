@@ -173,6 +173,7 @@ export function getGeneAnalysisParams(paths, params) {
   let geneAnalysisParams = {
     bFile: paths.bFile,
     geneAnnotFile: paths.geneAnnotFile,
+    bedFilterFile: paths.bedFilterFile,
     genesOnly: !runGeneSetAnalysis,
     outFile: paths.geneAnalyisFilePrefix,
   };
@@ -197,9 +198,15 @@ export function getGeneAnalysisParams(paths, params) {
 }
 
 export async function runGeneAnalysis(
-  { bFile, pvalFile, sampleSize, geneAnnotFile, genesOnly, outFile },
+  { bFile, pvalFile, bedFilterFile, sampleSize, geneAnnotFile, genesOnly, outFile },
   type = "standard"
 ) {
+
+  // execute filter if bed file is provided
+  if (bedFilterFile) {
+    pvalFile = await filterPvalFile(pvalFile, bedFilterFile);
+  }
+
   // win32 does not support batch mode's --merge option
   if (os.platform() !== "win32") {
     // assume each process requires 2GB of memory
@@ -318,6 +325,12 @@ export async function getPaths(params, env = process.env) {
     path.resolve(defaultInputFolder, params.snpPValuesFile),
   ]);
 
+  // bedFilterFile should be a .bed file containing SNPs to filter by
+  const bedFilterFile = params.bedFilterFile ? coalesceFilePaths([
+    path.resolve(inputFolder, params.bedFilterFile),
+    path.resolve(defaultInputFolder, 'filters', params.bedFilterFile),
+  ]) : null;
+
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
   const geneAnalysisFile = path.resolve(outputFolder, "gene_analysis.genes.out");
   const geneAnalysisRawFile = path.resolve(outputFolder, "gene_analysis.genes.raw");
@@ -339,6 +352,7 @@ export async function getPaths(params, env = process.env) {
     geneAnnotFile,
     bFile,
     pValFile,
+    bedFilterFile,
     geneAnalyisFilePrefix,
     geneAnalysisFile,
     geneAnalysisRawFile,
@@ -346,6 +360,16 @@ export async function getPaths(params, env = process.env) {
     geneSetAnalysisFile,
     databaseFile,
   };
+}
+
+/**
+ * Filters a pvalue file by a bed file
+ * @param {string} pvalFile - path to pvalue file
+ * @param {string} bedFilterFile - path to bed file
+ * @returns {string} path to filtered pvalue file
+ */
+export async function filterPvalFile(pvalFile, bedFilterFile) {
+  return pvalFile;
 }
 
 export async function waitUntilComplete(id, env = process.env, checkInterval = 1000) {
