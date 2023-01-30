@@ -11,6 +11,7 @@ import { defaultFormState } from "./analysis-form.state";
 import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
 import { paramsSelector, loadingState } from "./analysis.state";
 import { useEffect } from "react";
+import bedFilterOptions from "./json/bedFilterOptions.json";
 
 export default function AnalysisForm() {
   const { handleSubmit, register, reset, setValue, watch, formState, control } = useForm({
@@ -53,7 +54,7 @@ export default function AnalysisForm() {
     }
   }
   async function onSubmit(data) {
-    
+
     try {
       setLoading(true);
       const previousId = id;
@@ -91,7 +92,7 @@ export default function AnalysisForm() {
             Select an option
           </option>
           <option value="standard">Standard MAGMA</option>
-          <option value="enhanced">ABC MAGMA</option>
+          <option value="enhanced">F MAGMA</option>
         </Form.Select>
       </Form.Group>
 
@@ -219,6 +220,17 @@ export default function AnalysisForm() {
               placeholder="Sample Size Column"
               {...register("sampleSizeColumn", { required: sampleSizeType === "fileColumn" })}
             />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="bedFilterFile">
+            <Form.Label className="required">BED File Filter</Form.Label>
+            <Form.Select required {...register("bedFileFilter", { required: true, onChange: handleChange })}>
+              {bedFilterOptions.map((e) => {
+                return (
+                  <option value={e.value}>{e.label}</option>
+                )
+              })}
+            </Form.Select>
           </Form.Group>
         </div>
       </fieldset>

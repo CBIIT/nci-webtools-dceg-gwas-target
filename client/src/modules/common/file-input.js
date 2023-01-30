@@ -11,8 +11,8 @@ export default function FileInput(props) {
   } = useController(props);
   const inputRef = useRef();
   const fileList = asFileList(value);
-  const files = Array.from(fileList);
 
+  const files = Array.from(fileList);
   useEffect(() => {
     ref(inputRef.current);
     if (inputRef.current) {
@@ -21,6 +21,8 @@ export default function FileInput(props) {
   }, [fileList, ref]);
 
   function handleChange(event) {
+    console.log(value)
+    console.log(fileList)
     onChange(event.target.files);
   }
 
