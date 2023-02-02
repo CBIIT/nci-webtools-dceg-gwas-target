@@ -224,7 +224,7 @@ export default function AnalysisForm() {
 
           <Form.Group className="mb-3" controlId="bedFilterFile">
             <Form.Label className="required">BED File Filter</Form.Label>
-            <Form.Select required {...register("bedFileFilter", { required: true, onChange: handleChange })}>
+            <Form.Select required {...register("bedFilterFile", { required: true, onChange: handleChange })}>
               {bedFilterOptions.map((e) => {
                 return (
                   <option value={e.value}>{e.label}</option>
