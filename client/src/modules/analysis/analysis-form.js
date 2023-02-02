@@ -51,8 +51,13 @@ export default function AnalysisForm() {
           value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
         setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
         break;
+      case "bedFilterFile":
+        setValue("bedFilterFile", value)
+        break;
+
     }
   }
+
   async function onSubmit(data) {
 
     try {
