@@ -51,8 +51,8 @@ export default function AnalysisForm() {
           value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
         setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
         break;
-      case "bedFilterFile":
-        setValue("bedFilterFile", value)
+      case "bedFileFilter":
+        setValue("bedFileFilter", value)
         break;
 
     }
@@ -227,9 +227,9 @@ export default function AnalysisForm() {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="bedFilterFile">
+          <Form.Group className="mb-3" controlId="bedFileFilter">
             <Form.Label className="required">BED File Filter</Form.Label>
-            <Form.Select required {...register("bedFilterFile", { required: true, onChange: handleChange })}>
+            <Form.Select required {...register("bedFileFilter", { required: true, onChange: handleChange })}>
               {bedFilterOptions.map((e) => {
                 return (
                   <option value={e.value}>{e.label}</option>

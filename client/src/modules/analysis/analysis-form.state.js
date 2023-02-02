@@ -3,7 +3,7 @@ import { asFileList } from "./analysis-form.utils";
 
 export const defaultFormState = {
   magmaType: null,
-  bedFilterFile: null,
+  bedFileFilter: null,
   snpPopulation: null,
   referenceDataFiles: null,
   geneLocationFile: null,

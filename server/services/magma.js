@@ -12,7 +12,7 @@ import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
 export async function runMagma(params, logger, env = process.env) {
-  logger.info(".bed Filter: " + bedFilterFile)
+  logger.info(".bed Filter: " + bedFileFilter)
   const id = params.id;
   const paths = await getPaths(params, env);
   const submittedTime = new Date();
@@ -174,7 +174,7 @@ export function getGeneAnalysisParams(paths, params) {
   let geneAnalysisParams = {
     bFile: paths.bFile,
     geneAnnotFile: paths.geneAnnotFile,
-    bedFilterFile: paths.bedFilterFile,
+    bedFileFilter: paths.bedFileFilter,
     genesOnly: !runGeneSetAnalysis,
     outFile: paths.geneAnalyisFilePrefix,
   };
@@ -199,13 +199,13 @@ export function getGeneAnalysisParams(paths, params) {
 }
 
 export async function runGeneAnalysis(
-  { bFile, pvalFile, bedFilterFile, sampleSize, geneAnnotFile, genesOnly, outFile },
+  { bFile, pvalFile, bedFileFilter, sampleSize, geneAnnotFile, genesOnly, outFile },
   type = "standard"
 ) {
 
   // execute filter if bed file is provided
-  if (bedFilterFile) {
-    pvalFile = await filterPvalFile(pvalFile, bedFilterFile);
+  if (bedFileFilter) {
+    pvalFile = await filterPvalFile(pvalFile, bedFileFilter);
   }
 
   // win32 does not support batch mode's --merge option
@@ -326,10 +326,10 @@ export async function getPaths(params, env = process.env) {
     path.resolve(defaultInputFolder, params.snpPValuesFile),
   ]);
 
-  // bedFilterFile should be a .bed file containing SNPs to filter by
-  const bedFilterFile = params.bedFilterFile ? coalesceFilePaths([
-    path.resolve(inputFolder, params.bedFilterFile),
-    path.resolve(defaultInputFolder, 'filters', params.bedFilterFile),
+  // bedFileFilter should be a .bed file containing SNPs to filter by
+  const bedFileFilter = params.bedFileFilter ? coalesceFilePaths([
+    path.resolve(inputFolder, params.bedFileFilter),
+    path.resolve(defaultInputFolder, 'filters', params.bedFileFilter),
   ]) : null;
 
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
@@ -353,7 +353,7 @@ export async function getPaths(params, env = process.env) {
     geneAnnotFile,
     bFile,
     pValFile,
-    bedFilterFile,
+    bedFileFilter,
     geneAnalyisFilePrefix,
     geneAnalysisFile,
     geneAnalysisRawFile,
@@ -366,12 +366,12 @@ export async function getPaths(params, env = process.env) {
 /**
  * Filters a pvalue file by a bed file
  * @param {string} pvalFile - path to pvalue file
- * @param {string} bedFilterFile - path to bed file
+ * @param {string} bedFileFilter - path to bed file
  * @returns {string} path to filtered pvalue file
  */
-export async function filterPvalFile(pvalFile, bedFilterFile) {
+export async function filterPvalFile(pvalFile, bedFileFilter) {
   const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
-  const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFilterFile)
+  const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
 
   const args = [
     pvalFile,
