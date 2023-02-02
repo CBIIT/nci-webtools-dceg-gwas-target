@@ -200,7 +200,8 @@ export function getGeneAnalysisParams(paths, params) {
 
 export async function runGeneAnalysis(
   { bFile, pvalFile, bedFileFilter, sampleSize, geneAnnotFile, genesOnly, outFile },
-  type = "standard"
+  type = "standard",
+  env = process.env,
 ) {
 
   // execute filter if bed file is provided
