@@ -369,7 +369,16 @@ export async function getPaths(params, env = process.env) {
  * @returns {string} path to filtered pvalue file
  */
 export async function filterPvalFile(pvalFile, bedFilterFile) {
-  return pvalFile;
+  const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
+  const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFilterFile)
+
+  const args = [
+    pvalFile,
+    filterFile
+  ]
+  await execFileAsync(execPath, args.join(" ").filter(Boolean));
+  looger.info("Filtered pValue File: " + path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv"))
+  return path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv");
 }
 
 export async function waitUntilComplete(id, env = process.env, checkInterval = 1000) {
