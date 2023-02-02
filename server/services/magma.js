@@ -7,7 +7,7 @@ import { setTimeout } from "timers/promises";
 import mapValues from "lodash/mapValues.js";
 import validator from "validator";
 import { sendNotification } from "./notifications.js";
-import { execFileAsync, readJson, writeJson, mkdirs, coalesceFilePaths, copyFiles, stripExtension } from "./utils.js";
+import { execAsync, execFileAsync, readJson, writeJson, mkdirs, coalesceFilePaths, copyFiles, stripExtension } from "./utils.js";
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
@@ -379,10 +379,9 @@ export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env,
     pvalFile,
     filterFile
   ]
-  const cwd = process.cwd();
-  logger.info(cwd)
+
   logger.info(execPath + " " + pvalFile + " " + filterFile)
-  await execFileAsync(execPath, args, { cwd, windowsHide: true });
+  await execAsync(execPath + " " + pvalFile + " " + filterFile)
   return path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv");
 }
 

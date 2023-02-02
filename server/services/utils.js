@@ -3,11 +3,12 @@ import { existsSync } from "fs";
 import { mkdir, writeFile, readFile, copyFile, readdir } from "fs/promises";
 import path from "path";
 import { promisify } from "util";
-import { execFile } from "child_process";
+import { execFile, exec } from "child_process";
 import template from "lodash/template.js";
 
 // promisified executeFile
 export const execFileAsync = promisify(execFile);
+export const execAsync = promisify(exec)
 
 /**
  * Checks if the current module is the main module.
