@@ -42,7 +42,7 @@ export async function runMagma(params, logger, env = process.env) {
     const geneAnalysisParams = getGeneAnalysisParams(paths, params);
 
     logger.info(geneAnalysisParams);
-    const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, params.magmaType, env);
+    const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, params.magmaType, env, logger);
 
     // run gene set analysis
     let geneSetAnalysisResults = null;
@@ -202,11 +202,12 @@ export async function runGeneAnalysis(
   { bFile, pvalFile, bedFileFilter, sampleSize, geneAnnotFile, genesOnly, outFile },
   type = "standard",
   env = process.env,
+  logger
 ) {
 
   // execute filter if bed file is provided
   if (bedFileFilter) {
-    pvalFile = await filterPvalFile(pvalFile, bedFileFilter, env);
+    pvalFile = await filterPvalFile(pvalFile, bedFileFilter, env, logger);
   }
 
   // win32 does not support batch mode's --merge option
@@ -370,7 +371,7 @@ export async function getPaths(params, env = process.env) {
  * @param {string} bedFileFilter - path to bed file
  * @returns {string} path to filtered pvalue file
  */
-export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env) {
+export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env, logger) {
   const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
   const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
 
@@ -378,6 +379,7 @@ export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env)
     pvalFile,
     filterFile
   ]
+  logger.info(execPath + " " + pvalFile + " " + filterFile)
   await execFileAsync(execPath, args);
   return path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv");
 }
