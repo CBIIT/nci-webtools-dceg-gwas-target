@@ -378,7 +378,7 @@ export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env)
     pvalFile,
     filterFile
   ]
-  await execFileAsync(execPath, args.join(" "));
+  await execFileAsync(execPath, args);
   return path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv");
 }
 
