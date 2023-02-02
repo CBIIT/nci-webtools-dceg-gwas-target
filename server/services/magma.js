@@ -12,6 +12,7 @@ import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
 export async function runMagma(params, logger, env = process.env) {
+  logger.info(".bed Filter: " + bedFilterFile)
   const id = params.id;
   const paths = await getPaths(params, env);
   const submittedTime = new Date();
@@ -20,7 +21,7 @@ export async function runMagma(params, logger, env = process.env) {
   try {
     if (!id) throw new Error("Missing id");
     if (!validator.isUUID(id)) throw new Error("Invalid id");
-
+    
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
     await writeJson(paths.statusFile, { id, status: "IN_PROGRESS" });
