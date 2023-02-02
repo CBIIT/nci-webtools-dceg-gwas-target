@@ -12,7 +12,7 @@ import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 
 export async function runMagma(params, logger, env = process.env) {
-  logger.info(".bed Filter: " + bedFileFilter)
+  logger.info(".bed Filter: " + params.bedFileFilter)
   const id = params.id;
   const paths = await getPaths(params, env);
   const submittedTime = new Date();
