@@ -385,7 +385,7 @@ export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.
 
   logger.info(execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
   await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
-  return path.resolve(inputPath, "results.filtered.bed");
+  return path.resolve(inputPath, "filtered.for.magma.tsv");
 }
 
 export async function waitUntilComplete(id, env = process.env, checkInterval = 1000) {
