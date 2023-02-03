@@ -109,6 +109,7 @@ export async function runMagma(params, logger, env = process.env) {
     logger.error(error);
     const status = { id, status: "FAILED", error: { ...error } };
     await writeJson(paths.statusFile, status);
+    /*
     //delete input files
     readdir(paths.inputFolder, (err, files) => {
       if (err) {
@@ -122,7 +123,7 @@ export async function runMagma(params, logger, env = process.env) {
           unlinkSync(fileDir);
         }
       });
-    });
+    });*/
 
 
     if (params.email) {
