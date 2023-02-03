@@ -42,7 +42,7 @@ export async function runMagma(params, logger, env = process.env) {
     const geneAnalysisParams = getGeneAnalysisParams(paths, params);
 
     logger.info(geneAnalysisParams);
-    const geneAnalysisResults = await runGeneAnalysis(geneAnalysisParams, params.magmaType, env, logger);
+    const geneAnalysisResults = await runGeneAnalysis(id, geneAnalysisParams, params.magmaType, env, logger);
 
     // run gene set analysis
     let geneSetAnalysisResults = null;
@@ -199,6 +199,7 @@ export function getGeneAnalysisParams(paths, params) {
 }
 
 export async function runGeneAnalysis(
+  id,
   { bFile, pvalFile, bedFileFilter, sampleSize, geneAnnotFile, genesOnly, outFile },
   type = "standard",
   env = process.env,
@@ -207,7 +208,7 @@ export async function runGeneAnalysis(
 
   // execute filter if bed file is provided
   if (bedFileFilter) {
-    pvalFile = await filterPvalFile(pvalFile, bedFileFilter, env, logger);
+    pvalFile = await filterPvalFile(id, pvalFile, bedFileFilter, env, logger);
   }
 
   // win32 does not support batch mode's --merge option
@@ -371,18 +372,19 @@ export async function getPaths(params, env = process.env) {
  * @param {string} bedFileFilter - path to bed file
  * @returns {string} path to filtered pvalue file
  */
-export async function filterPvalFile(pvalFile, bedFileFilter, env = process.env, logger) {
+export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env, logger) {
   const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
   const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
+  const inputPath = path.resolve(env.INPUT_FOLDER, id);
 
   const args = [
     pvalFile,
     filterFile
   ]
 
-  logger.info(execPath + " " + pvalFile + " " + filterFile)
-  await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile)
-  return path.resolve(pvalFile + ".intermediate.files", "filtered.for.magma.tsv");
+  logger.info(execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
+  await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
+  return path.resolve(inputPath, "filtered.for.magma.tsv");
 }
 
 export async function waitUntilComplete(id, env = process.env, checkInterval = 1000) {
