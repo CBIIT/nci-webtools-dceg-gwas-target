@@ -376,7 +376,7 @@ export async function getPaths(params, env = process.env) {
 export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env, logger) {
   const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
   const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
-  const headerFile = path.resolve(env.INPUT_FOLDER, "default", "headers.file")
+  const headerFile = path.resolve(env.INPUT_FOLDER, "default", "header.file")
   const inputPath = path.resolve(env.INPUT_FOLDER, id);
 
   const args = [
