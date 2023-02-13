@@ -9,7 +9,7 @@ bedtools intersect -a $1.bed -b $2 > results.filtered.bed
 
 head -1 $1.header.bed > filtered.for.magma.tsv 
 
-awk '{print $4"\t"$5"\t"$6"\t"$7}' results.filtered.bed >> filtered.for.magma.tsv
+awk '{print $4"\t"$5"\t"$6"\t"$14}' results.filtered.bed >> filtered.for.magma.tsv
 
 mv results.filtered.bed $3
 mv $1.header.bed $3
