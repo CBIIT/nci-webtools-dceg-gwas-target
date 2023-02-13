@@ -376,6 +376,7 @@ export async function getPaths(params, env = process.env) {
 export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env, logger) {
   const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
   const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
+  const headerFile = path.resolve(env.INPUT_FOLDER, "default", "headers.file")
   const inputPath = path.resolve(env.INPUT_FOLDER, id);
 
   const args = [
@@ -383,8 +384,8 @@ export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.
     filterFile
   ]
 
-  logger.info(execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
-  await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile + " " + inputPath)
+  logger.info(execPath + " " + pvalFile + " " + filterFile + " " + inputPath + " " + headerFile)
+  await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile + " " + inputPath + " " + headerFile)
   return path.resolve(inputPath, "filtered.for.magma.tsv");
 }
 
