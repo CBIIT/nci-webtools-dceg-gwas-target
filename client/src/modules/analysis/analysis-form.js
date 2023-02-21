@@ -4,8 +4,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
 import { useParams, redirect, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+import {Form, Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 import FileInput from "../common/file-input";
 import { defaultFormState } from "./analysis-form.state";
 import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
@@ -25,6 +24,7 @@ export default function AnalysisForm() {
 
   useEffect(() => reset(params), [reset, params]);
 
+  const magmaType = watch("magmaType")
   const genotypeDataSource = watch("genotypeDataSource");
   const sampleSizeType = watch("sampleSizeType");
   const sendNotification = watch("sendNotification");
@@ -38,6 +38,9 @@ export default function AnalysisForm() {
           standard: "NCBI37.3.gene.loc",
           enhanced: "ABC_genes_mrg_disjoint.txt",
         }[value];
+        if(value === "enhanced")
+          setValue("sampleSizeType", "constant")
+          
         setValue("geneLocationFile", geneLocationFile);
         break;
       case "sendNotification":
@@ -66,7 +69,7 @@ export default function AnalysisForm() {
       const newId = uuidv4();
       await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
       const submitParams = { ...mapValues(data, getFileNames), previousId };
-      console.log(params)
+
       console.log(submitParams)
       await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
@@ -177,6 +180,7 @@ export default function AnalysisForm() {
         </div>
 
         <div className={genotypeDataSource === "referenceData" ? "d-block" : "d-none"}>
+        <OverlayTrigger overlay={<Tooltip id="snpPValuesFile">{`Allowed File Format:\nCHR SNP BP  P`}</Tooltip>}>
           <Form.Group className="mb-3" controlId="snpPValuesFile">
             <Form.Label className="required">SNP P-Values File</Form.Label>
             <FileInput
@@ -186,6 +190,7 @@ export default function AnalysisForm() {
               rules={{ required: genotypeDataSource === "referenceData" }}
             />
           </Form.Group>
+          </OverlayTrigger>
 
           <Form.Group className="d-flex flex-wrap justify-content-between">
             <Form.Label className="required">Sample Size</Form.Label>
@@ -207,6 +212,7 @@ export default function AnalysisForm() {
                 name="sampleSizeType"
                 type="radio"
                 id="sample-size-file-column"
+                disabled={magmaType === "enhanced"}
                 {...register("sampleSizeType")}
               />
             </div>
@@ -221,13 +227,14 @@ export default function AnalysisForm() {
             />
             <Form.Control
               className={sampleSizeType === "fileColumn" ? "d-block" : "d-none"}
+              disabled={magmaType === "enhanced"}
               aria-label="Sample Size Column"
               placeholder="Sample Size Column"
               {...register("sampleSizeColumn", { required: sampleSizeType === "fileColumn" })}
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="bedFileFilter">
+          {magmaType === "enhanced" ? <Form.Group className="mb-3" controlId="bedFileFilter">
             <Form.Label className="required">BED File Filter</Form.Label>
             <Form.Select required {...register("bedFileFilter", { required: true, onChange: handleChange })}>
               {bedFilterOptions.map((e) => {
@@ -236,7 +243,7 @@ export default function AnalysisForm() {
                 )
               })}
             </Form.Select>
-          </Form.Group>
+          </Form.Group> : <></>}
         </div>
       </fieldset>
 
