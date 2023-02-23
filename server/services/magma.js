@@ -44,9 +44,9 @@ export async function runMagma(params, logger, env = process.env) {
         const validHeader = ["CHR", "SNP", "BP", "P"]
 
         const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
-          return element === array2[index];
+          return element === validHeader[index];
         })
-        
+
         if (isValid) {
           logger.info("Valid Header")
         }
