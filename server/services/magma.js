@@ -1,7 +1,7 @@
 import os from "os";
 import path from "path";
 import { stat } from "fs/promises";
-import { readdir, unlinkSync } from "fs";
+import { readdir, unlinkSync, createReadStream } from "fs";
 import { cpus } from "os";
 import { setTimeout } from "timers/promises";
 import mapValues from "lodash/mapValues.js";
@@ -10,6 +10,7 @@ import { sendNotification } from "./notifications.js";
 import { execAsync, execFileAsync, readJson, writeJson, mkdirs, coalesceFilePaths, copyFiles, stripExtension } from "./utils.js";
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
+import { createInterface } from "readline";
 
 export async function runMagma(params, logger, env = process.env) {
   logger.info(".bed Filter: " + params.bedFileFilter)
@@ -29,6 +30,18 @@ export async function runMagma(params, logger, env = process.env) {
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
+
+    if (params.snpPValuesFile) {
+      const lineReader = createInterface({input: createReadStream(paths.pValFile)})
+      var header;
+      lineReader.on("line", function(line) {
+        header = line;
+        lineReader.close()
+      })
+      lineReader.on("close", function() {
+        logger.info(line)
+      })
+    }
 
     // run annotation
     logger.info(`[${id}] Run annotation`);
