@@ -30,18 +30,16 @@ export async function runMagma(params, logger, env = process.env) {
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
-    var header;
+
     if (params.snpPValuesFile) {
       const lineReader = createInterface({ input: createReadStream(paths.pValFile) })
 
       lineReader.on("line", function (line) {
-        header = line;
+        const headerArray = line.split(/\s+/)
+        const validHeader = ["CHR", "SNP", "BP", "P"]
+
         lineReader.close()
         lineReader.removeAllListeners()
-      })
-      lineReader.on("close", function () {
-        const headerArray = header.split(/\s+/)
-        const validHeader = ["CHR", "SNP", "BP", "P"]
 
         const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
           return element === validHeader[index];
@@ -51,7 +49,7 @@ export async function runMagma(params, logger, env = process.env) {
           logger.info("Valid Header")
         }
         else {
-          logger.info(header)
+          logger.info(line)
           throw new Error("P-Value File - Header Invalid")
         }
       })
