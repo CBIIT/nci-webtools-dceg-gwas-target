@@ -39,7 +39,14 @@ export async function runMagma(params, logger, env = process.env) {
         lineReader.close()
       })
       lineReader.on("close", function() {
-        logger.info(header)
+        
+        if(header === "CHR\tSNP\tBP\tP"){
+          logger.info("Tab Deliminated")
+        }
+        else{
+          logger.info(header)
+          throw new Error("P-Value File - Header Invalid")
+        }
       })
     }
 
