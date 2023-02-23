@@ -35,29 +35,12 @@ export async function runMagma(params, logger, env = process.env) {
     logger.info(paths.pValFile)
 
     if (params.snpPValuesFile) {
-      const lineReader = createInterface({ input: createReadStream(paths.pValFile) })
+      const valid = await validateHeader(paths.pValFile) 
 
-      lineReader.on("line", function (line) {
-        const headerArray = line.split(/\s+/)
-        const validHeader = ["CHR", "SNP", "BP", "P"]
-
-        lineReader.close()
-        lineReader.removeAllListeners()
-
-        logger.info(line)
-
-        const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
-          return element === validHeader[index];
-        })
-
-        if (isValid) {
-          logger.info("Valid Header")
-        }
-        else {
-
-          throw new Error("P-Value File - Header Invalid")
-        }
-      })
+      if(valid)
+        logger.info("Valid Header")
+      else 
+        throw new Error("P-Value File - Header Invalid")
     }
 
     // run annotation
@@ -167,6 +150,26 @@ export async function runMagma(params, logger, env = process.env) {
 
     return false;
   }
+}
+
+export async function validateHeader(pValFile){
+ 
+  const lineReader = createInterface({ input: createReadStream(pValFile) })
+
+  lineReader.on("line", function (line) {
+    const headerArray = line.split(/\s+/)
+    const validHeader = ["CHR", "SNP", "BP", "P"]
+    logger.info(line)
+
+    const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
+      return element === validHeader[index];
+    })  
+    
+    lineReader.close()
+    lineReader.removeAllListeners()
+
+    return isValid
+  })
 }
 
 export async function magma(args, type = "standard", cwd = process.cwd()) {
