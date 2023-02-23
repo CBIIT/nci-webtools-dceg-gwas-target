@@ -31,6 +31,9 @@ export async function runMagma(params, logger, env = process.env) {
       mapValues(paths, (value) => path.parse(value).base)
     );
 
+    logger.info(path.resolve(paths.inputFolder, params.snpPValuesFile))
+    logger.info(paths.pValFile)
+
     if (params.snpPValuesFile) {
       const lineReader = createInterface({ input: createReadStream(paths.pValFile) })
 
@@ -356,8 +359,7 @@ export async function getPaths(params, env = process.env) {
     path.resolve(inputFolder, params.snpPValuesFile),
     path.resolve(defaultInputFolder, params.snpPValuesFile),
   ]);
-  logger.info(path.resolve(inputFolder, params.snpPValuesFile))
-  logger.info(pValFile)
+
   // bedFileFilter should be a .bed file containing SNPs to filter by
   const bedFileFilter = params.bedFileFilter ? coalesceFilePaths([
     path.resolve(inputFolder, params.bedFileFilter),
