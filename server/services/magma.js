@@ -159,7 +159,6 @@ export async function validateHeader(pValFile){
   lineReader.on("line", function (line) {
     const headerArray = line.split(/\s+/)
     const validHeader = ["CHR", "SNP", "BP", "P"]
-    logger.info(line)
 
     const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
       return element === validHeader[index];
