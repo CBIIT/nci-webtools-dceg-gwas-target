@@ -41,6 +41,8 @@ export async function runMagma(params, logger, env = process.env) {
         lineReader.close()
         lineReader.removeAllListeners()
 
+        logger.info(line)
+
         const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
           return element === validHeader[index];
         })
@@ -49,7 +51,7 @@ export async function runMagma(params, logger, env = process.env) {
           logger.info("Valid Header")
         }
         else {
-          logger.info(line)
+
           throw new Error("P-Value File - Header Invalid")
         }
       })
