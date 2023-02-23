@@ -356,7 +356,8 @@ export async function getPaths(params, env = process.env) {
     path.resolve(inputFolder, params.snpPValuesFile),
     path.resolve(defaultInputFolder, params.snpPValuesFile),
   ]);
-
+  logger.info(path.resolve(inputFolder, params.snpPValuesFile))
+  logger.info(pValFile)
   // bedFileFilter should be a .bed file containing SNPs to filter by
   const bedFileFilter = params.bedFileFilter ? coalesceFilePaths([
     path.resolve(inputFolder, params.bedFileFilter),
