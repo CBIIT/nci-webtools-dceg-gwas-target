@@ -22,7 +22,7 @@ export async function runMagma(params, logger, env = process.env) {
   try {
     if (!id) throw new Error("Missing id");
     if (!validator.isUUID(id)) throw new Error("Invalid id");
-    
+
     await mkdirs([paths.inputFolder, paths.outputFolder]);
     await writeJson(paths.paramsFile, params);
     await writeJson(paths.statusFile, { id, status: "IN_PROGRESS" });
@@ -30,20 +30,27 @@ export async function runMagma(params, logger, env = process.env) {
       paths.manifestFile,
       mapValues(paths, (value) => path.parse(value).base)
     );
-
+    var header;
     if (params.snpPValuesFile) {
-      const lineReader = createInterface({input: createReadStream(paths.pValFile)})
-      var header;
-      lineReader.on("line", function(line) {
+      const lineReader = createInterface({ input: createReadStream(paths.pValFile) })
+
+      lineReader.on("line", function (line) {
         header = line;
         lineReader.close()
+        lineReader.removeAllListeners()
       })
-      lineReader.on("close", function() {
+      lineReader.on("close", function () {
+        const headerArray = header.split(/\s+/)
+        const validHeader = ["CHR", "SNP", "BP", "P"]
+
+        const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
+          return element === array2[index];
+        })
         
-        if(header === "CHR\tSNP\tBP\tP"){
-          logger.info("Tab Deliminated")
+        if (isValid) {
+          logger.info("Valid Header")
         }
-        else{
+        else {
           logger.info(header)
           throw new Error("P-Value File - Header Invalid")
         }
@@ -85,7 +92,7 @@ export async function runMagma(params, logger, env = process.env) {
     // write success status
     const status = { id, status: "COMPLETED" };
     await writeJson(paths.statusFile, status);
-    
+
     // send success notification if email was provided
     if (params.email) {
 
@@ -94,17 +101,17 @@ export async function runMagma(params, logger, env = process.env) {
         if (err) {
           console.log(err);
         }
-  
+
         files.forEach((file) => {
           const fileDir = path.join(paths.inputFolder, file);
-  
+
           if (file !== 'params.json') {
             unlinkSync(fileDir);
           }
         });
       });
 
-      
+
       await sendNotification(
         params.email,
         `Analysis Complete - ${params.jobName}`,
@@ -125,7 +132,7 @@ export async function runMagma(params, logger, env = process.env) {
     };
   } catch (error) {
     // send error notification if email was provided
-    console.log(error);
+    logger.info("Sending error email")
     logger.error(error);
     const status = { id, status: "FAILED", error: { ...error } };
     await writeJson(paths.statusFile, status);
@@ -394,7 +401,7 @@ export async function getPaths(params, env = process.env) {
  * @returns {string} path to filtered pvalue file
  */
 export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env, logger) {
-  const execPath =  path.join("bin", "run.dhs.filter.on.magma.file.sh");
+  const execPath = path.join("bin", "run.dhs.filter.on.magma.file.sh");
   const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
   const headerFile = path.resolve(env.INPUT_FOLDER, "default", "header.file")
   const inputPath = path.resolve(env.INPUT_FOLDER, id);
