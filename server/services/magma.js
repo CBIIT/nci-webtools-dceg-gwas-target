@@ -39,7 +39,7 @@ export async function runMagma(params, logger, env = process.env) {
         lineReader.close()
       })
       lineReader.on("close", function() {
-        logger.info(line)
+        logger.info(header)
       })
     }
 
