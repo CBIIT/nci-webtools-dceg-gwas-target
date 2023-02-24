@@ -11,7 +11,7 @@ import { execAsync, execFileAsync, readJson, writeJson, mkdirs, coalesceFilePath
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 import { createInterface } from "readline";
-import { isEqual } from "lodash";
+import isEqual from "lodash.isequal";
 
 export async function runMagma(params, logger, env = process.env) {
   logger.info(".bed Filter: " + params.bedFileFilter)
