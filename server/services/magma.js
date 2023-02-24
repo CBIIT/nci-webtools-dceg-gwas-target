@@ -41,7 +41,7 @@ export async function runMagma(params, logger, env = process.env) {
       if(valid)
         logger.info("Valid Header")
       else 
-        throw new Error("P-Value File - Header Invalid")
+        throw new Error("Header Format for F MAGMA: CHR     SNP     BP      P.\nPlease update and try again’")
     }
 
     // run annotation
