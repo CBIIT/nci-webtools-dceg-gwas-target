@@ -11,6 +11,7 @@ import { execAsync, execFileAsync, readJson, writeJson, mkdirs, coalesceFilePath
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 import { createInterface } from "readline";
+import isEqual from "lodash/isEqual";
 
 export async function runMagma(params, logger, env = process.env) {
   logger.info(".bed Filter: " + params.bedFileFilter)
@@ -152,23 +153,18 @@ export async function runMagma(params, logger, env = process.env) {
   }
 }
 
-export async function validateHeader(pValFile){
- 
-  const lineReader = createInterface({ input: createReadStream(pValFile) })
+async function readFirstLine(inputStream) {
+  for await (const line of createInterface(inputStream))
+    return line;
+  return '';
+}
 
-  lineReader.on("line", function (line) {
-    const headerArray = line.split(/\s+/)
-    const validHeader = ["CHR", "SNP", "BP", "P"]
-
-    const isValid = (headerArray.length == validHeader.length) && headerArray.every(function (element, index) {
-      return element === validHeader[index];
-    })  
-    
-    lineReader.close()
-    lineReader.removeAllListeners()
-
-    return isValid
-  })
+export async function validateHeader(filePath, validHeaders = ["CHR", "SNP", "BP", "P"], delimiter = /\s+/) {
+  const readStream = createReadStream(filePath);
+  const firstLine = await readFirstLine(readStream)
+  readStream.destroy()
+  const fileHeaders = firstLine.split(delimiter);
+  return isEqual(fileHeaders, validHeaders);
 }
 
 export async function magma(args, type = "standard", cwd = process.cwd()) {
