@@ -145,7 +145,7 @@ export async function runMagma(params, logger, env = process.env) {
         jobName: params.jobName,
         submittedAt: submittedTime.toISOString(),
         executionTime: (new Date().getTime() - submittedTime.getTime()) / 1000,
-        error: formatObject(error),
+        error: formatObject(error.message),
       });
     }
 

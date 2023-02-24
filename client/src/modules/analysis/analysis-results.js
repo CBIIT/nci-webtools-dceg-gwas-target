@@ -56,7 +56,7 @@ export default function AnalysisResults() {
               Your analysis failed due to the following error. Please contact the site administrator for assistance if this issue persists. 
             </p>
             <pre>
-              {status?.error?.stdout.split('\n').filter(e => /ERROR/.test(e)) || 'INTERNAL ERROR'}
+              {status && status.error ? status.error : "INTERNAL ERROR"}
             </pre>
           </Alert>
         </>
