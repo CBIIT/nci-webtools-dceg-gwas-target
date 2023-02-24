@@ -120,8 +120,8 @@ export async function runMagma(params, logger, env = process.env) {
   } catch (error) {
     // send error notification if email was provided
     logger.info("Sending error email")
-    logger.error(error);
-    const status = { id, status: "FAILED", error: { ...error } };
+    logger.error(error.message);
+    const status = { id, status: "FAILED", error: error.message };
     await writeJson(paths.statusFile, status);
     /*
     //delete input files

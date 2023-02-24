@@ -34,14 +34,11 @@ export default function AnalysisForm() {
 
     switch (name) {
       case "magmaType":
-        const geneLocationFile = {
-          standard: "NCBI37.3.gene.loc",
-          enhanced: "ABC_genes_mrg_disjoint.txt",
-        }[value];
+
         if(value === "enhanced")
           setValue("sampleSizeType", "constant")
           
-        setValue("geneLocationFile", geneLocationFile);
+        setValue("geneLocationFile", "NCBI37.3.gene.loc");
         break;
       case "sendNotification":
         if (!checked) {
