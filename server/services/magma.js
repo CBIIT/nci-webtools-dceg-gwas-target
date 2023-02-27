@@ -18,6 +18,7 @@ export async function runMagma(params, logger, env = process.env) {
   const id = params.id;
   const paths = await getPaths(params, env);
   const submittedTime = new Date();
+  logger.info("Job Start Time: " + submittedTime)
   logger.info(paths);
 
   try {
@@ -36,11 +37,11 @@ export async function runMagma(params, logger, env = process.env) {
     logger.info(paths.pValFile)
 
     if (params.snpPValuesFile) {
-      const valid = await validateHeader(paths.pValFile) 
+      const valid = await validateHeader(paths.pValFile)
 
-      if(valid)
+      if (valid)
         logger.info("Valid Header")
-      else 
+      else
         throw new Error("Header Format for F MAGMA: CHR     SNP     BP      P.\nPlease update and try again’")
     }
 
@@ -68,35 +69,40 @@ export async function runMagma(params, logger, env = process.env) {
       geneSetAnalysisResults = await runGeneSetAnalysis(geneSetAnalysisParams, params.magmaType);
     }
 
+    const dbStart = new Date()
     // export tables to .db file
     logger.info(`[${id}] Create .db file`);
     const tables = [
       { name: "gene_analysis", file: paths.geneAnalysisFile },
       { name: "gene_set_analysis", file: paths.geneSetAnalysisFile },
     ];
-    createDatabaseFromFiles(tables, paths.databaseFile);
+    await createDatabaseFromFiles(tables, paths.databaseFile);
+    logger.info("Database creation runtime: " + (new Date().getTime() - dbStart.getTime()) / 1000 + " seconds")
 
+    const finishTime = new Date()
+    logger.info("Job Finish Time: " + finishTime)
     // write success status
     const status = { id, status: "COMPLETED" };
     await writeJson(paths.statusFile, status);
 
+    //delete input files
+    readdir(paths.inputFolder, (err, files) => {
+      if (err) {
+        console.log(err);
+      }
+
+      files.forEach((file) => {
+        const fileDir = path.join(paths.inputFolder, file);
+
+        if (file !== 'params.json') {
+          unlinkSync(fileDir);
+        }
+      });
+    });
+
+
     // send success notification if email was provided
     if (params.email) {
-
-      //delete input files
-      readdir(paths.inputFolder, (err, files) => {
-        if (err) {
-          console.log(err);
-        }
-
-        files.forEach((file) => {
-          const fileDir = path.join(paths.inputFolder, file);
-
-          if (file !== 'params.json') {
-            unlinkSync(fileDir);
-          }
-        });
-      });
 
 
       await sendNotification(
@@ -106,7 +112,7 @@ export async function runMagma(params, logger, env = process.env) {
         {
           jobName: params.jobName,
           submittedAt: submittedTime.toISOString(),
-          executionTime: (new Date().getTime() - submittedTime.getTime()) / 1000,
+          executionTime: (finishTime.getTime() - submittedTime.getTime()) / 1000,
           resultsUrl: `${env.APP_BASE_URL}/analysis/${id}`,
         }
       );
@@ -143,6 +149,7 @@ export async function runMagma(params, logger, env = process.env) {
     if (params.email) {
       await sendNotification(params.email, `Analysis Failed - ${params.jobName}`, "templates/user-failure-email.html", {
         jobName: params.jobName,
+        id: id,
         submittedAt: submittedTime.toISOString(),
         executionTime: (new Date().getTime() - submittedTime.getTime()) / 1000,
         error: formatObject(error.message),
