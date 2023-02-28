@@ -52,9 +52,6 @@ export default function AnalysisResults() {
         <>
           <Alert variant="danger">
             <Alert.Heading className="mb-3">Analysis Failed</Alert.Heading>
-            <p>
-              Your analysis failed due to the following error. Please contact the site administrator for assistance if this issue persists. 
-            </p>
             <pre>
               {status && status.error ? status.error : "INTERNAL ERROR"}
             </pre>
