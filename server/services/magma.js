@@ -42,7 +42,7 @@ export async function runMagma(params, logger, env = process.env) {
       if (valid)
         logger.info("Valid Header")
       else
-        throw new Error("Header Format for F MAGMA: CHR     SNP     BP      P.\nPlease update and try again’")
+        throw new Error("The uploaded file deviates from the allowed file format for F MAGMA: CHR     SNP     BP      P\nPlease update and try again")
     }
 
     // run annotation
