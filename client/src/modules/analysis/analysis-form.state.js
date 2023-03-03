@@ -2,22 +2,27 @@ import { atom, selector } from "recoil";
 import { asFileList } from "./analysis-form.utils";
 
 export const defaultFormState = {
-  magmaType: null,
-  bedFileFilter: null,
-  snpPopulation: null,
-  referenceDataFiles: null,
-  geneLocationFile: null,
-  genotypeDataSource: null,
+  magmaType: "enhanced",
+  snpPopulation: "g1000_eur",
+  referenceDataFiles: [
+    "g1000_eur.bed",
+    "g1000_eur.bim",
+    "g1000_eur.fam",
+    "g1000_eur.synonyms"
+  ],
+  bedFileFilter: "E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+  geneLocationFile: "NCBI37.3.gene.loc",
+  genotypeDataSource: "referenceData",
   rawGenotypeDataFiles: null,
-  snpPValuesFile: null,
+  snpPValuesFile: "height.randall.jc.2013.giant.60.586.ieu-a-96.vcf.clean.tsv",
   sampleSizeType: "constant",
-  sampleSize: null,
-  sampleSizeColumn: null,
+  sampleSize: 100,
+  sampleSizeColumn: "Nca",
   geneSetFile: null,
   covariateFile: null,
   sendNotification: false,
   jobName: null,
-  email: null,
+  email: null
 };
 
 export const formState = atom({
