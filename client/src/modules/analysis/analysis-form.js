@@ -177,7 +177,7 @@ export default function AnalysisForm() {
         </div>
 
         <div className={genotypeDataSource === "referenceData" ? "d-block" : "d-none"}>
-        <OverlayTrigger overlay={<Tooltip id="snpPValuesFile">{`Allowed File Format:\nCHR SNP BP  P`}</Tooltip>}>
+        <OverlayTrigger overlay={<Tooltip id="snpPValuesFile">{`Allowed File Format for F MAGMA:\nCHR SNP BP  P`}</Tooltip>}>
           <Form.Group className="mb-3" controlId="snpPValuesFile">
             <Form.Label className="required">SNP P-Values File</Form.Label>
             <FileInput
