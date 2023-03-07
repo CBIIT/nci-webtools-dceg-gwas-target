@@ -244,7 +244,7 @@ export default function AnalysisForm() {
         </div>
       </fieldset>
 
-      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+      {/*<fieldset className="fieldset border rounded mb-4 pt-4 px-3">
         <legend className="legend fw-bold bg-light">Gene Set Analysis</legend>
 
         <Form.Group className="mb-3" controlId="geneSetFile">
@@ -256,7 +256,7 @@ export default function AnalysisForm() {
           <Form.Label>Covariate File</Form.Label>
           <FileInput name="covariateFile" control={control} />
         </Form.Group>
-      </fieldset>
+            </fieldset>*/}
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
         <legend className="legend fw-bold bg-light">Notifications</legend>
