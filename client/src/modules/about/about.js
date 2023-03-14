@@ -8,7 +8,7 @@ export default function About() {
       <Row>
         <Col>
           <article className="shadow p-4 rounded">
-            <h1 className="text-primary h3 mb-4">About GWASTarget F MAGMA</h1>
+            <h1 className="text-primary h3 mb-4">About GWASTarget</h1>
             <hr/>
             <p>
               GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across hundreds of tissues and epigenomic datasets alongside issue-specific chromatin conformation capture and target gene prediction models.
