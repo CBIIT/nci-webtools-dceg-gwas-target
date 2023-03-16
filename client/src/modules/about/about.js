@@ -11,16 +11,16 @@ export default function About() {
             <h1 className="text-primary h3 mb-4">About GWASTarget</h1>
             <hr/>
             <p>
-              GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across hundreds of tissues and <a href="https://forge2.altiusinstitute.org/" target="_blank">epigenomic datasets</a> alongside issue-specific chromatin conformation capture and target gene prediction models.
+            GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across different tissues and <a href="https://forge2.altiusinstitute.org/" target="_blank">epigenomic datasets</a>.
             </p>
             <p>
-              GWAS Target incorporates a state-of-the-art set of regulatory element annotations to pinpoint the tissue-specific regulatory context for all SNPs analyzed using the latest expansive ENCODE, Roadmap Epigenomics and FANTOM5 consortium data for DNase I Hypersensitive sites, histone mark broadPeaks, Hidden Markov model (HMM) Chromatin states and C1 CAGE-identified enhancers.
+            GWAS Target incorporates regulatory element annotations to pinpoint the tissue-specific functional context for all SNPs analyzed using Roadmap Epigenomics data for DNase I hotspots.
             </p>
             <p>
-              Once chromatin context is integrated, GWAS Target links regulatory elements to target promoters in a tissue-specific manner using the latest tissue-specific promoter capture Hi-C (PCHiC) and activity by contact (ABC) enhancer-target promoter datasets across hundreds of tissues to link regulatory elements to the affected genes.
+            This annotated dataset is then incorporated into a cumulative analysis tool that takes into account distribution of effect sizes and p-values for all SNPs included, building a comprehensive, robust set of high-priority target genes.
             </p>
             <p>
-              This enhanced, annotated data is then incorporated into a cumulative analysis tool that takes into account distribution of effect sizes and p-values for all SNPs included, building a comprehensive, robust set of high-priority target genes. Results may be further evaluated via gene set analysis to prioritize systems-level pathways for further laboratory analysis.
+            Results may be further evaluated via gene set analysis to prioritize systems-level pathways for further analyses.
             </p>
             <b>Credits</b>
             <p>
