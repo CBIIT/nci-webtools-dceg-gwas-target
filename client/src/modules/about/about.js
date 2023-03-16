@@ -11,7 +11,7 @@ export default function About() {
             <h1 className="text-primary h3 mb-4">About GWASTarget</h1>
             <hr/>
             <p>
-              GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across hundreds of tissues and epigenomic datasets alongside issue-specific chromatin conformation capture and target gene prediction models.
+              GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across hundreds of tissues and <a href="https://forge2.altiusinstitute.org/" target="_blank">epigenomic datasets</a> alongside issue-specific chromatin conformation capture and target gene prediction models.
             </p>
             <p>
               GWAS Target incorporates a state-of-the-art set of regulatory element annotations to pinpoint the tissue-specific regulatory context for all SNPs analyzed using the latest expansive ENCODE, Roadmap Epigenomics and FANTOM5 consortium data for DNase I Hypersensitive sites, histone mark broadPeaks, Hidden Markov model (HMM) Chromatin states and C1 CAGE-identified enhancers.
