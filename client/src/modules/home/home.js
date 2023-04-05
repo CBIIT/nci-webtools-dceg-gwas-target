@@ -10,11 +10,11 @@ export default function Home() {
       <div className="bg-primary-dark">
         <div
           className="cover-image"
-          style={{ minHeight: "400px", backgroundImage: `url(${process.env.PUBLIC_URL}/assets/images/home.svg)` }}>
+          style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/assets/images/home.svg)` }}>
           <Container>
             <Row>
               <Col md={6}>
-                <div className="d-flex h-100 align-items-center my-5">
+                <div className="d-flex h-100 align-items-center py-5">
                   <div>
                     <h1 className="font-title text-light mb-3">GWAS TARGET</h1>
                     <hr className="border-white" />
