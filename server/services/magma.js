@@ -30,7 +30,7 @@ export async function runMagma(params, logger, env = process.env) {
     await writeJson(paths.statusFile, { id, status: "IN_PROGRESS" });
     await writeJson(
       paths.manifestFile,
-      mapValues(paths, (value) => path.parse(value).base)
+      mapValues(paths, (value) => value ? path.parse(value).base : null)
     );
 
     logger.info(path.resolve(paths.inputFolder, params.snpPValuesFile))
