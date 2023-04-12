@@ -1,6 +1,6 @@
 ### GWASTarget API Utility
 
-The GWASTarget web application provides a public API. To simplify usage of this API, a python 3 utlity script `gwas_target.py` has been provided.
+The GWASTarget web application provides a public API. To simplify usage of this API, a python 3 utility `gwas_target.py` has been provided.
 
 #### Getting Started
 1. Download the `gwas_target.py` script
@@ -20,17 +20,17 @@ The following arguments can be passed to the script.
 - \--email: Specifies an email address for notification.
 - \--job\-name: Specifies a job name (required if email is set).
 
-To use this script, you would run it from the command line and pass in the desired arguments. For example, to run the script with the "standard" MAGMA gene set, the "g1000_eur" SNP population, and a gene location file named "gene_loc.txt", you would enter the following command:
+To use this script, you would run it from the command line and pass in the desired arguments. For example, to run the script with the "standard" MAGMA gene set, the "g1000_eur" SNP population, and a gene location file named "gene_loc.txt", and a snp p-values file named "snp-pvalues.tsv" you would enter the following command:
 
 ```sh
 python3 gwas_target.py \
   --magma-type standard \
   --snp-population g1000_eur \
-  --gene-location-file NCBI37.3.gene.loc \
-  --snp-pvalues-file my-snp-pvalues.tsv
+  --gene-location-file gene_loc.txt \
+  --snp-pvalues-file snp-pvalues.tsv
 ```
 
-Another example for enhanced MAGMA would be:
+Another example for enhanced MAGMA (filtered on tissue-specific snps) would be:
 
 ```sh
 python3 gwas-target.py \
