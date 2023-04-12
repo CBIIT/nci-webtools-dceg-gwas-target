@@ -37,6 +37,7 @@ python3 gwas-target.py \
   --magma-type enhanced \
   --snp-population g1000_eur \
   --gene-location-file NCBI37.3.gene.loc \
+  --snp-pvalues-file snp-pvalues.tsv \
   --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
   --email "my_email@example.com" \
   --job-name "my custom job name"
