@@ -35,7 +35,7 @@ def submit(params):
     file_params = [params.gene_location_file, params.snp_pvalues_file, params.bed_filter_file]
     for file_path in file_params:
         if file_path is not None and path.exists(file_path):
-            logging.debug("Uploading file %s...", file_path)
+            logging.info("Uploading file %s", file_path)
             upload_file(upload_endpoint, file_path)
 
     # Specify parameters
@@ -69,9 +69,10 @@ def submit(params):
     post(submit_endpoint, json=job_params)
     logging.info("Job submitted successfully")
     logging.info("Status/Results Page: %s/analysis/%s", base_url, job_id)
-    logging.info("Annotation Results Download Link: %s/annotation.genes.annot", output_data_endpoint)
-    logging.info("Annotation Logs: %s/annotation.log", output_data_endpoint))
-    logging.info("Gene Analysis Results Download Link: %s/gene_analysis.genes.out", output_data_endpoint)
+    logging.info("The following links will become available once results have been generated:")
+    logging.info("Annotation Results File: %s/annotation.genes.annot", output_data_endpoint)
+    logging.info("Annotation Logs: %s/annotation.log", output_data_endpoint)
+    logging.info("Gene Analysis Results File: %s/gene_analysis.genes.out", output_data_endpoint)
     logging.info("Gene Analysis Logs: %s/gene_analysis.log", output_data_endpoint)
 
 def parse_args():
