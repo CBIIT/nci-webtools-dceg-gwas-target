@@ -127,6 +127,7 @@ export async function runMagma(params, logger, env = process.env) {
     // send error notification if email was provided
     logger.info("Sending error email")
     logger.error(error.message);
+    logger.error(error.stack);
     const status = { id, status: "FAILED", error: error.message };
     await writeJson(paths.statusFile, status);
     /*
