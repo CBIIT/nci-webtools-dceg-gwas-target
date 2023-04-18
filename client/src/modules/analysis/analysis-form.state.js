@@ -17,7 +17,7 @@ export const defaultFormState = {
   snpPValuesFile: "height.randall.jc.2013.giant.60.586.ieu-a-96.vcf.clean.tsv",
   sampleSizeType: "constant",
   sampleSize: 100,
-  sampleSizeColumn: "Nca",
+  sampleSizeColumn: null,
   geneSetFile: null,
   covariateFile: null,
   sendNotification: false,
