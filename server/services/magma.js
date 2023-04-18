@@ -1,7 +1,7 @@
 import os from "os";
 import path from "path";
-import { stat } from "fs/promises";
-import { readdir, unlinkSync, createReadStream } from "fs";
+import { stat, readdir, unlink } from "fs/promises";
+import { createReadStream } from "fs";
 import { cpus } from "os";
 import { setTimeout } from "timers/promises";
 import mapValues from "lodash/mapValues.js";
@@ -86,25 +86,14 @@ export async function runMagma(params, logger, env = process.env) {
     await writeJson(paths.statusFile, status);
 
     //delete input files
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
+    for (const fileName of await readdir(paths.inputFolder)) {
+      if (fileName !== 'params.json') {
+        await unlink(path.join(paths.inputFolder, fileName));
       }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          unlinkSync(fileDir);
-        }
-      });
-    });
-
+    }
 
     // send success notification if email was provided
     if (params.email) {
-
-
       await sendNotification(
         params.email,
         `Analysis Complete - ${params.jobName}`,
@@ -130,23 +119,6 @@ export async function runMagma(params, logger, env = process.env) {
     logger.error(error.stack);
     const status = { id, status: "FAILED", error: error.message };
     await writeJson(paths.statusFile, status);
-    /*
-    //delete input files
-    readdir(paths.inputFolder, (err, files) => {
-      if (err) {
-        console.log(err);
-      }
-
-      files.forEach((file) => {
-        const fileDir = path.join(paths.inputFolder, file);
-
-        if (file !== 'params.json') {
-          unlinkSync(fileDir);
-        }
-      });
-    });*/
-
-
     if (params.email) {
       await sendNotification(params.email, `Analysis Failed - ${params.jobName}`, "templates/user-failure-email.html", {
         jobName: params.jobName,
@@ -167,12 +139,12 @@ async function readFirstLine(inputStream) {
   return '';
 }
 
-export async function validateHeader(filePath, validHeaders = ["CHR", "SNP", "BP", "P"], delimiter = /\s+/) {
+export async function validateHeader(filePath, requiredHeaders = ["CHR", "SNP", "BP", "P"], delimiter = /\s+/) {
   const readStream = createReadStream(filePath);
   const firstLine = await readFirstLine(readStream)
   readStream.destroy()
   const fileHeaders = firstLine.split(delimiter);
-  return isEqual(fileHeaders, validHeaders);
+  return requiredHeaders.every((requiredHeader) => fileHeaders.includes(requiredHeader));
 }
 
 export async function magma(args, type = "standard", cwd = process.cwd()) {
@@ -245,7 +217,7 @@ export async function runGeneAnalysis(
 
   // execute filter if bed file is provided
   if (bedFileFilter) {
-    pvalFile = await filterPvalFile(id, pvalFile, bedFileFilter, env, logger);
+    pvalFile = await filterPvalFile(id, pvalFile, bedFileFilter, env);
   }
 
   // win32 does not support batch mode's --merge option
@@ -409,20 +381,13 @@ export async function getPaths(params, env = process.env) {
  * @param {string} bedFileFilter - path to bed file
  * @returns {string} path to filtered pvalue file
  */
-export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env, logger) {
-  const execPath = path.join("bin", "run.dhs.filter.on.magma.file.sh");
-  const filterFile = path.resolve(env.INPUT_FOLDER, "filters", bedFileFilter)
-  const headerFile = path.resolve(env.INPUT_FOLDER, "default", "header.file")
-  const inputPath = path.resolve(env.INPUT_FOLDER, id);
-
-  const args = [
-    pvalFile,
-    filterFile
-  ]
-
-  logger.info(execPath + " " + pvalFile + " " + filterFile + " " + inputPath + " " + headerFile)
-  await execAsync("sh " + execPath + " " + pvalFile + " " + filterFile + " " + inputPath + " " + headerFile)
-  return path.resolve(inputPath, "filtered.for.magma.tsv");
+export async function filterPvalFile(id, pvalFile, bedFileFilter, env = process.env) {
+  const execPath = path.join("bin", "filter_pval_file.sh");
+  const outputFilename = path.basename(`${pvalFile}.filtered`);
+  const outputPath = path.resolve(env.INPUT_FOLDER, id, outputFilename);
+  const args = [bedFileFilter, pvalFile, outputPath];
+  await execFileAsync(execPath, args, { windowsHide: true, shell: true });
+  return outputPath;
 }
 
 export async function waitUntilComplete(id, env = process.env, checkInterval = 1000) {
