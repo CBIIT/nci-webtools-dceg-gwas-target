@@ -34,11 +34,12 @@ export default function AnalysisForm() {
 
     switch (name) {
       case "magmaType":
-
-        if(value === "enhanced")
-          setValue("sampleSizeType", "constant")
-          
-        setValue("geneLocationFile", "NCBI37.3.gene.loc");
+        setValue("bedFileFilter", null, { shouldValidate: true })
+        break;
+      case "snpPopulation":
+        const referenceDataFiles =
+          value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
+        setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
         break;
       case "sendNotification":
         if (!checked) {
@@ -46,15 +47,6 @@ export default function AnalysisForm() {
           setValue("email", null);
         }
         break;
-      case "snpPopulation":
-        const referenceDataFiles =
-          value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
-        setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
-        break;
-      case "bedFileFilter":
-        setValue("bedFileFilter", value)
-        break;
-
     }
   }
 
@@ -231,16 +223,17 @@ export default function AnalysisForm() {
             />
           </Form.Group>
 
-          {magmaType === "enhanced" ? <Form.Group className="mb-3" controlId="bedFileFilter">
+          <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
             <Form.Label className="required">BED File Filter</Form.Label>
-            <Form.Select required {...register("bedFileFilter", { required: true, onChange: handleChange })}>
+            <Form.Select {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
+              <option value="" hidden>No Filter Selected</option>
               {bedFilterOptions.map((e) => {
                 return (
                   <option value={e.value}>{e.label}</option>
                 )
               })}
             </Form.Select>
-          </Form.Group> : <></>}
+          </Form.Group>
         </div>
       </fieldset>
 
@@ -269,9 +262,9 @@ export default function AnalysisForm() {
             id="sendNotification"
             {...register("sendNotification", { onChange: handleChange })}
           />
-          <i style={{ fontSize: "14px", color: "#4C4E52" }}>
-            Check this for a long-running job and your results will be sent to the email address specified below when ready.
-          </i>
+          <Form.Text className="text-muted fst-italic">
+            When submitting a long-running job, please select this option to receive the results via email upon completion.
+          </Form.Text>
         </Form.Group>
 
         {sendNotification && <div className={sendNotification ? "d-block" : "d-block"}>
