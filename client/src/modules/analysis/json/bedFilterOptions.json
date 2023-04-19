@@ -1,0 +1,158 @@
+[
+    {
+        "value": "E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E003_H1_Cells_ES_Cell"
+    },
+    {
+        "value": "E004_H1_BMP4_Derived_Mesendoderm_Cultured_Cells_ES_Cell.E004-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E004_H1_BMP4_Derived_Mesendoderm_Cultured_Cells_ES_Cell"
+    },
+    {
+        "value": "E005_H1_BMP4_Derived_Trophoblast_Cultured_Cells_ES_Cell.E005-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E005_H1_BMP4_Derived_Trophoblast_Cultured_Cells_ES_Cell"
+    },
+    {
+        "value": "E006_H1_Derived_Mesenchymal_Stem_Cells_ES_Cell.E006-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E006_H1_Derived_Mesenchymal_Stem_Cells_ES_Cell"
+    },
+    {
+        "value": "E007_H1_Derived_Neuronal_Progenitor_Cultured_Cells_ES_Cell.E007-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E007_H1_Derived_Neuronal_Progenitor_Cultured_Cells_ES_Cell"
+    },
+    {
+        "value": "E008_H9_Cells_ES_Cell.E008-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E008_H9_Cells_ES_Cell"
+    },
+    {
+        "value": "E017_IMR90_fetal_lung_fibroblasts_Cell_Line_Lung.E017-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E017_IMR90_fetal_lung_fibroblasts_Cell_Line_Lung"
+    },
+    {
+        "value": "E021_iPS_DF_6.9_Cells_IPS_cell.E021-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E021_iPS_DF_6"
+    },
+    {
+        "value": "E022_iPS_DF_19.11_Cells_IPS_cell.E022-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E022_iPS_DF_19"
+    },
+    {
+        "value": "E028_Breast_variant_Human_Mammary_Epithelial_Cells_Breast.E028-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E028_Breast_variant_Human_Mammary_Epithelial_Cells_Breast"
+    },
+    {
+        "value": "E029_Primary_monocytes_from_peripheral_blood_Blood.E029-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E029_Primary_monocytes_from_peripheral_blood_Blood"
+    },
+    {
+        "value": "E032_Primary_B_cells_from_peripheral_blood_Blood.E032-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E032_Primary_B_cells_from_peripheral_blood_Blood"
+    },
+    {
+        "value": "E033_Primary_T_cells_from_cord_blood_Blood.E033-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E033_Primary_T_cells_from_cord_blood_Blood"
+    },
+    {
+        "value": "E034_Primary_T_cells_from_peripheral_blood_Blood.E034-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E034_Primary_T_cells_from_peripheral_blood_Blood"
+    },
+    {
+        "value": "E046_Primary_Natural_Killer_cells_from_peripheral_Blood.E046-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E046_Primary_Natural_Killer_cells_from_peripheral_Blood"
+    },
+    {
+        "value": "E050_Primary_hematopoietic_stem_cells_G-CSF-mobili_Blood.E050-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E050_Primary_hematopoietic_stem_cells_G-CSF-mobili_Blood"
+    },
+    {
+        "value": "E051_Primary_hematopoietic_stem_cells_G-CSF-mobili_Blood.E051-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E051_Primary_hematopoietic_stem_cells_G-CSF-mobili_Blood"
+    },
+    {
+        "value": "E055_Foreskin_Fibroblast_Primary_Cells_skin01_Skin.E055-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E055_Foreskin_Fibroblast_Primary_Cells_skin01_Skin"
+    },
+    {
+        "value": "E056_Foreskin_Fibroblast_Primary_Cells_skin02_Skin.E056-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E056_Foreskin_Fibroblast_Primary_Cells_skin02_Skin"
+    },
+    {
+        "value": "E057_Foreskin_Keratinocyte_Primary_Cells_skin02_Skin.E057-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E057_Foreskin_Keratinocyte_Primary_Cells_skin02_Skin"
+    },
+    {
+        "value": "E059_Foreskin_Melanocyte_Primary_Cells_skin01_Skin.E059-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E059_Foreskin_Melanocyte_Primary_Cells_skin01_Skin"
+    },
+    {
+        "value": "E080_Fetal_Adrenal_Gland_Fetal_Adrenal_Gland.E080-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E080_Fetal_Adrenal_Gland_Fetal_Adrenal_Gland"
+    },
+    {
+        "value": "E081_Fetal_Brain_Male_Fetal_Brain.E081-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E081_Fetal_Brain_Male_Fetal_Brain"
+    },
+    {
+        "value": "E082_Fetal_Brain_Female_Fetal_Brain.E082-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E082_Fetal_Brain_Female_Fetal_Brain"
+    },
+    {
+        "value": "E083_Fetal_Heart_Fetal_Heart.E083-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E083_Fetal_Heart_Fetal_Heart"
+    },
+    {
+        "value": "E084_Fetal_Intestine_Large_Fetal_Intestine_Large.E084-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E084_Fetal_Intestine_Large_Fetal_Intestine_Large"
+    },
+    {
+        "value": "E085_Fetal_Intestine_Small_Feta_Intestine_Small.E085-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E085_Fetal_Intestine_Small_Feta_Intestine_Small"
+    },
+    {
+        "value": "E086_Fetal_Kidney_Fetal_Kidney.E086-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E086_Fetal_Kidney_Fetal_Kidney"
+    },
+    {
+        "value": "E088_Fetal_Lung_Fetal_Lung.E088-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E088_Fetal_Lung_Fetal_Lung"
+    },
+    {
+        "value": "E089_Fetal_Muscle_Trunk_Fetal_Muscle_Trunk.E089-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E089_Fetal_Muscle_Trunk_Fetal_Muscle_Trunk"
+    },
+    {
+        "value": "E090_Fetal_Muscle_Leg_Fetal_Muscle_Leg.E090-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E090_Fetal_Muscle_Leg_Fetal_Muscle_Leg"
+    },
+    {
+        "value": "E091_Placenta_Placenta.E091-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E091_Placenta_Placenta"
+    },
+    {
+        "value": "E092_Fetal_Stomach_Fetal_Stomach.E092-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E092_Fetal_Stomach_Fetal_Stomach"
+    },
+    {
+        "value": "E093_Fetal_Thymus_Fetal_Thymus.E093-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E093_Fetal_Thymus_Fetal_Thymus"
+    },
+    {
+        "value": "E094_Gastric_Gastric.E094-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E094_Gastric_Gastric"
+    },
+    {
+        "value": "E097_Ovary_Ovary.E097-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E097_Ovary_Ovary"
+    },
+    {
+        "value": "E098_Pancreas_Pancreas.E098-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E098_Pancreas_Pancreas"
+    },
+    {
+        "value": "E100_Psoas_Muscle_Psoas_Muscle.E100-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E100_Psoas_Muscle_Psoas_Muscle"
+    },
+    {
+        "value": "E109_Small_Intestine_Small_Intestine.E109-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
+        "label": "E109_Small_Intestine_Small_Intestine"
+    }
+]

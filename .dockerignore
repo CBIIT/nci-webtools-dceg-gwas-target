@@ -1,0 +1,10 @@
+**/.angular
+**/.git
+**/config.json
+**/coverage
+**/dist
+**/logs
+**/node_modules
+**/.env
+**/tmp
+**/data
