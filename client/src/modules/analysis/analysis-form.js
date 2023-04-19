@@ -257,13 +257,13 @@ export default function AnalysisForm() {
         <Form.Group className="mb-3">
           <Form.Check
             type="checkbox"
-            label="Long Running Job"
+            label="Long-running Job"
             name="sendNotification"
             id="sendNotification"
             {...register("sendNotification", { onChange: handleChange })}
           />
           <Form.Text className="text-muted fst-italic">
-            When submitting a long-running job, please select this option to receive the results via email upon completion.
+            When submitting a long-running job, select this option to receive a notification via email upon completion.
           </Form.Text>
         </Form.Group>
 
