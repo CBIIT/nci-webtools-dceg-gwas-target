@@ -11,4 +11,5 @@ server/logs
 **/logs
 **/tmp/
 **/efs/
+**/.DS_Store
 data/
