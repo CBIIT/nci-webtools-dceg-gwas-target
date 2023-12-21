@@ -8,6 +8,8 @@ services:
     volumes:
       - ./server/data/input/default:/server/data/input/default:ro
       - ./server/data/output/default:/server/data/output/default:ro
+      - ./server/data/input/:/server/data/input/
+      - ./server/data/output/:/server/data/output/
     ports:
       - "9000:9000"
   frontend:
