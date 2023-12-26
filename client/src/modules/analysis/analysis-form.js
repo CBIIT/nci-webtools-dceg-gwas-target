@@ -28,6 +28,8 @@ export default function AnalysisForm() {
   const genotypeDataSource = watch("genotypeDataSource");
   const sampleSizeType = watch("sampleSizeType");
   const sendNotification = watch("sendNotification");
+  const geneSetFile = watch("geneSetFile");
+  const covariateFile = watch("covariateFile");
 
   function handleChange(event) {
     const { name, value, checked } = event.target;
@@ -237,19 +239,19 @@ export default function AnalysisForm() {
         </div>
       </fieldset>
 
-      {/*<fieldset className="fieldset border rounded mb-4 pt-4 px-3">
+      <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
         <legend className="legend fw-bold bg-light">Gene Set Analysis</legend>
-
+        <p>Add Gene Set or Covariate file</p>
         <Form.Group className="mb-3" controlId="geneSetFile">
           <Form.Label>Gene Set File</Form.Label>
-          <FileInput name="geneSetFile" control={control} />
+          <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="covariateFile">
           <Form.Label>Covariate File</Form.Label>
-          <FileInput name="covariateFile" control={control} />
+          <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
         </Form.Group>
-            </fieldset>*/}
+      </fieldset>
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
         <legend className="legend fw-bold bg-light">Notifications</legend>
