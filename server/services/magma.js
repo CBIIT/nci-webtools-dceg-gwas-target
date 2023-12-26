@@ -178,7 +178,7 @@ export async function runAnnotation({ snpLocFile, geneLocFile, outFile }, type =
 }
 
 export function getGeneAnalysisParams(paths, params) {
-  const runGeneSetAnalysis = Boolean(params.geneSetFile || params.covarFile);
+  const runGeneSetAnalysis = Boolean(params.geneSetFile || params.covariateFile);
 
   let geneAnalysisParams = {
     bFile: paths.bFile,
@@ -269,18 +269,18 @@ export async function runGeneAnalysis(
 export function getGeneSetAnalysisParams(paths) {
   return {
     geneAnalysisRawFile: paths.geneAnalysisRawFile,
-    setFile: paths.setFile,
-    covarFile: paths.covarFile,
+    geneSetFile: paths.geneSetFile,
+    covariateFile: paths.covariateFile,
     outFile: paths.geneSetAnalysisFilePrefix,
   };
 }
 
-export async function runGeneSetAnalysis({ geneAnalysisRawFile, setFile, covarFile, outFile }, type = "standard") {
+export async function runGeneSetAnalysis({ geneAnalysisRawFile, geneSetFile, covariateFile, outFile }, type = "standard") {
   return await magma(
     [
       ["--gene-results", geneAnalysisRawFile],
-      setFile && ["--set-annot", setFile],
-      covarFile && ["--gene-covar", covarFile],
+      geneSetFile && ["--set-annot", geneSetFile],
+      covariateFile && ["--gene-covar", covariateFile],
       ["--out", outFile],
     ],
     type
@@ -344,6 +344,10 @@ export async function getPaths(params, env = process.env) {
     path.resolve(defaultInputFolder, 'filters', params.bedFileFilter),
   ]) : null;
 
+  // gene set analysis input files
+  const geneSetFile = params.geneSetFile ? path.resolve(inputFolder, params.geneSetFile) : null
+  const covariateFile = params.covariateFile ? path.resolve(inputFolder, params.covariateFile) : null
+
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
   const geneAnalysisFile = path.resolve(outputFolder, "gene_analysis.genes.out");
   const geneAnalysisRawFile = path.resolve(outputFolder, "gene_analysis.genes.raw");
@@ -366,6 +370,8 @@ export async function getPaths(params, env = process.env) {
     bFile,
     pValFile,
     bedFileFilter,
+    geneSetFile,
+    covariateFile,
     geneAnalyisFilePrefix,
     geneAnalysisFile,
     geneAnalysisRawFile,
