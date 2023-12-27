@@ -157,7 +157,7 @@ export async function magma(args, type = "standard", cwd = process.cwd()) {
   } catch (e) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  return await execFileAsync(execPath, args.flat().filter(Boolean), { cwd, windowsHide: true });
+  return await execFileAsync(execPath, args.flat().filter(Boolean), { cwd, windowsHide: true, maxBuffer: 5 * 1024 * 1024 });
 }
 
 export async function checkStatus(type = "standard") {
