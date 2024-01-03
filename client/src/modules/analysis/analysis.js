@@ -39,13 +39,15 @@ export default function Analysis() {
           </SidebarPanel>
           <MainPanel>
             <Col>
-              <div className="shadow p-4 rounded" style={{ minHeight: "400px" }}>
+              <div className="shadow rounded" style={{ minHeight: "400px" }}>
                 <ErrorBoundary
                   fallback={
-                    <strong>
-                      An internal error occured when loading results. If this issue persists, please contact the site
-                      administrator.
-                    </strong>
+                    <div className="p-4">
+                      <strong>
+                        An internal error occured when loading results. If this issue persists, please contact the site
+                        administrator.
+                      </strong>
+                    </div>
                   }>
                   <Suspense fallback={<strong>Loading</strong>}>
                     <AnalysisResults />

@@ -51,13 +51,122 @@ export const resultsSelector = selectorFamily({
           limit: -1,
         });
         return {
-          geneAnalysis: geneAnalysisResponse.data,
+          data: geneAnalysisResponse.data,
+          columns: [
+            {
+              header: "GENE",
+              accessorKey: "GENE",
+              className: "text-nowrap",
+            },
+            {
+              header: "CHR",
+              accessorKey: "CHR",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "START (hg19)",
+              accessorKey: "START",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "STOP (hg19)",
+              accessorKey: "STOP",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "NSNPS",
+              accessorKey: "NSNPS",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "NPARAM",
+              accessorKey: "NPARAM",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "N",
+              accessorKey: "N",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "ZSTAT",
+              accessorKey: "ZSTAT",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "P",
+              accessorKey: "P",
+              className: "text-nowrap text-end",
+            },
+          ],
         };
       } catch (error) {
         console.error(error);
+        return [];
+      }
+    },
+});
+
+export const geneSetSelector = selectorFamily({
+  key: "analysis.geneSetSelector",
+  get:
+    (id = "default") =>
+    async ({ get }) => {
+      try {
+        const endpoint = `${process.env.PUBLIC_URL}/api/query/${id}`;
+        const query = await axios.post(endpoint, {
+          table: "gene_set_analysis",
+          orderBy: "P",
+          limit: -1,
+        });
         return {
-          geneAnalysis: [],
+          data: query.data,
+          columns: [
+            {
+              header: "VARIABLE",
+              accessorKey: "VARIABLE",
+              className: "text-nowrap",
+            },
+            {
+              header: "TYPE",
+              accessorKey: "TYPE",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "NGENES",
+              accessorKey: "NGENES",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "BETA",
+              accessorKey: "BETA",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "BETA_STD",
+              accessorKey: "BETA_STD",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "SE",
+              accessorKey: "SE",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "P",
+              accessorKey: "P",
+              className: "text-nowrap text-end",
+            },
+            {
+              header: "FULL_NAME",
+              accessorKey: "FULL_NAME",
+              className: "text-nowrap text-end",
+            },
+          ],
         };
+      } catch (error) {
+        console.error(error);
+        return [];
       }
     },
 });

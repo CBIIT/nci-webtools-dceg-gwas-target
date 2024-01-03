@@ -10,59 +10,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-export const geneAnalysisColumns = [
-  {
-    header: "GENE",
-    accessorKey: "GENE",
-    className: "text-nowrap",
-  },
-  {
-    header: "CHR",
-    accessorKey: "CHR",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "START (hg19)",
-    accessorKey: "START",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "STOP (hg19)",
-    accessorKey: "STOP",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "NSNPS",
-    accessorKey: "NSNPS",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "NPARAM",
-    accessorKey: "NPARAM",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "N",
-    accessorKey: "N",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "ZSTAT",
-    accessorKey: "ZSTAT",
-    className: "text-nowrap text-end",
-  },
-  {
-    header: "P",
-    accessorKey: "P",
-    className: "text-nowrap text-end",
-  },
-];
-
-export default function AnalysisResultsTable({ results }) {
+export default function AnalysisResultsTable({ data, columns }) {
   const [sorting, setSorting] = useState([{ id: "P", desc: false }]);
   const table = useReactTable({
-    data: results.geneAnalysis,
-    columns: geneAnalysisColumns,
+    data,
+    columns,
     state: {
       sorting,
     },

@@ -1,10 +1,19 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
+import Card from "react-bootstrap/Card";
+import Nav from "react-bootstrap/Nav";
 import AnalysisResultsTable from "./analysis-results-table";
 import { useRecoilState, useRecoilValue, useRecoilRefresher_UNSTABLE as useRecoilRefresher } from "recoil";
-import { statusSelector, loadingState, manifestSelector, paramsSelector, resultsSelector } from "./analysis.state";
+import {
+  statusSelector,
+  loadingState,
+  manifestSelector,
+  paramsSelector,
+  resultsSelector,
+  geneSetSelector,
+} from "./analysis.state";
 
 export default function AnalysisResults() {
   const id = useParams().id || "default";
@@ -13,10 +22,15 @@ export default function AnalysisResults() {
   const status = useRecoilValue(statusSelector(id));
   const manifest = useRecoilValue(manifestSelector(id));
   const results = useRecoilValue(resultsSelector(id));
+  const geneSetResults = useRecoilValue(geneSetSelector(id));
   const refreshStatus = useRecoilRefresher(statusSelector(id));
   const refreshManifest = useRecoilRefresher(manifestSelector(id));
   const refreshResults = useRecoilRefresher(resultsSelector(id));
   const isDone = ["COMPLETED", "FAILED"].includes(status?.status);
+  const [tab, setTab] = useState("gene_analysis");
+  const data = tab === "gene_analysis" ? results.data : geneSetResults.data;
+  const columns = tab === "gene_analysis" ? results.columns : geneSetResults.columns;
+  const file = tab === "gene_analysis" ? manifest.geneAnalysisFile : manifest.geneSetAnalysisFile;
 
   const refreshState = useCallback(() => {
     refreshStatus();
@@ -37,24 +51,36 @@ export default function AnalysisResults() {
   return (
     <div>
       {status.status === "COMPLETED" && (
-        <>
-          <div className="text-end mb-3">
-            <a
-              href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${manifest.geneAnalysisFile}`}
-              download={`${params.magmaType === "enhanced" ? "F MAGMA" : "Standard Magma"}_${manifest.geneAnalysisFile}`}>
-              Download Results
-            </a>
-          </div>
-          <AnalysisResultsTable results={results} />
-        </>
+        <Card>
+          <Card.Header>
+            <Nav variant="tabs" defaultActiveKey={tab} activeKey={tab} onSelect={(e) => setTab(e)}>
+              <Nav.Item>
+                <Nav.Link eventKey="gene_analysis">Gene Analysis</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="gene_set_analysis" disabled={!geneSetResults.data?.length}>
+                  Gene Set Analysis
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Card.Header>
+          <Card.Body>
+            <div className="text-end mb-3">
+              <a
+                href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${file}`}
+                download={`${params.magmaType === "enhanced" ? "F MAGMA" : "Standard Magma"}_${file}`}>
+                Download Results
+              </a>
+            </div>
+            <AnalysisResultsTable data={data} columns={columns} />
+          </Card.Body>
+        </Card>
       )}
       {status.status === "FAILED" && (
         <>
           <Alert variant="danger">
             <Alert.Heading className="mb-3">Analysis Failed</Alert.Heading>
-            <pre>
-              {status && status.error ? status.error : "INTERNAL ERROR"}
-            </pre>
+            <pre>{status && status.error ? status.error : "INTERNAL ERROR"}</pre>
           </Alert>
         </>
       )}
