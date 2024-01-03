@@ -7,18 +7,27 @@ import { setTimeout } from "timers/promises";
 import mapValues from "lodash/mapValues.js";
 import validator from "validator";
 import { sendNotification } from "./notifications.js";
-import { execAsync, execFileAsync, readJson, writeJson, mkdirs, coalesceFilePaths, copyFiles, stripExtension } from "./utils.js";
+import {
+  execAsync,
+  execFileAsync,
+  readJson,
+  writeJson,
+  mkdirs,
+  coalesceFilePaths,
+  copyFiles,
+  stripExtension,
+} from "./utils.js";
 import { createDatabaseFromFiles } from "./database.js";
 import { formatObject } from "./logger.js";
 import { createInterface } from "readline";
 import isEqual from "lodash.isequal";
 
 export async function runMagma(params, logger, env = process.env) {
-  logger.info(".bed Filter: " + params.bedFileFilter)
+  logger.info(".bed Filter: " + params.bedFileFilter);
   const id = params.id;
   const paths = await getPaths(params, env);
   const submittedTime = new Date();
-  logger.info("Job Start Time: " + submittedTime)
+  logger.info("Job Start Time: " + submittedTime);
   logger.info(paths);
 
   try {
@@ -30,19 +39,20 @@ export async function runMagma(params, logger, env = process.env) {
     await writeJson(paths.statusFile, { id, status: "IN_PROGRESS" });
     await writeJson(
       paths.manifestFile,
-      mapValues(paths, (value) => value ? path.parse(value).base : null)
+      mapValues(paths, (value) => (value ? path.parse(value).base : null))
     );
 
-    logger.info(path.resolve(paths.inputFolder, params.snpPValuesFile))
-    logger.info(paths.pValFile)
+    logger.info(path.resolve(paths.inputFolder, params.snpPValuesFile));
+    logger.info(paths.pValFile);
 
     if (params.snpPValuesFile) {
-      const valid = await validateHeader(paths.pValFile)
+      const valid = await validateHeader(paths.pValFile);
 
-      if (valid)
-        logger.info("Valid Header")
+      if (valid) logger.info("Valid Header");
       else
-        throw new Error("The uploaded file deviates from the allowed file format for F MAGMA: CHR     SNP     BP      P\nPlease update and try again")
+        throw new Error(
+          "The uploaded file deviates from the allowed file format for F MAGMA: CHR     SNP     BP      P\nPlease update and try again"
+        );
     }
 
     // run annotation
@@ -69,25 +79,25 @@ export async function runMagma(params, logger, env = process.env) {
       geneSetAnalysisResults = await runGeneSetAnalysis(geneSetAnalysisParams, params.magmaType);
     }
 
-    const dbStart = new Date()
+    const dbStart = new Date();
     // export tables to .db file
     logger.info(`[${id}] Create .db file`);
     const tables = [
       { name: "gene_analysis", file: paths.geneAnalysisFile },
-      { name: "gene_set_analysis", file: paths.geneSetAnalysisFile },
+      { name: "gene_set_analysis", file: paths.geneSetAnalysisFile, parseOptions: { from_line: 5 } },
     ];
     await createDatabaseFromFiles(tables, paths.databaseFile);
-    logger.info("Database creation runtime: " + (new Date().getTime() - dbStart.getTime()) / 1000 + " seconds")
+    logger.info("Database creation runtime: " + (new Date().getTime() - dbStart.getTime()) / 1000 + " seconds");
 
-    const finishTime = new Date()
-    logger.info("Job Finish Time: " + finishTime)
+    const finishTime = new Date();
+    logger.info("Job Finish Time: " + finishTime);
     // write success status
     const status = { id, status: "COMPLETED" };
     await writeJson(paths.statusFile, status);
 
     //delete input files
     for (const fileName of await readdir(paths.inputFolder)) {
-      if (fileName !== 'params.json') {
+      if (fileName !== "params.json") {
         await unlink(path.join(paths.inputFolder, fileName));
       }
     }
@@ -114,7 +124,7 @@ export async function runMagma(params, logger, env = process.env) {
     };
   } catch (error) {
     // send error notification if email was provided
-    logger.info("Sending error email")
+    logger.info("Sending error email");
     logger.error(error.message);
     logger.error(error.stack);
     const status = { id, status: "FAILED", error: error.message };
@@ -134,15 +144,14 @@ export async function runMagma(params, logger, env = process.env) {
 }
 
 async function readFirstLine(inputStream) {
-  for await (const line of createInterface(inputStream))
-    return line;
-  return '';
+  for await (const line of createInterface(inputStream)) return line;
+  return "";
 }
 
 export async function validateHeader(filePath, requiredHeaders = ["CHR", "SNP", "BP", "P"], delimiter = /\s+/) {
   const readStream = createReadStream(filePath);
-  const firstLine = await readFirstLine(readStream)
-  readStream.destroy()
+  const firstLine = await readFirstLine(readStream);
+  readStream.destroy();
   const fileHeaders = firstLine.split(delimiter);
   return requiredHeaders.every((requiredHeader) => fileHeaders.includes(requiredHeader));
 }
@@ -157,7 +166,11 @@ export async function magma(args, type = "standard", cwd = process.cwd()) {
   } catch (e) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  return await execFileAsync(execPath, args.flat().filter(Boolean), { cwd, windowsHide: true, maxBuffer: 5 * 1024 * 1024 });
+  return await execFileAsync(execPath, args.flat().filter(Boolean), {
+    cwd,
+    windowsHide: true,
+    maxBuffer: 5 * 1024 * 1024,
+  });
 }
 
 export async function checkStatus(type = "standard") {
@@ -214,7 +227,6 @@ export async function runGeneAnalysis(
   env = process.env,
   logger
 ) {
-
   // execute filter if bed file is provided
   if (bedFileFilter) {
     pvalFile = await filterPvalFile(id, pvalFile, bedFileFilter, env);
@@ -275,7 +287,10 @@ export function getGeneSetAnalysisParams(paths) {
   };
 }
 
-export async function runGeneSetAnalysis({ geneAnalysisRawFile, geneSetFile, covariateFile, outFile }, type = "standard") {
+export async function runGeneSetAnalysis(
+  { geneAnalysisRawFile, geneSetFile, covariateFile, outFile },
+  type = "standard"
+) {
   return await magma(
     [
       ["--gene-results", geneAnalysisRawFile],
@@ -312,9 +327,9 @@ export async function getPaths(params, env = process.env) {
   const snpLocFile =
     params.snpPopulation === "other"
       ? path.resolve(
-        inputFolder,
-        params.referenceDataFiles.find((f) => f.toLowerCase().endsWith(".bim"))
-      )
+          inputFolder,
+          params.referenceDataFiles.find((f) => f.toLowerCase().endsWith(".bim"))
+        )
       : path.resolve(defaultInputFolder, params.snpPopulation, params.snpPopulation + ".bim");
 
   // geneLocFile should be a text file containing gene locations
@@ -339,14 +354,16 @@ export async function getPaths(params, env = process.env) {
   ]);
 
   // bedFileFilter should be a .bed file containing SNPs to filter by
-  const bedFileFilter = params.bedFileFilter ? coalesceFilePaths([
-    path.resolve(inputFolder, params.bedFileFilter),
-    path.resolve(defaultInputFolder, 'filters', params.bedFileFilter),
-  ]) : null;
+  const bedFileFilter = params.bedFileFilter
+    ? coalesceFilePaths([
+        path.resolve(inputFolder, params.bedFileFilter),
+        path.resolve(defaultInputFolder, "filters", params.bedFileFilter),
+      ])
+    : null;
 
   // gene set analysis input files
-  const geneSetFile = params.geneSetFile ? path.resolve(inputFolder, params.geneSetFile) : null
-  const covariateFile = params.covariateFile ? path.resolve(inputFolder, params.covariateFile) : null
+  const geneSetFile = params.geneSetFile ? path.resolve(inputFolder, params.geneSetFile) : null;
+  const covariateFile = params.covariateFile ? path.resolve(inputFolder, params.covariateFile) : null;
 
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
   const geneAnalysisFile = path.resolve(outputFolder, "gene_analysis.genes.out");

@@ -5,10 +5,10 @@ import knex from "knex";
 
 export async function createDatabaseFromFiles(tables, databaseFile) {
   const connection = getSqliteConnection(databaseFile);
-  for (const { name, file } of tables) {
+  for (const { name, file, parseOptions } of tables) {
     if (existsSync(file)) {
       const delimiter = ["\t", ...createDelimiters(" ", 100)];
-      await createSqliteTableFromFile(connection, name, file, { delimiter });
+      await createSqliteTableFromFile(connection, name, file, { delimiter, ...parseOptions });
     }
   }
 }
@@ -107,7 +107,7 @@ export async function importTable(connection, table, iterator, bufferSize = 500,
 }
 
 export async function getHeader(filepath, parseOptions = {}) {
-  const parser = getDelimitedFileParser(filepath, { ...parseOptions, to_line: 2 });
+  const parser = getDelimitedFileParser(filepath, { ...parseOptions });
   const header = await parser.iterator().next();
   return await header.value;
 }
