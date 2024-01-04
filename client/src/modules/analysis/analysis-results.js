@@ -30,7 +30,7 @@ export default function AnalysisResults() {
   const [tab, setTab] = useState("gene_analysis");
   const data = tab === "gene_analysis" ? results.data : geneSetResults.data;
   const columns = tab === "gene_analysis" ? results.columns : geneSetResults.columns;
-  const file = tab === "gene_analysis" ? manifest.geneAnalysisFile : manifest.geneSetAnalysisFile;
+  const file = tab === "gene_analysis" ? manifest?.geneAnalysisFile : manifest?.geneSetAnalysisFile;
 
   const refreshState = useCallback(() => {
     refreshStatus();
