@@ -4,18 +4,26 @@ from argparse import ArgumentParser
 from uuid import uuid4
 from os import path
 from requests import post  # pip install requests
+from requests_toolbelt.multipart.encoder import (
+    MultipartEncoder,
+)  # pip install requests_toolbelt
+
 
 def strip_path(file_path):
-    """ Strips the path from a file name """
+    """Strips the path from a file name"""
     return path.basename(file_path)
 
+
 def upload_file(upload_endpoint, file_path):
-    """ Uploads a file to the GWAS Target API """
-    with open(file_path, "rb") as file:
-        post(upload_endpoint, files={"file": file})
+    """Uploads a file to the GWAS Target API"""
+    m = MultipartEncoder(
+        fields={"file": (path.basename(file_path), open(file_path, "rb"))}
+    )
+    post(upload_endpoint, data=m, headers={"Content-Type": m.content_type})
+
 
 def submit(params):
-    """ Submits a job to the GWAS Target API """
+    """Submits a job to the GWAS Target API"""
 
     # Set up endpoints
     job_id = uuid4()
@@ -32,7 +40,13 @@ def submit(params):
 
     # Upload files if they exist locally
 
-    file_params = [params.gene_location_file, params.snp_pvalues_file, params.bed_filter_file]
+    file_params = [
+        params.gene_location_file,
+        params.snp_pvalues_file,
+        params.bed_filter_file,
+        params.gene_set_file,
+        params.covariate_file,
+    ]
     for file_path in file_params:
         if file_path is not None and path.exists(file_path):
             logging.info("Uploading file %s", file_path)
@@ -47,21 +61,31 @@ def submit(params):
             f"{params.snp_population}.bed",
             f"{params.snp_population}.bim",
             f"{params.snp_population}.fam",
-            f"{params.snp_population}.synonyms"
+            f"{params.snp_population}.synonyms",
         ],
-        "bedFileFilter": path.basename(params.bed_filter_file) if params.bed_filter_file is not None else None,
-        "geneLocationFile": path.basename(params.gene_location_file) if params.gene_location_file is not None else None,
+        "bedFileFilter": path.basename(params.bed_filter_file)
+        if params.bed_filter_file is not None
+        else None,
+        "geneLocationFile": path.basename(params.gene_location_file)
+        if params.gene_location_file is not None
+        else None,
         "genotypeDataSource": "referenceData",
         "rawGenotypeDataFiles": None,
-        "snpPValuesFile": path.basename(params.snp_pvalues_file) if params.snp_pvalues_file is not None else None,
+        "snpPValuesFile": path.basename(params.snp_pvalues_file)
+        if params.snp_pvalues_file is not None
+        else None,
         "sampleSizeType": "constant",
         "sampleSize": params.sample_size,
         "sampleSizeColumn": None,
-        "geneSetFile": None,
-        "covariateFile": None,
+        "geneSetFile": path.basename(params.gene_set_file)
+        if params.gene_set_file is not None
+        else None,
+        "covariateFile": path.basename(params.covariate_file)
+        if params.covariate_file is not None
+        else None,
         "sendNotification": params.email is not None,
         "jobName": params.job_name,
-        "email": params.email
+        "email": params.email,
     }
 
     logging.info("Submitting Job: %s", job_id)
@@ -69,20 +93,34 @@ def submit(params):
     post(submit_endpoint, json=job_params)
     logging.info("Job submitted successfully")
     logging.info("Status/Results Page: %s/analysis/%s", base_url, job_id)
-    logging.info("The following links will become available once results have been generated:")
-    logging.info("Annotation Results File: %s/annotation.genes.annot", output_data_endpoint)
+    logging.info(
+        "The following links will become available once results have been generated:"
+    )
+    logging.info(
+        "Annotation Results File: %s/annotation.genes.annot", output_data_endpoint
+    )
     logging.info("Annotation Logs: %s/annotation.log", output_data_endpoint)
-    logging.info("Gene Analysis Results File: %s/gene_analysis.genes.out", output_data_endpoint)
+    logging.info(
+        "Gene Analysis Results File: %s/gene_analysis.genes.out", output_data_endpoint
+    )
     logging.info("Gene Analysis Logs: %s/gene_analysis.log", output_data_endpoint)
+    logging.info(
+        "Gene Set Analysis Results File: %s/gene_set_analysis.gsa.out",
+        output_data_endpoint,
+    )
+    logging.info(
+        "Gene Set Analysis Logs: %s/gene_set_analysis.log", output_data_endpoint
+    )
+
 
 def parse_args():
-    """ Parses command-line arguments """
+    """Parses command-line arguments"""
     parser = ArgumentParser()
     parser.add_argument("--debug", help="Enable debug logging", action="store_true")
     parser.add_argument(
         "--endpoint",
         help="GWAS Target API Endpoint",
-        default="https://analysistools.cancer.gov/gwas-target"
+        default="https://analysistools.cancer.gov/gwas-target",
     )
     parser.add_argument(
         "--magma-type",
@@ -96,13 +134,22 @@ def parse_args():
         choices=["g1000_eur", "g1000_afr", "g1000_eas", "g1000_sas", "g1000_amr"],
         default="g1000_eur",
     )
-    parser.add_argument("--gene-location-file", help="Gene location file", default="NCBI37.3.gene.loc")
+    parser.add_argument(
+        "--gene-location-file", help="Gene location file", default="NCBI37.3.gene.loc"
+    )
     parser.add_argument("--snp-pvalues-file", help="SNP p-values file", required=True)
     parser.add_argument("--sample-size", help="Sample size", type=int, required=True)
     parser.add_argument("--bed-filter-file", help="Tissue-specific BED Filter File")
+    parser.add_argument("--gene-set-file", help="Tissue-specific BED Filter File")
+    parser.add_argument("--covariate-file", help="Tissue-specific BED Filter File")
     parser.add_argument("--email", help="Email address for notifications")
-    parser.add_argument("--job-name",  required='--email' in sys.argv, help="Job name (required if email is set)")
+    parser.add_argument(
+        "--job-name",
+        required="--email" in sys.argv,
+        help="Job name (required if email is set)",
+    )
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     args = parse_args()

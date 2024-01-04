@@ -17,6 +17,8 @@ The following arguments can be passed to the script.
 - \--snp\-pvalues\-file: Specifies the file containing SNP p\-values.
 - \--sample\-size: Specifies the sample size for the GWAS.
 - \--bed\-filter\-file: Specifies a tissue\-specific BED filter file (for enhanced or F-MAGMA).
+- \--gene\-set\-file: Specifies a gene set file (for Gene Set Analysis).
+- \--covariate\-file: Specifies a covariate file (for Gene Set Analysis).
 - \--email: Specifies an email address for notification.
 - \--job\-name: Specifies a job name (required if email is set).
 
@@ -24,23 +26,38 @@ To use this script, you would run it from the command line and pass in the desir
 
 ```sh
 python3 gwas_target.py \
-  --magma-type standard \
+  --magma-type default \
   --snp-population g1000_eur \
   --gene-location-file gene_loc.txt \
-  --snp-pvalues-file snp-pvalues.tsv
+  --snp-pvalues-file snp-pvalues.tsv \
+  --sample-size 100
 ```
 
 Another example for enhanced MAGMA (filtered on tissue-specific snps) would be:
 
 ```sh
-python3 gwas-target.py \
+python3 gwas_target.py \
   --magma-type enhanced \
   --snp-population g1000_eur \
   --gene-location-file NCBI37.3.gene.loc \
   --snp-pvalues-file snp-pvalues.tsv \
   --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
+  --sample-size 100 \
   --email "my_email@example.com" \
   --job-name "my custom job name"
+```
+
+For Gene Set Analysis, include either the --gene-set-file or --covariate-file argument in your command:
+
+```sh
+python3 gwas_target.py \
+  --magma-type enhanced \
+  --snp-population g1000_eur \
+  --gene-location-file NCBI37.3.gene.loc \
+  --snp-pvalues-file snp-pvalues.tsv \
+  --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
+  --sample-size 100 \
+  --covariate-file covariate.txt 
 ```
 
 
