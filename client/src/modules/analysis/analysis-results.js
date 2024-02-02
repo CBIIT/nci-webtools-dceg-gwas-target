@@ -26,6 +26,7 @@ export default function AnalysisResults() {
   const refreshStatus = useRecoilRefresher(statusSelector(id));
   const refreshManifest = useRecoilRefresher(manifestSelector(id));
   const refreshResults = useRecoilRefresher(resultsSelector(id));
+  const refreshGeneSetResults = useRecoilRefresher(geneSetSelector(id));
   const isDone = ["COMPLETED", "FAILED"].includes(status?.status);
   const [tab, setTab] = useState("gene_analysis");
   const data = tab === "gene_analysis" ? results.data : geneSetResults.data;
@@ -36,7 +37,8 @@ export default function AnalysisResults() {
     refreshStatus();
     refreshManifest();
     refreshResults();
-  }, [refreshStatus, refreshManifest, refreshResults]);
+    refreshGeneSetResults();
+  }, [refreshStatus, refreshManifest, refreshResults, refreshGeneSetResults]);
 
   useEffect(() => {
     const interval = setInterval(refreshState, 1000 * 60);
