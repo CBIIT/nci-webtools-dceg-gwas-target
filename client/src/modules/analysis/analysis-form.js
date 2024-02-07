@@ -4,7 +4,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
 import { useParams, redirect, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { Form, Button, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Form, Button, Tooltip, OverlayTrigger, Row, Col } from "react-bootstrap";
 import FileInput from "../common/file-input";
 import { defaultFormState } from "./analysis-form.state";
 import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
@@ -30,6 +30,7 @@ export default function AnalysisForm() {
   const sendNotification = watch("sendNotification");
   const geneSetFile = watch("geneSetFile");
   const covariateFile = watch("covariateFile");
+  const geneSetFileType = watch("geneSetFileType");
 
   function handleChange(event) {
     const { name, value, checked } = event.target;
@@ -241,16 +242,38 @@ export default function AnalysisForm() {
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
         <legend className="legend fw-bold bg-light">Gene Set Analysis</legend>
-        <p>Add Gene Set or Covariate file</p>
-        <Form.Group className="mb-3" controlId="geneSetFile">
-          <Form.Label>Gene Set File</Form.Label>
-          <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="covariateFile">
-          <Form.Label>Covariate File</Form.Label>
-          <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
-        </Form.Group>
+        <p>Add Covariate or Gene Set file to enable Gene Set Analysis</p>
+        <Row className="mb-3">
+          <Col sm="auto">
+            <Form.Check
+              {...register("geneSetFileType")}
+              type="radio"
+              id="useCovariate"
+              label="Covariate File"
+              value="covariateFile"
+            />
+          </Col>
+          <Col sm="auto">
+            <Form.Check
+              {...register("geneSetFileType")}
+              type="radio"
+              id="useGeneSet"
+              label="Gene Set File"
+              value="geneSetFile"
+            />
+          </Col>
+        </Row>
+        {geneSetFileType == "geneSetFile" ? (
+          <Form.Group className="mb-3" controlId="geneSetFile">
+            <Form.Label>Gene Set File</Form.Label>
+            <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
+          </Form.Group>
+        ) : (
+          <Form.Group className="mb-3" controlId="covariateFile">
+            <Form.Label>Covariate File</Form.Label>
+            <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
+          </Form.Group>
+        )}
       </fieldset>
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">

@@ -4,12 +4,7 @@ import { asFileList } from "./analysis-form.utils";
 export const defaultFormState = {
   magmaType: "enhanced",
   snpPopulation: "g1000_eur",
-  referenceDataFiles: [
-    "g1000_eur.bed",
-    "g1000_eur.bim",
-    "g1000_eur.fam",
-    "g1000_eur.synonyms"
-  ],
+  referenceDataFiles: ["g1000_eur.bed", "g1000_eur.bim", "g1000_eur.fam", "g1000_eur.synonyms"],
   bedFileFilter: "E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed",
   geneLocationFile: "NCBI37.3.gene.loc",
   genotypeDataSource: "referenceData",
@@ -22,7 +17,8 @@ export const defaultFormState = {
   covariateFile: null,
   sendNotification: false,
   jobName: null,
-  email: null
+  email: null,
+  geneSetFileType: "covariateFile",
 };
 
 export const formState = atom({
