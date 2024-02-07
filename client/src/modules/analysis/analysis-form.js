@@ -4,7 +4,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
 import { useParams, redirect, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import {Form, Button, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Form, Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 import FileInput from "../common/file-input";
 import { defaultFormState } from "./analysis-form.state";
 import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
@@ -24,7 +24,7 @@ export default function AnalysisForm() {
 
   useEffect(() => reset(params), [reset, params]);
 
-  const magmaType = watch("magmaType")
+  const magmaType = watch("magmaType");
   const genotypeDataSource = watch("genotypeDataSource");
   const sampleSizeType = watch("sampleSizeType");
   const sendNotification = watch("sendNotification");
@@ -36,7 +36,7 @@ export default function AnalysisForm() {
 
     switch (name) {
       case "magmaType":
-        setValue("bedFileFilter", null, { shouldValidate: true })
+        setValue("bedFileFilter", null, { shouldValidate: true });
         break;
       case "snpPopulation":
         const referenceDataFiles =
@@ -53,7 +53,6 @@ export default function AnalysisForm() {
   }
 
   async function onSubmit(data) {
-
     try {
       setLoading(true);
       const previousId = id;
@@ -61,7 +60,7 @@ export default function AnalysisForm() {
       await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
       const submitParams = { ...mapValues(data, getFileNames), previousId };
 
-      console.log(submitParams)
+      console.log(submitParams);
       await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
     } catch (error) {
@@ -171,16 +170,17 @@ export default function AnalysisForm() {
         </div>
 
         <div className={genotypeDataSource === "referenceData" ? "d-block" : "d-none"}>
-        <OverlayTrigger overlay={<Tooltip id="snpPValuesFile">{`Allowed File Format for F MAGMA:\nCHR SNP BP  P`}</Tooltip>}>
-          <Form.Group className="mb-3" controlId="snpPValuesFile">
-            <Form.Label className="required">SNP P-Values File</Form.Label>
-            <FileInput
-              name="snpPValuesFile"
-              accept=".txt,.tsv"
-              control={control}
-              rules={{ required: genotypeDataSource === "referenceData" }}
-            />
-          </Form.Group>
+          <OverlayTrigger
+            overlay={<Tooltip id="snpPValuesFile">{`Allowed File Format for F MAGMA:\nCHR SNP BP  P`}</Tooltip>}>
+            <Form.Group className="mb-3" controlId="snpPValuesFile">
+              <Form.Label className="required">SNP P-Values File</Form.Label>
+              <FileInput
+                name="snpPValuesFile"
+                accept=".txt,.tsv"
+                control={control}
+                rules={{ required: genotypeDataSource === "referenceData" }}
+              />
+            </Form.Group>
           </OverlayTrigger>
 
           <Form.Group className="d-flex flex-wrap justify-content-between">
@@ -228,11 +228,11 @@ export default function AnalysisForm() {
           <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
             <Form.Label className="required">BED File Filter</Form.Label>
             <Form.Select {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
-              <option value="" hidden>No Filter Selected</option>
+              <option value="" hidden>
+                No Filter Selected
+              </option>
               {bedFilterOptions.map((e) => {
-                return (
-                  <option value={e.value}>{e.label}</option>
-                )
+                return <option value={e.value}>{e.label}</option>;
               })}
             </Form.Select>
           </Form.Group>
@@ -269,27 +269,29 @@ export default function AnalysisForm() {
           </Form.Text>
         </Form.Group>
 
-        {sendNotification && <div className={sendNotification ? "d-block" : "d-block"}>
-          <Form.Group className="mb-3" controlId="jobName">
-            <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
-            <Form.Control
-              name="jobName"
-              required={sendNotification}
-              disabled={!sendNotification}
-              {...register("jobName", { required: sendNotification })}
-            />
-          </Form.Group>
+        {sendNotification && (
+          <div className={sendNotification ? "d-block" : "d-block"}>
+            <Form.Group className="mb-3" controlId="jobName">
+              <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
+              <Form.Control
+                name="jobName"
+                required={sendNotification}
+                disabled={!sendNotification}
+                {...register("jobName", { required: sendNotification })}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Label className={sendNotification && "required"}>Email</Form.Label>
-            <Form.Control
-              name="email"
-              type="email"
-              required={sendNotification}
-              {...register("email", { required: sendNotification, disabled: !sendNotification })}
-            />
-          </Form.Group>
-        </div>}
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label className={sendNotification && "required"}>Email</Form.Label>
+              <Form.Control
+                name="email"
+                type="email"
+                required={sendNotification}
+                {...register("email", { required: sendNotification, disabled: !sendNotification })}
+              />
+            </Form.Group>
+          </div>
+        )}
       </fieldset>
 
       <div className="text-end">
