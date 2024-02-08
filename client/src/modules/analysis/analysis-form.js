@@ -32,6 +32,10 @@ export default function AnalysisForm() {
   const covariateFile = watch("covariateFile");
   const geneSetFileType = watch("geneSetFileType");
 
+  useEffect(() => {
+    if (geneSetFile || covariateFile) setValue("sendNotification", true);
+  }, [geneSetFile, covariateFile]);
+
   function handleChange(event) {
     const { name, value, checked } = event.target;
 
@@ -53,7 +57,20 @@ export default function AnalysisForm() {
     }
   }
 
+  function handleGeneSetFileType(event) {
+    const { name, value, checked } = event.target;
+    if (name === "geneSetFileType" && checked) {
+      setValue("geneSetFileType", value);
+      if (value === "geneSetFile") {
+        setValue("covariateFile", null);
+      } else {
+        setValue("geneSetFile", null);
+      }
+    }
+  }
+
   async function onSubmit(data) {
+    console.log(formState.errors);
     try {
       setLoading(true);
       const previousId = id;
@@ -246,7 +263,7 @@ export default function AnalysisForm() {
         <Row className="mb-3">
           <Col sm="auto">
             <Form.Check
-              {...register("geneSetFileType")}
+              {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
               type="radio"
               id="useCovariate"
               label="Covariate File"
@@ -255,7 +272,7 @@ export default function AnalysisForm() {
           </Col>
           <Col sm="auto">
             <Form.Check
-              {...register("geneSetFileType")}
+              {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
               type="radio"
               id="useGeneSet"
               label="Gene Set File"
@@ -285,8 +302,16 @@ export default function AnalysisForm() {
             label="Long-running Job"
             name="sendNotification"
             id="sendNotification"
-            {...register("sendNotification", { onChange: handleChange })}
+            {...register("sendNotification", {
+              required: (covariateFile || geneSetFile) !== null,
+              onChange: handleChange,
+            })}
           />
+          <div>
+            <Form.Text className="text-danger">
+              {formState.errors?.sendNotification ? "Required for Gene Set Analysis" : ""}
+            </Form.Text>
+          </div>
           <Form.Text className="text-muted fst-italic">
             When submitting a long-running job, select this option to receive a notification via email upon completion.
           </Form.Text>
