@@ -15,6 +15,7 @@ export default function AnalysisResultsTable({ data, columns }) {
   const table = useReactTable({
     data,
     columns,
+    initialState: { pagination: { pageSize: 25 } },
     state: {
       sorting,
     },
