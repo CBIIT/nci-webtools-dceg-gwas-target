@@ -4,12 +4,12 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
 import { useParams, redirect, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { Form, Button, Tooltip, OverlayTrigger, Row, Col } from "react-bootstrap";
+import { Form, Button, Tooltip, OverlayTrigger, Row, Col, Modal } from "react-bootstrap";
 import FileInput from "../common/file-input";
 import { defaultFormState } from "./analysis-form.state";
 import { isValidPlinkDataset, getFileNames, uploadFiles } from "./analysis-form.utils";
 import { paramsSelector, loadingState } from "./analysis.state";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import bedFilterOptions from "./json/bedFilterOptions.json";
 
 export default function AnalysisForm() {
@@ -18,6 +18,7 @@ export default function AnalysisForm() {
     defaultValues: defaultFormState,
   });
   const { id } = useParams();
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useRecoilState(loadingState);
   const params = useRecoilValue(paramsSelector(id));
   const navigate = useNavigate();
@@ -70,7 +71,6 @@ export default function AnalysisForm() {
   }
 
   async function onSubmit(data) {
-    console.log(formState.errors);
     try {
       setLoading(true);
       const previousId = id;
@@ -78,9 +78,11 @@ export default function AnalysisForm() {
       await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
       const submitParams = { ...mapValues(data, getFileNames), previousId };
 
-      console.log(submitParams);
       await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
+      if (sendNotification) {
+        setShowModal(true);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -350,6 +352,21 @@ export default function AnalysisForm() {
           Submit
         </Button>
       </div>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header style={{ backgroundColor: "#04c585 " }}>
+          <Modal.Title className="d-flex justify-content-center w-100">
+            <i className="bi bi-check-circle" style={{ color: "#fafafa" }} />
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="d-flex justify-content-center" style={{ backgroundColor: "#fafafa" }}>
+          <p className="m-0">Your job is submitted and you will receive an email when the results are available.</p>
+        </Modal.Body>
+        <Modal.Footer className="d-flex justify-content-center border-0" style={{ backgroundColor: "#fafafa" }}>
+          <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Form>
   );
 }
