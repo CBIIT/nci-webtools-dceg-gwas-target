@@ -84,7 +84,7 @@ export async function runMagma(params, logger, env = process.env) {
     logger.info(`[${id}] Create .db file`);
     const tables = [
       { name: "gene_analysis", file: paths.geneAnalysisFile },
-      { name: "gene_set_analysis", file: paths.geneSetAnalysisFile, parseOptions: { from_line: 5 } },
+      { name: "gene_set_analysis", file: paths.geneSetAnalysisFile, parseOptions: { from_line: 5, cast: false } },
     ];
     await createDatabaseFromFiles(tables, paths.databaseFile);
     logger.info("Database creation runtime: " + (new Date().getTime() - dbStart.getTime()) / 1000 + " seconds");
