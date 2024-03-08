@@ -53,13 +53,17 @@ For Gene Set Analysis, include either the --gene-set-file or --covariate-file ar
 python3 gwas_target.py \
   --magma-type enhanced \
   --snp-population g1000_eur \
-  --gene-location-file NCBI37.3.gene.loc \
+  --gene-location-file depictAndGtexGeneIntersection_noMHC.gene.loc \
   --snp-pvalues-file snp-pvalues.tsv \
   --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
   --sample-size 100 \
-  --covariate-file covariate.txt 
+  --covariate-file GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt 
 ```
 
+Files used in the examples can be found here:
+- gene_loc.txt: https://analysistools.cancer.gov/gwas-target/api/data/input/default/example.zip 
+- depictAndGtexGeneIntersection_noMHC.gene.loc: https://raw.githubusercontent.com/RebeccaFine/benchmarker/master/data/depictAndGtexGeneIntersection_noMHC.gene.loc
+- GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt: ftp://ftp.broadinstitute.org/outgoing/benchmarker_data/GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt
 
 NB: the following bed filter files are already on the server:
 
