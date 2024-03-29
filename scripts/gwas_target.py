@@ -140,8 +140,8 @@ def parse_args():
     parser.add_argument("--snp-pvalues-file", help="SNP p-values file", required=True)
     parser.add_argument("--sample-size", help="Sample size", type=int, required=True)
     parser.add_argument("--bed-filter-file", help="Tissue-specific BED Filter File")
-    parser.add_argument("--gene-set-file", help="Tissue-specific BED Filter File")
-    parser.add_argument("--covariate-file", help="Tissue-specific BED Filter File")
+    parser.add_argument("--gene-set-file", help="Gene set file for gene set analysis")
+    parser.add_argument("--covariate-file", help="Covariate file for gene set analysis")
     parser.add_argument("--email", help="Email address for notifications")
     parser.add_argument(
         "--job-name",

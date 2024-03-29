@@ -3,11 +3,12 @@
 The GWASTarget web application provides a public API. To simplify usage of this API, a python 3 utility `gwas_target.py` has been provided.
 
 #### Getting Started
+
 1. Download the `gwas_target.py` script
 2. Install the requests library: `python3 -m pip install requests --user`
 
-
 #### Usage
+
 The following arguments can be passed to the script.
 
 - \-h: Displays the help message and exits.
@@ -53,20 +54,36 @@ For Gene Set Analysis, include either the --gene-set-file or --covariate-file ar
 python3 gwas_target.py \
   --magma-type enhanced \
   --snp-population g1000_eur \
+  --gene-location-file NCBI37.3.gene.loc \
+  --snp-pvalues-file snp-pvalues.tsv \
+  --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
+  --sample-size 100 \
+  --gene-set-file AIZARANI_LIVER_C10_MVECS_1.v2023.2.Hs.gmt \
+  --email "my_email@example.com" \
+  --job-name "my custom job name"
+```
+
+```sh
+python3 gwas_target.py \
+  --magma-type enhanced \
+  --snp-population g1000_eur \
   --gene-location-file depictAndGtexGeneIntersection_noMHC.gene.loc \
   --snp-pvalues-file snp-pvalues.tsv \
   --bed-filter-file E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed \
   --sample-size 100 \
-  --covariate-file GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt 
+  --covariate-file GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt \
+  --email "my_email@example.com" \
+  --job-name "my custom job name"
 ```
 
 Files used in the examples can be found here:
-- gene_loc.txt: https://analysistools.cancer.gov/gwas-target/api/data/input/default/example.zip 
+
+- gene_loc.txt: https://analysistools.cancer.gov/gwas-target/api/data/input/default/example.zip
 - depictAndGtexGeneIntersection_noMHC.gene.loc: https://raw.githubusercontent.com/RebeccaFine/benchmarker/master/data/depictAndGtexGeneIntersection_noMHC.gene.loc
+- AIZARANI_LIVER_C10_MVECS_1.v2023.2.Hs.gmt https://www.gsea-msigdb.org/gsea/msigdb/human/geneset/AIZARANI_LIVER_C10_MVECS_1.html
 - GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt: ftp://ftp.broadinstitute.org/outgoing/benchmarker_data/GPL570-GPL96-GPL1261-GPL1355TermGeneZScores-MGI_MF_CC_RT_IW_BP_KEGG_z_z_GTExGenesOnly.txt
 
 NB: the following bed filter files are already on the server:
-
 
 - E003_H1_Cells_ES_Cell.E003-DNase.hotspot.fdr0.01.broad.bed.hg19.bed
 - E004_H1_BMP4_Derived_Mesendoderm_Cultured_Cells_ES_Cell.E004-DNase.hotspot.fdr0.01.broad.bed.hg19.bed
