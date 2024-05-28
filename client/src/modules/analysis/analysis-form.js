@@ -32,6 +32,7 @@ export default function AnalysisForm() {
   const geneSetFile = watch("geneSetFile");
   const covariateFile = watch("covariateFile");
   const geneSetFileType = watch("geneSetFileType");
+  const bedFileType = watch("bedFileType") || "select";
 
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
@@ -245,9 +246,35 @@ export default function AnalysisForm() {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
+          <Form.Group className="d-flex flex-wrap justify-content-between">
             <Form.Label className="required">BED File Filter</Form.Label>
-            <Form.Select {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
+            <div>
+              <Form.Check
+                inline
+                label="Select"
+                value="select"
+                name="bedFileType"
+                type="radio"
+                id="bed-file-select"
+                {...register("bedFileType")}
+              />
+              <Form.Check
+                inline
+                className="me-0"
+                label="Upload"
+                value="upload"
+                name="bedFileType"
+                type="radio"
+                id="bed-file-upload"
+                {...register("bedFileType")}
+              />
+            </div>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
+            <Form.Select
+              className={bedFileType === "select" ? "d-block" : "d-none"}
+              {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
               <option value="" hidden>
                 No Filter Selected
               </option>
@@ -255,6 +282,14 @@ export default function AnalysisForm() {
                 return <option value={e.value}>{e.label}</option>;
               })}
             </Form.Select>
+            <div className={bedFileType === "upload" ? "d-block" : "d-none"}>
+              <FileInput
+                name="bedFileFilter"
+                aira-label="Upload BED File"
+                placeholder="Upload BED File"
+                control={control}
+              />
+            </div>
           </Form.Group>
         </div>
       </fieldset>

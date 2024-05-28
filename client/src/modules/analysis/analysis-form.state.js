@@ -19,6 +19,7 @@ export const defaultFormState = {
   jobName: null,
   email: null,
   geneSetFileType: "covariateFile",
+  bedFileType: "select",
 };
 
 export const formState = atom({
