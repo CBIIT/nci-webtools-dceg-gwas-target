@@ -94,6 +94,7 @@ export default function AnalysisForm() {
   function onReset(event) {
     event.preventDefault();
     reset(defaultFormState);
+    navigate("/");
   }
 
   return (
