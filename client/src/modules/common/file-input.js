@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -29,6 +29,9 @@ export default function FileInput(props) {
   function removeFile(index) {
     const remainingFiles = files.filter((f, i) => i !== index);
     onChange(asFileList(remainingFiles));
+    if (props.onRemove) {
+      props.onRemove(name, remainingFiles);
+    }
   }
 
   return (
@@ -60,6 +63,18 @@ export default function FileInput(props) {
               </Button>
             </ListGroup.Item>
           ))}
+        </ListGroup>
+      )}
+      {!props.multiple && files.length > 0 && (
+        <ListGroup>
+          <ListGroup.Item
+            className="list-group-item-action d-flex justify-content-between align-items-center">
+            <small className="text-muted">{files[0].name}</small>
+            <Button size="sm" variant="outline-danger" className="border-0" onClick={(ev) => removeFile(0)}>
+              <i className="bi bi-x-lg" role="img" aria-label="Remove File Icon"></i>
+              <span className="visually-hidden">Remove File</span>
+            </Button>
+          </ListGroup.Item>
         </ListGroup>
       )}
     </div>

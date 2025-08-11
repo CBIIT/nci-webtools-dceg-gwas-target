@@ -71,6 +71,13 @@ export default function AnalysisForm() {
     }
   }
 
+  function handleFileRemove(fieldName, remainingFiles) {
+    if ((fieldName === "geneSetFile" || fieldName === "covariateFile") && remainingFiles.length === 0) {
+      setValue("sendNotification", false);
+      setValue(fieldName, null);
+    }
+  }
+
   async function onSubmit(data) {
     try {
       setLoading(true);
@@ -93,8 +100,8 @@ export default function AnalysisForm() {
 
   function onReset(event) {
     event.preventDefault();
-    reset(defaultFormState);
     navigate("/");
+    reset(defaultFormState);
   }
 
   return (
@@ -318,15 +325,15 @@ export default function AnalysisForm() {
             />
           </Col>
         </Row>
-        {geneSetFileType == "geneSetFile" ? (
+        {geneSetFileType === "geneSetFile" ? (
           <Form.Group className="mb-3" controlId="geneSetFile">
             <Form.Label>Gene Set File</Form.Label>
-            <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
+            <FileInput name="geneSetFile" control={control} disabled={covariateFile} onRemove={handleFileRemove} />
           </Form.Group>
         ) : (
           <Form.Group className="mb-3" controlId="covariateFile">
             <Form.Label>Covariate File</Form.Label>
-            <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
+            <FileInput name="covariateFile" control={control} disabled={geneSetFile} onRemove={handleFileRemove} />
           </Form.Group>
         )}
       </fieldset>
@@ -340,6 +347,7 @@ export default function AnalysisForm() {
             label="Long-running Job"
             name="sendNotification"
             id="sendNotification"
+            checked={sendNotification}
             {...register("sendNotification", {
               required: (covariateFile || geneSetFile) !== null,
               onChange: handleChange,
