@@ -82,8 +82,6 @@ export default function AnalysisForm() {
   }
 
   async function onSubmit(data) {
-    console.log(data);
-    console.log(formState.errors);
     try {
       setLoading(true);
       const previousId = id;
@@ -228,7 +226,9 @@ export default function AnalysisForm() {
                 name="sampleSizeType"
                 type="radio"
                 id="sample-size-constant"
-                {...register("sampleSizeType", { required: genotypeDataSource === "referenceData" })}
+                {...register("sampleSizeType", {
+                  required: genotypeDataSource === "referenceData" ? "Please select a sample size option" : false,
+                })}
               />
               <Form.Check
                 inline
@@ -239,7 +239,9 @@ export default function AnalysisForm() {
                 type="radio"
                 id="sample-size-file-column"
                 disabled={magmaType === "enhanced"}
-                {...register("sampleSizeType", { required: genotypeDataSource === "referenceData" })}
+                {...register("sampleSizeType", {
+                  required: genotypeDataSource === "referenceData" ? "Please select a sample size option" : false,
+                })}
               />
             </div>
             {genotypeDataSource === "referenceData" && (
@@ -278,7 +280,10 @@ export default function AnalysisForm() {
                 type="radio"
                 id="bed-file-select"
                 {...register("bedFileType", {
-                  required: magmaType === "enhanced" && genotypeDataSource === "referenceData",
+                  required:
+                    magmaType === "enhanced" && genotypeDataSource === "referenceData"
+                      ? "Please select a BED file option"
+                      : false,
                 })}
               />
               <Form.Check
@@ -290,7 +295,10 @@ export default function AnalysisForm() {
                 type="radio"
                 id="bed-file-upload"
                 {...register("bedFileType", {
-                  required: magmaType === "enhanced" && genotypeDataSource === "referenceData",
+                  required:
+                    magmaType === "enhanced" && genotypeDataSource === "referenceData"
+                      ? "Please select a BED file option"
+                      : false,
                 })}
               />
             </div>
@@ -302,7 +310,10 @@ export default function AnalysisForm() {
           <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
             <Form.Select
               className={bedFileType === "select" ? "d-block" : "d-none"}
-              {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
+              {...register("bedFileFilter", {
+                required: magmaType === "enhanced" ? "Please select a BED filter" : false,
+                onChange: handleChange,
+              })}>
               <option value="" hidden>
                 No Filter Selected
               </option>
@@ -320,6 +331,9 @@ export default function AnalysisForm() {
                 aria-label="Upload BED File"
                 placeholder="Upload BED File"
                 control={control}
+                rules={{
+                  required: magmaType === "enhanced" && bedFileType === "upload" ? "Please upload a BED file" : false,
+                }}
               />
             </div>
             <Form.Text className="text-danger">{formState.errors?.bedFileFilter?.message}</Form.Text>
@@ -419,7 +433,7 @@ export default function AnalysisForm() {
         <Button type="reset" variant="outline-danger" className="me-1">
           Reset
         </Button>
-        <Button type="submit" variant="primary">
+        <Button type="submit" variant="primary" disabled={loading}>
           Submit
         </Button>
       </div>
