@@ -2,7 +2,7 @@ import axios from "axios";
 import mapValues from "lodash/mapValues";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
-import { useParams, redirect, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Form, Button, Tooltip, OverlayTrigger, Row, Col, Modal } from "react-bootstrap";
 import FileInput from "../common/file-input";
@@ -36,7 +36,7 @@ export default function AnalysisForm() {
 
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
-  }, [geneSetFile, covariateFile]);
+  }, [geneSetFile, covariateFile, setValue]);
 
   function handleChange(event) {
     const { name, value, checked } = event.target;
@@ -44,6 +44,7 @@ export default function AnalysisForm() {
     switch (name) {
       case "magmaType":
         setValue("bedFileFilter", null, { shouldValidate: true });
+        setValue("sampleSizeType", "constant");
         break;
       case "snpPopulation":
         const referenceDataFiles =
@@ -55,6 +56,8 @@ export default function AnalysisForm() {
           setValue("jobName", null);
           setValue("email", null);
         }
+        break;
+      default:
         break;
     }
   }
@@ -287,13 +290,17 @@ export default function AnalysisForm() {
                 No Filter Selected
               </option>
               {bedFilterOptions.map((e) => {
-                return <option value={e.value}>{e.label}</option>;
+                return (
+                  <option key={e.value} value={e.value}>
+                    {e.label}
+                  </option>
+                );
               })}
             </Form.Select>
             <div className={bedFileType === "upload" ? "d-block" : "d-none"}>
               <FileInput
                 name="bedFileFilter"
-                aira-label="Upload BED File"
+                aria-label="Upload BED File"
                 placeholder="Upload BED File"
                 control={control}
               />
@@ -364,7 +371,7 @@ export default function AnalysisForm() {
         </Form.Group>
 
         {sendNotification && (
-          <div className={sendNotification ? "d-block" : "d-block"}>
+          <div className="d-block">
             <Form.Group className="mb-3" controlId="jobName">
               <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
               <Form.Control
@@ -397,7 +404,7 @@ export default function AnalysisForm() {
         </Button>
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header style={{ backgroundColor: "#04c585 " }}>
+        <Modal.Header style={{ backgroundColor: "#04c585" }}>
           <Modal.Title className="d-flex justify-content-center w-100">
             <i className="bi bi-check-circle" style={{ color: "#fafafa" }} />
           </Modal.Title>
