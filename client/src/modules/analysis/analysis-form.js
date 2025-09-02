@@ -124,6 +124,7 @@ export default function AnalysisForm() {
           <option value="standard">Standard MAGMA</option>
           <option value="enhanced">F MAGMA</option>
         </Form.Select>
+        <Form.Text className="text-danger">{formState.errors?.magmaType?.message}</Form.Text>
       </Form.Group>
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
@@ -142,6 +143,7 @@ export default function AnalysisForm() {
             <option value="g1000_amr">Middle/South American</option>
             <option value="other">Other</option>
           </Form.Select>
+          <Form.Text className="text-danger">{formState.errors?.snpPopulation?.message}</Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="referenceDataFiles">
@@ -154,7 +156,6 @@ export default function AnalysisForm() {
             required
             accept=".bim,.bed,.fam,.synonyms"
           />
-          <Form.Text className="text-danger">{formState.errors?.referenceDataFiles?.message}</Form.Text>
         </Form.Group>
       </fieldset>
 
@@ -185,6 +186,7 @@ export default function AnalysisForm() {
             <option value="rawData">Raw Data</option>
             <option value="referenceData">Reference Data</option>
           </Form.Select>
+          <Form.Text className="text-danger">{formState.errors?.genotypeDataSource?.message}</Form.Text>
         </Form.Group>
 
         <div className={genotypeDataSource === "rawData" ? "d-block" : "d-none"}>
@@ -197,7 +199,6 @@ export default function AnalysisForm() {
               control={control}
               rules={{ required: genotypeDataSource === "rawData", validate: { plink: isValidPlinkDataset } }}
             />
-            <Form.Text className="text-danger">{formState.errors?.rawGenotypeDataFiles?.message}</Form.Text>
           </Form.Group>
         </div>
 
@@ -225,7 +226,7 @@ export default function AnalysisForm() {
                 name="sampleSizeType"
                 type="radio"
                 id="sample-size-constant"
-                {...register("sampleSizeType")}
+                {...register("sampleSizeType", { required: genotypeDataSource === "referenceData" })}
               />
               <Form.Check
                 inline
@@ -236,9 +237,12 @@ export default function AnalysisForm() {
                 type="radio"
                 id="sample-size-file-column"
                 disabled={magmaType === "enhanced"}
-                {...register("sampleSizeType")}
+                {...register("sampleSizeType", { required: genotypeDataSource === "referenceData" })}
               />
             </div>
+            {genotypeDataSource === "referenceData" && (
+              <Form.Text className="text-danger w-100">{formState.errors?.sampleSizeType?.message}</Form.Text>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -255,6 +259,10 @@ export default function AnalysisForm() {
               placeholder="Sample Size Column"
               {...register("sampleSizeColumn", { required: sampleSizeType === "fileColumn" })}
             />
+            <Form.Text className="text-danger">
+              {sampleSizeType === "constant" && formState.errors?.sampleSize?.message}
+              {sampleSizeType === "fileColumn" && formState.errors?.sampleSizeColumn?.message}
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="d-flex flex-wrap justify-content-between">
@@ -267,7 +275,9 @@ export default function AnalysisForm() {
                 name="bedFileType"
                 type="radio"
                 id="bed-file-select"
-                {...register("bedFileType")}
+                {...register("bedFileType", {
+                  required: magmaType === "enhanced" && genotypeDataSource === "referenceData",
+                })}
               />
               <Form.Check
                 inline
@@ -277,9 +287,14 @@ export default function AnalysisForm() {
                 name="bedFileType"
                 type="radio"
                 id="bed-file-upload"
-                {...register("bedFileType")}
+                {...register("bedFileType", {
+                  required: magmaType === "enhanced" && genotypeDataSource === "referenceData",
+                })}
               />
             </div>
+            {magmaType === "enhanced" && genotypeDataSource === "referenceData" && (
+              <Form.Text className="text-danger w-100">{formState.errors?.bedFileType?.message}</Form.Text>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
@@ -305,6 +320,7 @@ export default function AnalysisForm() {
                 control={control}
               />
             </div>
+            <Form.Text className="text-danger">{formState.errors?.bedFileFilter?.message}</Form.Text>
           </Form.Group>
         </div>
       </fieldset>
@@ -380,6 +396,7 @@ export default function AnalysisForm() {
                 disabled={!sendNotification}
                 {...register("jobName", { required: sendNotification })}
               />
+              <Form.Text className="text-danger">{formState.errors?.jobName?.message}</Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="email">
@@ -390,6 +407,7 @@ export default function AnalysisForm() {
                 required={sendNotification}
                 {...register("email", { required: sendNotification, disabled: !sendNotification })}
               />
+              <Form.Text className="text-danger">{formState.errors?.email?.message}</Form.Text>
             </Form.Group>
           </div>
         )}

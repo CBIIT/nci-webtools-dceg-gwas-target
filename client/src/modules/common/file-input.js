@@ -8,6 +8,7 @@ import { asFileList } from "../analysis/analysis-form.utils";
 export default function FileInput(props) {
   const {
     field: { value, name, ref, onChange, onBlur },
+    fieldState: { error },
   } = useController(props);
   const inputRef = useRef();
   const fileList = asFileList(value);
@@ -49,6 +50,7 @@ export default function FileInput(props) {
         autoFocus={props.autoFocus}
         disabled={props.disabled}
         required={props.required}
+        isInvalid={!!error}
       />
       {props.multiple && (
         <ListGroup>
@@ -77,6 +79,7 @@ export default function FileInput(props) {
           </ListGroup.Item>
         </ListGroup>
       )}
+      {error && <Form.Text className="text-danger">{error.message}</Form.Text>}
     </div>
   );
 }
