@@ -15,7 +15,7 @@ def strip_path(file_path):
 
 
 def upload_file(upload_endpoint, file_path):
-    """Uploads a file to the GWAS Target API"""
+    """Uploads a file to the GWAStarget API"""
     m = MultipartEncoder(
         fields={"file": (path.basename(file_path), open(file_path, "rb"))}
     )
@@ -23,7 +23,7 @@ def upload_file(upload_endpoint, file_path):
 
 
 def submit(params):
-    """Submits a job to the GWAS Target API"""
+    """Submits a job to the GWAStarget API"""
 
     # Set up endpoints
     job_id = uuid4()
@@ -119,7 +119,7 @@ def parse_args():
     parser.add_argument("--debug", help="Enable debug logging", action="store_true")
     parser.add_argument(
         "--endpoint",
-        help="GWAS Target API Endpoint",
+        help="GWAStarget API Endpoint",
         default="https://analysistools.cancer.gov/gwas-target",
     )
     parser.add_argument(

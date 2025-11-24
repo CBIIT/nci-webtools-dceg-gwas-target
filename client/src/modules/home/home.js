@@ -16,7 +16,7 @@ export default function Home() {
               <Col md={6}>
                 <div className="d-flex h-100 align-items-center py-5">
                   <div>
-                    <h1 className="font-title text-light mb-3">GWAS TARGET</h1>
+                    <h1 className="font-title text-light mb-3">GWAStarget</h1>
                     <hr className="border-white" />
                     <p className="lead text-light">
                       Perform gene analysis and generalized gene set analysis of GWAS data
@@ -37,12 +37,12 @@ export default function Home() {
           <Row>
             <Col>
               <p>
-                GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex
+                GWAStarget is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex
                 multidimensional approach to prioritize target genes involving the latest epigenome mapping data across
                 different tissues and epigenomic datasets.
               </p>
               <p>
-                GWASTarget was developed by <a href="https://dceg.cancer.gov/fellowship-training/fellowship-experience/meet-fellows/oeeb/breeze-charles" target="_blank">Charles Breeze</a> in collaboration with NCI's Center for Biomedical Informatics and Information Technology (CBIIT). Support comes from the Division of Cancer Epidemiology and Genetics Informatics Tool Challenge.
+                GWAStarget was developed by <a href="https://dceg.cancer.gov/fellowship-training/fellowship-experience/meet-fellows/oeeb/breeze-charles" target="_blank">Charles Breeze</a> in collaboration with NCI's Center for Biomedical Informatics and Information Technology (CBIIT). Support comes from the Division of Cancer Epidemiology and Genetics Informatics Tool Challenge.
               </p>
               <p>
                 <p>Questions or comments? Contact Charles Breeze via <a href="mailto:c.breeze@ucl.ac.uk" target="_blank">c.breeze@ucl.ac.uk</a></p>

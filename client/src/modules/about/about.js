@@ -8,13 +8,13 @@ export default function About() {
       <Row>
         <Col>
           <article className="shadow p-4 rounded">
-            <h1 className="text-primary h3 mb-4">About GWASTarget</h1>
+            <h1 className="text-primary h3 mb-4">About GWAStarget</h1>
             <hr/>
             <p>
-            GWAS Target is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across different tissues and <a href="https://forge2.altiusinstitute.org/" target="_blank">epigenomic datasets</a>.
+            GWAStarget is a web tool that seamlessly takes GWAS summary statistics and incorporates a complex multidimensional approach to prioritize target genes involving the latest epigenome mapping data across different tissues and <a href="https://forge2.altiusinstitute.org/" target="_blank">epigenomic datasets</a>.
             </p>
             <p>
-            GWAS Target incorporates regulatory element annotations to pinpoint the tissue-specific functional context for all SNPs analyzed using Roadmap Epigenomics data for DNase I hotspots.
+            GWAStarget incorporates regulatory element annotations to pinpoint the tissue-specific functional context for all SNPs analyzed using Roadmap Epigenomics data for DNase I hotspots.
             </p>
             <p>
             This annotated dataset is then incorporated into a cumulative analysis tool that takes into account distribution of effect sizes and p-values for all SNPs included, building a comprehensive, robust set of high-priority target genes.
