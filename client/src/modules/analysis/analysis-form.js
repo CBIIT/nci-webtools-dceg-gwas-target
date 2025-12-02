@@ -328,6 +328,7 @@ export default function AnalysisForm() {
           <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
             {bedFileType === "select" ? (
               <div>
+                <Form.Label className="visually-hidden">Select BED File Filter</Form.Label>
                 <Form.Select
                   className={bedFileType === "select" ? "d-block" : "d-none"}
                   {...register("bedFileFilter", {
@@ -350,6 +351,7 @@ export default function AnalysisForm() {
               </div>
             ) : (
               <div>
+                <Form.Label className="visually-hidden">Upload BED File</Form.Label>
                 <FileInput
                   name="bedFileFilter"
                   aria-label="Upload BED File"
@@ -458,7 +460,7 @@ export default function AnalysisForm() {
       </fieldset>
 
       <div className="text-end">
-        <Button type="reset" variant="outline-danger" className="me-1">
+        <Button type="reset" variant="danger" className="me-1">
           Reset
         </Button>
         <Button type="submit" variant="primary" disabled={loading}>
