@@ -1,12 +1,12 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2022
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf -y update \
- && dnf -y install \
-    httpd \
-    make \
-    nodejs \
-    npm \
- && dnf clean all
+   && dnf -y install \
+   httpd \
+   make \
+   nodejs \
+   npm \
+   && dnf clean all
 
 RUN mkdir -p /deploy/client
 
@@ -19,11 +19,13 @@ RUN npm install
 COPY client /deploy/client/
 
 ARG REACT_APP_GTAG
-
 ENV REACT_APP_GTAG ${REACT_APP_GTAG}
 
+ARG REACT_APP_VERSION=local
+ENV REACT_APP_VERSION=${REACT_APP_VERSION}
+
 RUN npm run build \
- && cp -r /deploy/client/build /var/www/html/gwas-target
+   && cp -r /deploy/client/build /var/www/html/gwas-target
 
 WORKDIR /var/www/html
 
@@ -36,4 +38,4 @@ EXPOSE 80
 EXPOSE 443
 
 CMD rm -rf /run/httpd/* /tmp/httpd* \
- && exec /usr/sbin/httpd -DFOREGROUND
+   && exec /usr/sbin/httpd -DFOREGROUND

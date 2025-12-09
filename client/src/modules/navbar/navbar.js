@@ -9,7 +9,7 @@ export default function AppNavbar({ routes }) {
     <Navbar bg="dark" variant="dark" className="text-uppercase font-title" expand="md">
       <Container>
         <Navbar.Brand as={NavLink} to="/" className="d-flex d-md-none text-light">
-          GWAS Target{" "}
+          GWAStarget{" "}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-nav" className="px-0 py-3 text-uppercase">
           <i className="bi bi-list me-1"></i>

@@ -1,6 +1,6 @@
-### GWASTarget API Utility
+### GWAStarget API Utility
 
-The GWASTarget web application provides a public API. To simplify usage of this API, a python 3 utility `gwas_target.py` has been provided.
+The GWAStarget web application provides a public API. To simplify usage of this API, a python 3 utility `gwas_target.py` has been provided.
 
 #### Getting Started
 

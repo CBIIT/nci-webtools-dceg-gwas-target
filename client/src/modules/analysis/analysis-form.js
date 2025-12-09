@@ -2,7 +2,7 @@ import axios from "axios";
 import mapValues from "lodash/mapValues";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useForm } from "react-hook-form";
-import { useParams, redirect, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { Form, Button, Tooltip, OverlayTrigger, Row, Col, Modal } from "react-bootstrap";
 import FileInput from "../common/file-input";
@@ -36,14 +36,15 @@ export default function AnalysisForm() {
 
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
-  }, [geneSetFile, covariateFile]);
+  }, [geneSetFile, covariateFile, setValue]);
 
   function handleChange(event) {
     const { name, value, checked } = event.target;
 
     switch (name) {
       case "magmaType":
-        setValue("bedFileFilter", null, { shouldValidate: true });
+        setValue("bedFileFilter", value === "enhanced" ? "" : null);
+        setValue("sampleSizeType", "constant");
         break;
       case "snpPopulation":
         const referenceDataFiles =
@@ -55,6 +56,8 @@ export default function AnalysisForm() {
           setValue("jobName", null);
           setValue("email", null);
         }
+        break;
+      default:
         break;
     }
   }
@@ -68,6 +71,13 @@ export default function AnalysisForm() {
       } else {
         setValue("geneSetFile", null);
       }
+    }
+  }
+
+  function handleFileRemove(fieldName, remainingFiles) {
+    if ((fieldName === "geneSetFile" || fieldName === "covariateFile") && remainingFiles.length === 0) {
+      setValue("sendNotification", false);
+      setValue(fieldName, null);
     }
   }
 
@@ -93,11 +103,12 @@ export default function AnalysisForm() {
 
   function onReset(event) {
     event.preventDefault();
+    navigate("/");
     reset(defaultFormState);
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} onReset={onReset} disabled={loading}>
+    <Form onSubmit={handleSubmit(onSubmit)} onReset={onReset} disabled={loading} noValidate>
       <div className="text-end">
         <a download href={`${process.env.PUBLIC_URL}/api/data/input/default/example.zip`}>
           Download Example Data
@@ -106,13 +117,16 @@ export default function AnalysisForm() {
 
       <Form.Group className="mb-4" controlId="magmaType">
         <Form.Label className="required">Magma Model</Form.Label>
-        <Form.Select required {...register("magmaType", { required: true, onChange: handleChange })}>
+        <Form.Select
+          required
+          {...register("magmaType", { required: "Please select a MAGMA model", onChange: handleChange })}>
           <option value="" hidden>
             Select an option
           </option>
           <option value="standard">Standard MAGMA</option>
           <option value="enhanced">F MAGMA</option>
         </Form.Select>
+        <Form.Text className="text-danger">{formState.errors?.magmaType?.message}</Form.Text>
       </Form.Group>
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
@@ -120,7 +134,9 @@ export default function AnalysisForm() {
 
         <Form.Group className="mb-3" controlId="snpPopulation">
           <Form.Label className="required">SNP Population</Form.Label>
-          <Form.Select required {...register("snpPopulation", { required: true, onChange: handleChange })}>
+          <Form.Select
+            required
+            {...register("snpPopulation", { required: "Please select a SNP population", onChange: handleChange })}>
             <option value="" hidden>
               Select an option
             </option>
@@ -131,19 +147,19 @@ export default function AnalysisForm() {
             <option value="g1000_amr">Middle/South American</option>
             <option value="other">Other</option>
           </Form.Select>
+          <Form.Text className="text-danger">{formState.errors?.snpPopulation?.message}</Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="referenceDataFiles">
           <Form.Label className="required">Reference Data Files</Form.Label>
           <FileInput
             control={control}
-            rules={{ required: true, validate: { plink: isValidPlinkDataset } }}
+            rules={{ required: "Please upload reference data files", validate: { plink: isValidPlinkDataset } }}
             name="referenceDataFiles"
             multiple
             required
             accept=".bim,.bed,.fam,.synonyms"
           />
-          <Form.Text className="text-danger">{formState.errors?.referenceDataFiles?.message}</Form.Text>
         </Form.Group>
       </fieldset>
 
@@ -154,7 +170,7 @@ export default function AnalysisForm() {
           <Form.Label className="required">Gene Location File</Form.Label>
           <FileInput
             control={control}
-            rules={{ required: true }}
+            rules={{ required: "Please upload a gene location file" }}
             name="geneLocationFile"
             required
             accept=".loc,.tsv,.txt"
@@ -167,13 +183,17 @@ export default function AnalysisForm() {
 
         <Form.Group className="mb-3" controlId="genotypeDataSource">
           <Form.Label className="required">Genotype Data Source</Form.Label>
-          <Form.Select name="genotypeDataSource" required {...register("genotypeDataSource", { required: true })}>
+          <Form.Select
+            name="genotypeDataSource"
+            required
+            {...register("genotypeDataSource", { required: "Please select a genotype data source" })}>
             <option value="" hidden>
               Select an option
             </option>
             <option value="rawData">Raw Data</option>
             <option value="referenceData">Reference Data</option>
           </Form.Select>
+          <Form.Text className="text-danger">{formState.errors?.genotypeDataSource?.message}</Form.Text>
         </Form.Group>
 
         <div className={genotypeDataSource === "rawData" ? "d-block" : "d-none"}>
@@ -184,9 +204,11 @@ export default function AnalysisForm() {
               multiple
               accept=".bim,.bed,.fam,.synonyms"
               control={control}
-              rules={{ required: genotypeDataSource === "rawData", validate: { plink: isValidPlinkDataset } }}
+              rules={{
+                required: genotypeDataSource === "rawData" ? "Please upload raw data files" : false,
+                validate: { plink: isValidPlinkDataset },
+              }}
             />
-            <Form.Text className="text-danger">{formState.errors?.rawGenotypeDataFiles?.message}</Form.Text>
           </Form.Group>
         </div>
 
@@ -199,7 +221,9 @@ export default function AnalysisForm() {
                 name="snpPValuesFile"
                 accept=".txt,.tsv"
                 control={control}
-                rules={{ required: genotypeDataSource === "referenceData" }}
+                rules={{
+                  required: genotypeDataSource === "referenceData" ? "Please upload a SNP P-values file" : false,
+                }}
               />
             </Form.Group>
           </OverlayTrigger>
@@ -214,7 +238,9 @@ export default function AnalysisForm() {
                 name="sampleSizeType"
                 type="radio"
                 id="sample-size-constant"
-                {...register("sampleSizeType")}
+                {...register("sampleSizeType", {
+                  required: genotypeDataSource === "referenceData" ? "Please select a sample size option" : false,
+                })}
               />
               <Form.Check
                 inline
@@ -225,9 +251,14 @@ export default function AnalysisForm() {
                 type="radio"
                 id="sample-size-file-column"
                 disabled={magmaType === "enhanced"}
-                {...register("sampleSizeType")}
+                {...register("sampleSizeType", {
+                  required: genotypeDataSource === "referenceData" ? "Please select a sample size option" : false,
+                })}
               />
             </div>
+            {genotypeDataSource === "referenceData" && (
+              <Form.Text className="text-danger w-100">{formState.errors?.sampleSizeType?.message}</Form.Text>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -235,61 +266,104 @@ export default function AnalysisForm() {
               className={sampleSizeType === "constant" ? "d-block" : "d-none"}
               aria-label="Sample Size"
               placeholder="Sample Size"
-              {...register("sampleSize", { required: sampleSizeType === "constant" })}
+              {...register("sampleSize", {
+                required: sampleSizeType === "constant" ? "Please enter a sample size" : false,
+              })}
             />
             <Form.Control
               className={sampleSizeType === "fileColumn" ? "d-block" : "d-none"}
               disabled={magmaType === "enhanced"}
               aria-label="Sample Size Column"
               placeholder="Sample Size Column"
-              {...register("sampleSizeColumn", { required: sampleSizeType === "fileColumn" })}
+              {...register("sampleSizeColumn", {
+                required: sampleSizeType === "fileColumn" ? "Please select a sample size column" : false,
+              })}
             />
+            <Form.Text className="text-danger">
+              {sampleSizeType === "constant" && formState.errors?.sampleSize?.message}
+              {sampleSizeType === "fileColumn" && formState.errors?.sampleSizeColumn?.message}
+            </Form.Text>
           </Form.Group>
 
-          <Form.Group className="d-flex flex-wrap justify-content-between">
-            <Form.Label className="required">BED File Filter</Form.Label>
-            <div>
-              <Form.Check
-                inline
-                label="Select"
-                value="select"
-                name="bedFileType"
-                type="radio"
-                id="bed-file-select"
-                {...register("bedFileType")}
-              />
-              <Form.Check
-                inline
-                className="me-0"
-                label="Upload"
-                value="upload"
-                name="bedFileType"
-                type="radio"
-                id="bed-file-upload"
-                {...register("bedFileType")}
-              />
-            </div>
-          </Form.Group>
+          {magmaType === "enhanced" && (
+            <Form.Group className="d-flex flex-wrap justify-content-between" controlId="bedFileType">
+              <Form.Label className="required">BED File Filter</Form.Label>
+              <div>
+                <Form.Check
+                  inline
+                  label="Select"
+                  value="select"
+                  name="bedFileType"
+                  type="radio"
+                  id="bed-file-select"
+                  {...register("bedFileType", {
+                    required:
+                      magmaType === "enhanced" && genotypeDataSource === "referenceData"
+                        ? "Please select a BED file option"
+                        : false,
+                  })}
+                />
+                <Form.Check
+                  inline
+                  className="me-0"
+                  label="Upload"
+                  value="upload"
+                  name="bedFileType"
+                  type="radio"
+                  id="bed-file-upload"
+                  {...register("bedFileType", {
+                    required:
+                      magmaType === "enhanced" && genotypeDataSource === "referenceData"
+                        ? "Please select a BED file option"
+                        : false,
+                  })}
+                />
+              </div>
+              {magmaType === "enhanced" && genotypeDataSource === "referenceData" && (
+                <Form.Text className="text-danger w-100">{formState.errors?.bedFileType?.message}</Form.Text>
+              )}
+            </Form.Group>
+          )}
 
           <Form.Group className="mb-3" controlId="bedFileFilter" hidden={magmaType !== "enhanced"}>
-            <Form.Select
-              className={bedFileType === "select" ? "d-block" : "d-none"}
-              {...register("bedFileFilter", { required: magmaType === "enhanced", onChange: handleChange })}>
-              <option value="" hidden>
-                No Filter Selected
-              </option>
-              {bedFilterOptions.map((e) => {
-                return <option value={e.value}>{e.label}</option>;
-              })}
-            </Form.Select>
-            <div className={bedFileType === "upload" ? "d-block" : "d-none"}>
-              <FileInput
-                name="bedFileFilter"
-                aira-label="Upload BED File"
-                placeholder="Upload BED File"
-                control={control}
-              />
-            </div>
+            {bedFileType === "select" ? (
+              <div>
+                <Form.Label className="visually-hidden">Select BED File Filter</Form.Label>
+                <Form.Select
+                  className={bedFileType === "select" ? "d-block" : "d-none"}
+                  {...register("bedFileFilter", {
+                    required: (v) => magmaType === "enhanced" && !v,
+                  })}>
+                  <option value="" hidden>
+                    No Filter Selected
+                  </option>
+                  {bedFilterOptions.map((e) => {
+                    return (
+                      <option key={e.value} value={e.value}>
+                        {e.label}
+                      </option>
+                    );
+                  })}
+                </Form.Select>
+                <Form.Text className="text-danger">
+                  {formState.errors?.bedFileFilter?.type === "required" ? "Please select a BED filter" : ""}
+                </Form.Text>
+              </div>
+            ) : (
+              <div>
+                <Form.Label className="visually-hidden">Upload BED File</Form.Label>
+                <FileInput
+                  name="bedFileFilter"
+                  aria-label="Upload BED File"
+                  placeholder="Upload BED File"
+                  control={control}
+                  rules={{ required: magmaType === "enhanced" }}
+                />
+                <Form.Text className="text-danger">
+                  {formState.errors?.bedFileFilter?.type === "required" ? "Please upload a BED file" : ""}
+                </Form.Text>
+              </div>
+            )}
           </Form.Group>
         </div>
       </fieldset>
@@ -317,15 +391,15 @@ export default function AnalysisForm() {
             />
           </Col>
         </Row>
-        {geneSetFileType == "geneSetFile" ? (
+        {geneSetFileType === "geneSetFile" ? (
           <Form.Group className="mb-3" controlId="geneSetFile">
             <Form.Label>Gene Set File</Form.Label>
-            <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
+            <FileInput name="geneSetFile" control={control} disabled={covariateFile} onRemove={handleFileRemove} />
           </Form.Group>
         ) : (
           <Form.Group className="mb-3" controlId="covariateFile">
             <Form.Label>Covariate File</Form.Label>
-            <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
+            <FileInput name="covariateFile" control={control} disabled={geneSetFile} onRemove={handleFileRemove} />
           </Form.Group>
         )}
       </fieldset>
@@ -339,8 +413,9 @@ export default function AnalysisForm() {
             label="Long-running Job"
             name="sendNotification"
             id="sendNotification"
+            checked={sendNotification}
             {...register("sendNotification", {
-              required: (covariateFile || geneSetFile) !== null,
+              required: (covariateFile || geneSetFile) !== null ? "Required for Gene Set Analysis" : false,
               onChange: handleChange,
             })}
           />
@@ -355,15 +430,16 @@ export default function AnalysisForm() {
         </Form.Group>
 
         {sendNotification && (
-          <div className={sendNotification ? "d-block" : "d-block"}>
+          <div className="d-block">
             <Form.Group className="mb-3" controlId="jobName">
               <Form.Label className={sendNotification && "required"}>Job Name</Form.Label>
               <Form.Control
                 name="jobName"
                 required={sendNotification}
                 disabled={!sendNotification}
-                {...register("jobName", { required: sendNotification })}
+                {...register("jobName", { required: sendNotification ? "Job Name is required" : false })}
               />
+              <Form.Text className="text-danger">{formState.errors?.jobName?.message}</Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="email">
@@ -372,23 +448,27 @@ export default function AnalysisForm() {
                 name="email"
                 type="email"
                 required={sendNotification}
-                {...register("email", { required: sendNotification, disabled: !sendNotification })}
+                {...register("email", {
+                  required: sendNotification ? "Email is required" : false,
+                  disabled: !sendNotification,
+                })}
               />
+              <Form.Text className="text-danger">{formState.errors?.email?.message}</Form.Text>
             </Form.Group>
           </div>
         )}
       </fieldset>
 
       <div className="text-end">
-        <Button type="reset" variant="outline-danger" className="me-1">
+        <Button type="reset" variant="danger" className="me-1">
           Reset
         </Button>
-        <Button type="submit" variant="primary">
+        <Button type="submit" variant="primary" disabled={loading}>
           Submit
         </Button>
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header style={{ backgroundColor: "#04c585 " }}>
+        <Modal.Header style={{ backgroundColor: "#04c585" }}>
           <Modal.Title className="d-flex justify-content-center w-100">
             <i className="bi bi-check-circle" style={{ color: "#fafafa" }} />
           </Modal.Title>

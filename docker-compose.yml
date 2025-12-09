@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: docker/frontend.dockerfile
+      args:
+        - REACT_APP_VERSION=compose
     environment:
       API_BASE_URL: http://backend:9000
     links:

@@ -27,40 +27,50 @@ export default function AnalysisResultsTable({ data, columns }) {
 
   return (
     <>
-      <Table striped hover responsive>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan} className={header.column.columnDef.className}>
-                  {header.isPlaceholder ? null : (
-                    <div
-                      className={header.column.getCanSort() ? "cursor-pointer" : ""}
-                      onClick={header.column.getToggleSortingHandler()}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {{
-                        asc: <i className="bi bi-sort-up ms-1" />,
-                        desc: <i className="bi bi-sort-down ms-1" />,
-                      }[header.column.getIsSorted()] ?? null}
-                    </div>
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className={cell.column.columnDef.className}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <div className="table-responsive" tabIndex={0} role="region" aria-label="Analysis results">
+        <Table striped hover>
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} colSpan={header.colSpan} className={header.column.columnDef.className}>
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={header.column.getCanSort() ? "cursor-pointer" : ""}
+                        tabIndex={header.column.getCanSort() ? 0 : undefined}
+                        role={header.column.getCanSort() ? "button" : undefined}
+                        onClick={header.column.getToggleSortingHandler()}
+                        onKeyDown={(e) => {
+                          if (header.column.getCanSort() && (e.key === "Enter" || e.key === " ")) {
+                            e.preventDefault();
+                            header.column.getToggleSortingHandler()(e);
+                          }
+                        }}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{
+                          asc: <i className="bi bi-sort-up ms-1" />,
+                          desc: <i className="bi bi-sort-down ms-1" />,
+                        }[header.column.getIsSorted()] ?? null}
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className={cell.column.columnDef.className}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
 
       <div className="d-flex flex-wrap justify-content-between align-items-center">
         <small>
