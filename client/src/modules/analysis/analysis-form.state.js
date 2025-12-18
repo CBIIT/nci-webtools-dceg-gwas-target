@@ -18,7 +18,7 @@ export const defaultFormState = {
   sendNotification: false,
   jobName: null,
   email: null,
-  geneSetFileType: "covariateFile",
+  geneSetFileType: "geneSetFile",
   bedFileType: "select",
 };
 
