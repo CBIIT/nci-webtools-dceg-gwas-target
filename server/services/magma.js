@@ -362,11 +362,18 @@ export async function getPaths(params, env = process.env) {
     : null;
 
   // gene set analysis input files
-  const geneSetFile = params.geneSetFile ? path.resolve(inputFolder, params.geneSetFile) : null;
-  const covariateFile = coalesceFilePaths([
-    path.resolve(inputFolder, params.covariateFile),
-    path.resolve(defaultInputFolder, params.covariateFile),
-  ]);
+  const geneSetFile = params.geneSetFile
+    ? coalesceFilePaths([
+        path.resolve(inputFolder, params.geneSetFile),
+        path.resolve(defaultInputFolder, params.geneSetFile),
+      ])
+    : null;
+  const covariateFile = params.covariateFile
+    ? coalesceFilePaths([
+        path.resolve(inputFolder, params.covariateFile),
+        path.resolve(defaultInputFolder, params.covariateFile),
+      ])
+    : null;
 
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
   const geneAnalysisFile = path.resolve(outputFolder, "gene_analysis.genes.out");
