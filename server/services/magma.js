@@ -166,11 +166,20 @@ export async function magma(args, type = "standard", cwd = process.cwd()) {
   } catch (e) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  return await execFileAsync(execPath, args.flat().filter(Boolean), {
-    cwd,
-    windowsHide: true,
-    maxBuffer: 5 * 1024 * 1024,
-  });
+
+  const flatArgs = args.flat().filter(Boolean);
+  try {
+    return await execFileAsync(execPath, flatArgs, {
+      cwd,
+      windowsHide: true,
+      maxBuffer: 5 * 1024 * 1024,
+    });
+  } catch (error) {
+    console.error(`Command failed: ${execPath} ${flatArgs.join(" ")}`);
+    if (error.stdout) console.error(`stdout: ${error.stdout}`);
+    if (error.stderr) console.error(`stderr: ${error.stderr}`);
+    throw error;
+  }
 }
 
 export async function checkStatus(type = "standard") {
