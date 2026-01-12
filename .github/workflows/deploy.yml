@@ -1,0 +1,271 @@
+name: GWAS Target Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+      # run_security_scan:
+      #   description: "Run Trivy security scan"
+      #   required: false
+      #   default: false
+      #   type: boolean
+      no_cache:
+        description: "Build images without cache"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+jobs:
+  Deploy:
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: ubuntu-latest
+    environment: ${{  inputs.tier || (endsWith(github.ref_name, '_dev') && 'dev' || 'qa') }}
+    env:
+      APP: gwas-target
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: .github/aws
+      DOCKER_BUILDKIT: 1
+      FRONTEND_CONTAINER_PORT: 80
+      BACKEND_CONTAINER_PORT: 9000
+      # RUN_SECURITY_SCAN: ${{ github.event_name == 'workflow_dispatch' && inputs.run_security_scan || false }}
+      NO_CACHE: ${{ github.event_name == 'workflow_dispatch' && inputs.no_cache || false }}
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: Set environment variables
+        run: |
+          # Determine deployment tier
+          BRANCH="${{ github.ref_name }}"
+          [[ "${{ github.event_name }}" == "workflow_dispatch" ]] \
+            && TIER="${{ inputs.tier }}" \
+            || TIER="${BRANCH##*_}"
+
+          # Set tier-dependent variables (match Ansible logic)
+          [[ "$TIER" =~ ^(prod|stage)$ ]] && IMAGE_TIER="release" || IMAGE_TIER="development"
+          [[ "$TIER" =~ ^(prod|stage)$ ]] && AWS_ACCOUNT_TIER="prod" || AWS_ACCOUNT_TIER="nonprod"
+
+          # Get git tag/commit info
+          GIT_TAG=$(git describe --tags --always --dirty 2>/dev/null || echo "unknown")
+          GIT_SHORT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+          
+          # Build timestamp (matching Ansible format: YYYYMMDDHHMMSS)
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          
+          # Build image repository and tags
+          REPO="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP"
+          S3_DATA_BUCKET="nci-cbiit-dceg-data-${AWS_ACCOUNT_TIER}"
+
+          # Export environment variables
+          cat << EOF >> $GITHUB_ENV
+          TIER=$TIER
+          IMAGE_TIER=$IMAGE_TIER
+          AWS_ACCOUNT_TIER=$AWS_ACCOUNT_TIER
+          S3_DATA_BUCKET=$S3_DATA_BUCKET
+          GIT_TAG=$GIT_TAG
+          GIT_SHORT_SHA=$GIT_SHORT_SHA
+          TIMESTAMP=$TIMESTAMP
+          IMAGE_REPOSITORY=$REPO
+          FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-$GIT_TAG-$TIMESTAMP
+          BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-$GIT_TAG-$TIMESTAMP
+          FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-latest
+          BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-latest
+          PARAMETER_PATH=/analysistools/$TIER/$APP
+          ENVIRONMENT_TIER=${TIER^^}
+          EOF
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-${{ env.APP }}-deploy-${{ env.BRANCH }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get parameters from AWS SSM
+        run: |
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["ecs_web_task"]="ECS_WEB_TASK"
+            ["ecs_web_task_cpu_units"]="ECS_CPU_UNITS"
+            ["ecs_web_task_memory_units"]="ECS_MEMORY_UNITS"
+            ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_worker_task"]="ECS_WORKER_TASK"
+            ["ecs_worker_task_cpu_units"]="ECS_WORKER_CPU_UNITS"
+            ["ecs_worker_task_memory_units"]="ECS_WORKER_MEMORY_UNITS"
+            ["role_arn"]="ROLE_ARN"
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+            ["gtag"]="GA4_TAG"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${PARAMETER_PATH}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend.dockerfile
+          pull: true
+          push: true
+          no-cache: ${{ env.NO_CACHE == 'true' }}
+          tags: |
+            ${{ env.BACKEND_IMAGE }}
+            ${{ env.BACKEND_IMAGE_LATEST }}
+          cache-from: ${{ env.NO_CACHE == 'false' && format('type=registry,ref={0}', env.BACKEND_IMAGE_LATEST) || '' }}
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+
+      # - name: Scan backend image for vulnerabilities
+      #   if: env.RUN_SECURITY_SCAN == 'true'
+      #   run: |
+      #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+      #       aquasec/trivy:latest image --timeout 15m \
+      #       --severity HIGH,CRITICAL \
+      #       ${{ env.BACKEND_IMAGE_LATEST }}
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend.dockerfile
+          pull: true
+          push: true
+          no-cache: ${{ env.NO_CACHE == 'true' }}
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}
+            ${{ env.FRONTEND_IMAGE_LATEST }}
+          build-args: |
+            APP_PATH=/
+            REACT_APP_GTAG=${{ env.GA4_TAG }}
+            REACT_APP_VERSION=${{ env.GIT_TAG }}
+            BUILDKIT_INLINE_CACHE=1
+          cache-from: ${{ env.NO_CACHE == 'false' && format('type=registry,ref={0}', env.FRONTEND_IMAGE_LATEST) || '' }}
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,mode=max
+
+      # - name: Scan frontend image for vulnerabilities
+      #   if: env.RUN_SECURITY_SCAN == 'true'
+      #   run: |
+      #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+      #       aquasec/trivy:latest image --timeout 15m \
+      #       --severity HIGH,CRITICAL \
+      #       ${{ env.FRONTEND_IMAGE_LATEST }}
+
+      - name: Render task definition from template
+        run: envsubst < ${{ env.TASK_DEFINITION_TEMPLATE_PATH }}/web.yml > web.yml
+        env:
+          ECS_WEB_TASK: ${{ env.ECS_WEB_TASK }}
+          ECS_CPU_UNITS: ${{ env.ECS_CPU_UNITS }}
+          ECS_MEMORY_UNITS: ${{ env.ECS_MEMORY_UNITS }}
+          ROLE_ARN: ${{ env.ROLE_ARN }}
+          EFS_FILESYSTEM_ID: ${{ env.EFS_FILESYSTEM_ID }}
+          EFS_ACCESS_POINT_ID: ${{ env.EFS_ACCESS_POINT_ID }}
+          FRONTEND_CONTAINER_PORT: ${{ env.FRONTEND_CONTAINER_PORT }}
+          BACKEND_CONTAINER_PORT: ${{ env.BACKEND_CONTAINER_PORT }}
+          FRONTEND_IMAGE_LATEST: ${{ env.FRONTEND_IMAGE_LATEST }}
+          BACKEND_IMAGE_LATEST: ${{ env.BACKEND_IMAGE_LATEST }}
+          TIER: ${{ env.TIER }}
+          APP: ${{ env.APP }}
+          ENVIRONMENT_TIER: ${{ env.ENVIRONMENT_TIER }}
+
+      - name: Render worker task definition from template
+        run: envsubst < ${{ env.TASK_DEFINITION_TEMPLATE_PATH }}/worker.yml > worker.yml
+        env:
+          ECS_WORKER_TASK: ${{ env.ECS_WORKER_TASK }}
+          ECS_WORKER_CPU_UNITS: ${{ env.ECS_WORKER_CPU_UNITS }}
+          ECS_WORKER_MEMORY_UNITS: ${{ env.ECS_WORKER_MEMORY_UNITS }}
+          ROLE_ARN: ${{ env.ROLE_ARN }}
+          EFS_FILESYSTEM_ID: ${{ env.EFS_FILESYSTEM_ID }}
+          EFS_ACCESS_POINT_ID: ${{ env.EFS_ACCESS_POINT_ID }}
+          BACKEND_CONTAINER_PORT: ${{ env.BACKEND_CONTAINER_PORT }}
+          BACKEND_IMAGE_LATEST: ${{ env.BACKEND_IMAGE_LATEST }}
+          TIER: ${{ env.TIER }}
+          APP: ${{ env.APP }}
+          ENVIRONMENT_TIER: ${{ env.ENVIRONMENT_TIER }}
+
+      - name: Register task definitions
+        run: |
+          aws ecs register-task-definition --cli-input-yaml file://web.yml > /dev/null
+          echo "✓ Web task definition registered: $ECS_WEB_TASK"
+          aws ecs register-task-definition --cli-input-yaml file://worker.yml > /dev/null
+          echo "✓ Worker task definition registered: $ECS_WORKER_TASK"
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_WEB_SERVICE }} \
+            --task-definition ${{ env.ECS_WEB_TASK }} \
+            --desired-count 1 \
+            --force-new-deployment > /dev/null
+          echo "✓ Service update initiated"
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for service to stabilize..."
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_WEB_SERVICE }}
+          echo "✓ Deployment completed successfully"
+
+      - name: Cleanup old task definitions
+        run: |
+          # Cleanup web task definitions
+          OLD_WEB_TASKS=$(aws ecs list-task-definitions \
+            --family-prefix "$ECS_WEB_TASK" \
+            --sort DESC \
+            --query 'taskDefinitionArns[3:]' \
+            --output text)
+          
+          if [ -n "$OLD_WEB_TASKS" ]; then
+            echo "$OLD_WEB_TASKS" | xargs -n1 aws ecs deregister-task-definition --task-definition
+            echo "✓ Cleaned up old web task definitions"
+          fi
+
+          # Cleanup worker task definitions
+          OLD_WORKER_TASKS=$(aws ecs list-task-definitions \
+            --family-prefix "$ECS_WORKER_TASK" \
+            --sort DESC \
+            --query 'taskDefinitionArns[3:]' \
+            --output text)
+          
+          if [ -n "$OLD_WORKER_TASKS" ]; then
+            echo "$OLD_WORKER_TASKS" | xargs -n1 aws ecs deregister-task-definition --task-definition
+            echo "✓ Cleaned up old worker task definitions"
+          fi
