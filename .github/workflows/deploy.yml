@@ -17,11 +17,6 @@ on:
       #   required: false
       #   default: false
       #   type: boolean
-      no_cache:
-        description: "Build images without cache"
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   id-token: write
@@ -41,7 +36,6 @@ jobs:
       FRONTEND_CONTAINER_PORT: 80
       BACKEND_CONTAINER_PORT: 9000
       # RUN_SECURITY_SCAN: ${{ github.event_name == 'workflow_dispatch' && inputs.run_security_scan || false }}
-      NO_CACHE: ${{ github.event_name == 'workflow_dispatch' && inputs.no_cache || false }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
 
     steps:
@@ -143,11 +137,10 @@ jobs:
           file: docker/backend.dockerfile
           pull: true
           push: true
-          no-cache: ${{ env.NO_CACHE == 'true' }}
           tags: |
             ${{ env.BACKEND_IMAGE }}
             ${{ env.BACKEND_IMAGE_LATEST }}
-          cache-from: ${{ env.NO_CACHE == 'false' && format('type=registry,ref={0}', env.BACKEND_IMAGE_LATEST) || '' }}
+          cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_LATEST }}
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
@@ -167,7 +160,6 @@ jobs:
           file: docker/frontend.dockerfile
           pull: true
           push: true
-          no-cache: ${{ env.NO_CACHE == 'true' }}
           tags: |
             ${{ env.FRONTEND_IMAGE }}
             ${{ env.FRONTEND_IMAGE_LATEST }}
@@ -176,7 +168,7 @@ jobs:
             REACT_APP_GTAG=${{ env.GA4_TAG }}
             REACT_APP_VERSION=${{ env.GIT_TAG }}
             BUILDKIT_INLINE_CACHE=1
-          cache-from: ${{ env.NO_CACHE == 'false' && format('type=registry,ref={0}', env.FRONTEND_IMAGE_LATEST) || '' }}
+          cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE_LATEST }}
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,mode=max
 
       # - name: Scan frontend image for vulnerabilities
