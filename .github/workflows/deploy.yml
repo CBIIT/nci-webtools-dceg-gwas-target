@@ -62,14 +62,12 @@ jobs:
           
           # Build image repository and tags
           REPO="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP"
-          S3_DATA_BUCKET="nci-cbiit-dceg-data-${AWS_ACCOUNT_TIER}"
 
           # Export environment variables
           cat << EOF >> $GITHUB_ENV
           TIER=$TIER
           IMAGE_TIER=$IMAGE_TIER
           AWS_ACCOUNT_TIER=$AWS_ACCOUNT_TIER
-          S3_DATA_BUCKET=$S3_DATA_BUCKET
           GIT_TAG=$GIT_TAG
           GIT_SHORT_SHA=$GIT_SHORT_SHA
           TIMESTAMP=$TIMESTAMP
@@ -228,13 +226,13 @@ jobs:
             --force-new-deployment > /dev/null
           echo "✓ Service update initiated"
 
-      - name: Wait for deployment
-        run: |
-          echo "Waiting for service to stabilize..."
-          aws ecs wait services-stable \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_WEB_SERVICE }}
-          echo "✓ Deployment completed successfully"
+      # - name: Wait for deployment
+      #   run: |
+      #     echo "Waiting for service to stabilize..."
+      #     aws ecs wait services-stable \
+      #       --cluster ${{ env.ECS_CLUSTER }} \
+      #       --services ${{ env.ECS_WEB_SERVICE }}
+      #     echo "✓ Deployment completed successfully"
 
       - name: Cleanup old task definitions
         run: |
