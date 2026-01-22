@@ -107,7 +107,7 @@ jobs:
             ["gtag"]="GA4_TAG"
           )
 
-          # Retrieve each parameter and export to environment, with extra logging for missing parameters
+          # Retrieve each parameter and export to environment, fail fast if missing
           for ssm_name in "${!PARAMS[@]}"; do
             env_var="${PARAMS[$ssm_name]}"
             value=$(aws ssm get-parameter \
@@ -118,6 +118,7 @@ jobs:
             if [[ $? -ne 0 ]]; then
               echo "ERROR: Parameter not found or could not be retrieved: ${PARAMETER_PATH}/${ssm_name}"
               echo "AWS CLI output: $value"
+              exit 1
             else
               echo "${env_var}=${value}" >> $GITHUB_ENV
               echo "Retrieved ${ssm_name} -> ${env_var}"
