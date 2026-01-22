@@ -107,16 +107,21 @@ jobs:
             ["gtag"]="GA4_TAG"
           )
 
-          # Retrieve each parameter and export to environment
+          # Retrieve each parameter and export to environment, with extra logging for missing parameters
           for ssm_name in "${!PARAMS[@]}"; do
             env_var="${PARAMS[$ssm_name]}"
             value=$(aws ssm get-parameter \
               --name "${PARAMETER_PATH}/${ssm_name}" \
               --with-decryption \
               --query "Parameter.Value" \
-              --output text)
-            echo "${env_var}=${value}" >> $GITHUB_ENV
-            echo "Retrieved ${ssm_name} -> ${env_var}"
+              --output text 2>&1)
+            if [[ $? -ne 0 ]]; then
+              echo "ERROR: Parameter not found or could not be retrieved: ${PARAMETER_PATH}/${ssm_name}"
+              echo "AWS CLI output: $value"
+            else
+              echo "${env_var}=${value}" >> $GITHUB_ENV
+              echo "Retrieved ${ssm_name} -> ${env_var}"
+            fi
           done
 
       - name: Login to Amazon ECR
