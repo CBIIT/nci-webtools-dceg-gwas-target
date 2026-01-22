@@ -67,6 +67,7 @@ jobs:
 
           # Export environment variables
           cat << EOF >> $GITHUB_ENV
+          BRANCH=$BRANCH
           TIER=$TIER
           IMAGE_TIER=$IMAGE_TIER
           AWS_ACCOUNT_TIER=$AWS_ACCOUNT_TIER
