@@ -200,7 +200,7 @@ export async function runAnnotation({ snpLocFile, geneLocFile, outFile }, type =
 }
 
 export function getGeneAnalysisParams(paths, params) {
-  const runGeneSetAnalysis = Boolean(params.geneSetFile || params.covariateFile);
+  const runGeneSetAnalysis = Boolean(params.enableGeneSet);
 
   let geneAnalysisParams = {
     bFile: paths.bFile,
