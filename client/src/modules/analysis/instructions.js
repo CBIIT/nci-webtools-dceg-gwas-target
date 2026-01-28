@@ -27,7 +27,7 @@ export default function Instructions() {
           </li>
           <li>
             <b>Reference Data Files:</b> These are the genotype files for your selected population (e.g.,{" "}
-            <code>g1000_eur.bed/.bim/.fam</code>) used to for analysis.
+            g1000_eur.bed/.bim/.fam) used to for analysis.
           </li>
         </ul>
       </div>
