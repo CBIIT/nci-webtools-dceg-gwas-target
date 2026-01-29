@@ -432,13 +432,13 @@ export default function AnalysisForm() {
         {enableGeneSet && geneSetFileType === "geneSetFile" && (
           <Form.Group className="mb-3" controlId="geneSetFile">
             <Form.Label>Gene Set File</Form.Label>
-            <FileInput name="geneSetFile" control={control} disabled={covariateFile} />
+            <FileInput name="geneSetFile" control={control} />
           </Form.Group>
         )}
         {enableGeneSet && geneSetFileType === "covariateFile" && (
           <Form.Group className="mb-3" controlId="covariateFile">
             <Form.Label>Covariate File</Form.Label>
-            <FileInput name="covariateFile" control={control} disabled={geneSetFile} />
+            <FileInput name="covariateFile" control={control} />
           </Form.Group>
         )}
       </fieldset>
