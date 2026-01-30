@@ -16,20 +16,39 @@ export default function FileInput(props) {
   const files = Array.from(fileList);
   useEffect(() => {
     ref(inputRef.current);
-    if (inputRef.current) {
+    if (inputRef.current && inputRef.current.files !== fileList) {
       inputRef.current.files = fileList;
     }
   }, [fileList, ref]);
 
   function handleChange(event) {
-    console.log(value)
-    console.log(fileList)
-    onChange(event.target.files);
+    const newFiles = event.target.files;
+    onChange(newFiles);
+    
+    // Notify parent component
+    if (props.onFileChange) {
+      const filenames = Array.from(newFiles).map(f => f.name);
+      props.onFileChange(name, filenames, newFiles);
+    }
   }
 
   function removeFile(index) {
     const remainingFiles = files.filter((f, i) => i !== index);
-    onChange(asFileList(remainingFiles));
+    const remainingFileList = asFileList(remainingFiles);
+    onChange(remainingFileList);
+    
+    // Clear native input if no files remain
+    if (remainingFiles.length === 0 && inputRef.current) {
+      inputRef.current.value = '';
+    }
+    
+    // Notify parent with updated files
+    if (props.onFileChange) {
+      const filenames = remainingFiles.map(f => f.name);
+      props.onFileChange(name, filenames, remainingFileList);
+    }
+    
+    // Keep backward compatibility with onRemove
     if (props.onRemove) {
       props.onRemove(name, remainingFiles);
     }

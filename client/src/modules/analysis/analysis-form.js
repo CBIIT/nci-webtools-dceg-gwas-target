@@ -53,13 +53,6 @@ export default function AnalysisForm() {
           value === "other" ? null : [`${value}.bed`, `${value}.bim`, `${value}.fam`, `${value}.synonyms`];
         setValue("referenceDataFiles", referenceDataFiles, { shouldValidate: true });
         break;
-      case "enableGeneSet":
-        if (!checked) {
-          setValue("geneSetFileType", null);
-          setValue("geneSetFile", null);
-          setValue("covariateFile", null);
-        }
-        break;
       case "sendNotification":
         if (!checked) {
           setValue("jobName", null);
@@ -83,9 +76,10 @@ export default function AnalysisForm() {
       setLoading(true);
       const previousId = id;
       const newId = uuidv4();
+      const dataToUpload = { ...data };
+      const paramsToSubmit = mapValues(data, getFileNames);
 
       // Filter out gene set files that aren't selected
-      const dataToUpload = { ...data };
       if (data.geneSetFileType !== "geneSetFile") {
         delete dataToUpload.geneSetFile;
       }
@@ -93,10 +87,7 @@ export default function AnalysisForm() {
         delete dataToUpload.covariateFile;
       }
 
-      await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, dataToUpload);
-
       // Filter out gene set parameters that aren't selected
-      const paramsToSubmit = mapValues(data, getFileNames);
       if (data.geneSetFileType === "depict") {
         // Use the default DEPICT gene set file
         paramsToSubmit.geneSetFile = "depict_geneset.tsv";
@@ -110,8 +101,8 @@ export default function AnalysisForm() {
         }
       }
 
+      await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, dataToUpload);
       const submitParams = { ...paramsToSubmit, previousId };
-
       await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
       if (sendNotification) {
@@ -432,13 +423,27 @@ export default function AnalysisForm() {
         {enableGeneSet && geneSetFileType === "geneSetFile" && (
           <Form.Group className="mb-3" controlId="geneSetFile">
             <Form.Label>Gene Set File</Form.Label>
-            <FileInput name="geneSetFile" control={control} />
+            <FileInput
+              name="geneSetFile"
+              control={control}
+              rules={{
+                validate: (geneSetFile) =>
+                  !geneSetFile || !geneSetFile.length ? "Please upload a gene set file" : false,
+              }}
+            />
           </Form.Group>
         )}
         {enableGeneSet && geneSetFileType === "covariateFile" && (
           <Form.Group className="mb-3" controlId="covariateFile">
             <Form.Label>Covariate File</Form.Label>
-            <FileInput name="covariateFile" control={control} />
+            <FileInput
+              name="covariateFile"
+              control={control}
+              rules={{
+                validate: (covariateFile) =>
+                  !covariateFile || !covariateFile.length ? "Please upload a covariate file" : false,
+              }}
+            />
           </Form.Group>
         )}
       </fieldset>
