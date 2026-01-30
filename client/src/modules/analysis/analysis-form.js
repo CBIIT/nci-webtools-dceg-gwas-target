@@ -430,6 +430,7 @@ export default function AnalysisForm() {
                 validate: (geneSetFile) =>
                   !geneSetFile || !geneSetFile.length ? "Please upload a gene set file" : false,
               }}
+              accept=".tsv,.gmt"
             />
           </Form.Group>
         )}
@@ -443,6 +444,7 @@ export default function AnalysisForm() {
                 validate: (covariateFile) =>
                   !covariateFile || !covariateFile.length ? "Please upload a covariate file" : false,
               }}
+              accept=".tsv,.gmt"
             />
           </Form.Group>
         )}
