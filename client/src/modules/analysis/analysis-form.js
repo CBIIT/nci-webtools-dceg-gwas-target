@@ -35,6 +35,7 @@ export default function AnalysisForm() {
   const bedFileType = watch("bedFileType") || "select";
   const enableGeneSet = watch("enableGeneSet");
 
+
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
   }, [geneSetFile, covariateFile, setValue]);
@@ -427,10 +428,8 @@ export default function AnalysisForm() {
               name="geneSetFile"
               control={control}
               rules={{
-                validate: (geneSetFile) =>
-                  !geneSetFile || !geneSetFile.length ? "Please upload a gene set file" : false,
+                required: enableGeneSet && geneSetFileType === "geneSetFile" ? "Please upload a gene set file" : false,
               }}
-              accept=".tsv,.gmt"
             />
           </Form.Group>
         )}
@@ -441,10 +440,9 @@ export default function AnalysisForm() {
               name="covariateFile"
               control={control}
               rules={{
-                validate: (covariateFile) =>
-                  !covariateFile || !covariateFile.length ? "Please upload a covariate file" : false,
+                required:
+                  enableGeneSet && geneSetFileType === "covariateFile" ? "Please upload a covariate file" : false,
               }}
-              accept=".tsv,.gmt"
             />
           </Form.Group>
         )}
