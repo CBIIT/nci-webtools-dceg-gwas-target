@@ -24,10 +24,10 @@ export default function FileInput(props) {
   function handleChange(event) {
     const newFiles = event.target.files;
     onChange(newFiles);
-    
+
     // Notify parent component
     if (props.onFileChange) {
-      const filenames = Array.from(newFiles).map(f => f.name);
+      const filenames = Array.from(newFiles).map((f) => f.name);
       props.onFileChange(name, filenames, newFiles);
     }
   }
@@ -36,18 +36,18 @@ export default function FileInput(props) {
     const remainingFiles = files.filter((f, i) => i !== index);
     const remainingFileList = asFileList(remainingFiles);
     onChange(remainingFileList);
-    
+
     // Clear native input if no files remain
     if (remainingFiles.length === 0 && inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = "";
     }
-    
+
     // Notify parent with updated files
     if (props.onFileChange) {
-      const filenames = remainingFiles.map(f => f.name);
+      const filenames = remainingFiles.map((f) => f.name);
       props.onFileChange(name, filenames, remainingFileList);
     }
-    
+
     // Keep backward compatibility with onRemove
     if (props.onRemove) {
       props.onRemove(name, remainingFiles);
@@ -77,8 +77,14 @@ export default function FileInput(props) {
             <ListGroup.Item
               className="list-group-item-action d-flex justify-content-between align-items-center"
               key={index}>
-              <small className="text-muted">{file.name}</small>
-              <Button size="sm" variant="outline-danger" className="border-0" onClick={(ev) => removeFile(index)}>
+              <small className="text-muted text-break me-2" style={{ minWidth: 0 }}>
+                {file.name}
+              </small>
+              <Button
+                size="sm"
+                variant="outline-danger"
+                className="border-0 flex-shrink-0"
+                onClick={(ev) => removeFile(index)}>
                 <i className="bi bi-x-lg" role="img" aria-label="Remove File Icon"></i>
                 <span className="visually-hidden">Remove File</span>
               </Button>
@@ -88,10 +94,15 @@ export default function FileInput(props) {
       )}
       {!props.multiple && files.length > 0 && (
         <ListGroup>
-          <ListGroup.Item
-            className="list-group-item-action d-flex justify-content-between align-items-center">
-            <small className="text-muted">{files[0].name}</small>
-            <Button size="sm" variant="outline-danger" className="border-0" onClick={(ev) => removeFile(0)}>
+          <ListGroup.Item className="list-group-item-action d-flex justify-content-between align-items-center">
+            <small className="text-muted text-break me-2" style={{ minWidth: 0 }}>
+              {files[0].name}
+            </small>
+            <Button
+              size="sm"
+              variant="outline-danger"
+              className="border-0 flex-shrink-0"
+              onClick={(ev) => removeFile(0)}>
               <i className="bi bi-x-lg" role="img" aria-label="Remove File Icon"></i>
               <span className="visually-hidden">Remove File</span>
             </Button>
