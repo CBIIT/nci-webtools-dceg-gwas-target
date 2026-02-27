@@ -43,7 +43,7 @@ export default function Footer() {
                     className="text-light"
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="mailto:GWASTargetWebAdmin@mail.nih.gov">
+                    href="mailto:NCIGWASTargetWebAdmin@mail.nih.gov">
                     Contact Us
                   </a>
                 </li>
