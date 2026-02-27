@@ -44,6 +44,7 @@ export default function AnalysisForm() {
     switch (name) {
       case "magmaType":
         setValue("bedFileFilter", value === "enhanced" ? "" : null);
+        setValue("bedFileType", value === "enhanced" ? "select" : null);
         setValue("sampleSizeType", "constant");
         break;
       case "snpPopulation":
@@ -332,7 +333,7 @@ export default function AnalysisForm() {
                 <Form.Select
                   className={bedFileType === "select" ? "d-block" : "d-none"}
                   {...register("bedFileFilter", {
-                    required: (v) => magmaType === "enhanced" && !v,
+                    required: magmaType === "enhanced",
                   })}>
                   <option value="" hidden>
                     No Filter Selected
