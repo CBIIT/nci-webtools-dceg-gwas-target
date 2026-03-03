@@ -26,6 +26,7 @@ jobs:
       contents: "read"
       id-token: "write"
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     environment: ${{  inputs.tier || (endsWith(github.ref_name, '_dev') && 'dev' || 'qa') }}
     env:
       APP: gwas-target
@@ -144,7 +145,7 @@ jobs:
             ${{ env.BACKEND_IMAGE }}
             ${{ env.BACKEND_IMAGE_LATEST }}
           cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_LATEST }}
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=max
+          cache-to: type=inline
           build-args: |
             BUILDKIT_INLINE_CACHE=1
 
@@ -172,7 +173,7 @@ jobs:
             REACT_APP_VERSION=${{ env.GIT_TAG }}
             BUILDKIT_INLINE_CACHE=1
           cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE_LATEST }}
-          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,mode=max
+          cache-to: type=inline
 
       # - name: Scan frontend image for vulnerabilities
       #   if: env.RUN_SECURITY_SCAN == 'true'
