@@ -19,15 +19,14 @@ The application uses environment-specific configurations managed through `.env` 
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `NODE_ENV` | Node environment | `production`, `development` |
 | `APP_BASE_URL` | Base URL of the application | `https://example.com/gwas-target` |
 | `APP_NAME` | Application name | `gwas-target` |
 | `APP_PORT` | Backend server port | `9000` |
-| `APP_TIER` | Deployment tier/environment | `dev`, `stage`, `prod` |
+| `APP_TIER` | Deployment tier/environment | `dev`, `qa`, `stage`, `prod` |
 | `LOG_LEVEL` | Logging level | `debug`, `info`, `warn`, `error` |
-| `DATA_FOLDER` | Root data directory path | `/path/to/data` |
-| `INPUT_FOLDER` | User input files directory | `/path/to/data/input` |
-| `OUTPUT_FOLDER` | Analysis results directory | `/path/to/data/output` |
+| `DATA_FOLDER` | Root data directory path | `/data` |
+| `INPUT_FOLDER` | User input files directory | `/data/input` |
+| `OUTPUT_FOLDER` | Analysis results directory | `/data/output` |
 | `EMAIL_ADMIN` | Admin email address | `admin@example.com` |
 | `EMAIL_SMTP_HOST` | SMTP server hostname | `smtp.example.com` |
 | `EMAIL_SMTP_PORT` | SMTP server port | `587` |
@@ -36,15 +35,19 @@ The application uses environment-specific configurations managed through `.env` 
 | `SECURITY_GROUP_IDS` | Comma-separated security group IDs | `sg-xxx,sg-yyy` |
 | `ECS_CLUSTER` | ECS cluster name for workers | `analysis-cluster` |
 | `WORKER_TASK_NAME` | ECS task definition name | `gwas-target-worker` |
-| `WORKER_TYPE` | Worker execution type | `ecs`, `local` |
+| `WORKER_TYPE` | Worker execution type | `fargate`, `local` |
 
-#### Optional AWS Configuration
+#### Optional Configuration
 
-| Variable | Description |
-|----------|-------------|
-| `AWS_DEFAULT_REGION` | AWS region |
-| `AWS_ACCESS_KEY_ID` | AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NODE_ENV` | Node environment | `production` |
+| `SERVER_TIMEOUT` | Server timeout in milliseconds | `900000` (15 min) |
+| `EMAIL_SMTP_USER` | SMTP authentication username | (no auth) |
+| `EMAIL_SMTP_PASSWORD` | SMTP authentication password | (no auth) |
+| `AWS_DEFAULT_REGION` | AWS region | `us-east-1` |
+| `AWS_ACCESS_KEY_ID` | AWS access key (use IAM roles in production) | (none) |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key (use IAM roles in production) | (none) |
 
 ### Deployment Architecture
 
@@ -72,23 +75,26 @@ docker-compose up --build
 
 The Docker setup includes:
 - **Backend Service**: Node.js API server with mounted data volumes
-- **Frontend Service**: React app served via HTTP server, proxied to backend
+- **Frontend Service**: React app built and served via Apache HTTP Server (httpd)
 
 #### Production Deployment
 
-The application is designed for deployment on AWS infrastructure:
+The application is deployed on AWS ECS/Fargate:
 
-1. **Frontend**: Built React static files served via web server (Apache/Nginx)
-2. **Backend API**: Node.js application managed by PM2
-3. **Worker Tasks**: ECS Fargate tasks for compute-intensive MAGMA analysis
+1. **Frontend Container**: React app built and served via Apache HTTP Server (httpd) on port 80
+2. **Backend Container**: Node.js Express API managed by PM2, running in cluster mode
+3. **Worker Tasks**: On-demand ECS Fargate tasks for compute-intensive MAGMA analysis
+4. **Storage**: Amazon EFS for persistent data storage (input/output files)
+5. **Logging**: Datadog via AWS FireLens for centralized logging
 
 ### Environment Mapping
 
 | Environment | APP_TIER | Purpose | Infrastructure |
 |-------------|----------|---------|----------------|
-| **Development** | `dev` | Local development and testing | Local or Docker Compose |
-| **Staging** | `stage` | Pre-production testing | AWS ECS/Fargate |
-| **Production** | `prod` | Live application | AWS ECS/Fargate with production data |
+| **Development** | `dev` | Development and initial testing | AWS ECS/Fargate |
+| **QA** | `qa` | Quality assurance and integration testing | AWS ECS/Fargate |
+| **Staging** | `stage` | Pre-production validation | AWS ECS/Fargate |
+| **Production** | `prod` | Live production environment | AWS ECS/Fargate |
 
 ### Build Process
 
@@ -112,64 +118,70 @@ docker build -f docker/backend.dockerfile -t gwas-target-backend .
 
 ### Deployment Pipeline
 
-Recommended CI/CD workflow:
+The project uses GitHub Actions for automated deployment (`.github/workflows/deploy.yml`):
 
-1. **Code Commit** → Version control (Git)
-2. **Continuous Integration**
-   - Install dependencies
-   - Run linters (`npm run lint`)
-   - Run formatters (`npm run format`)
-   - Run tests (`npm test`)
-3. **Build Artifacts**
-   - Build frontend React app
-   - Create Docker images (if using containerized deployment)
-4. **Deploy to Environment**
-   - Update environment variables for target tier
-   - Deploy backend API server
-   - Deploy frontend static assets
-   - Update ECS task definitions for worker tasks
-5. **Smoke Testing**
-   - Verify API endpoints
-   - Test analysis job submission
-   - Verify email notifications
+1. **Trigger** → Workflow dispatch with tier selection (dev, qa, stage, prod)
+2. **Environment Setup**
+   - Configure AWS credentials via OIDC
+   - Set environment variables based on deployment tier
+   - Retrieve secrets from AWS Systems Manager Parameter Store
+3. **Build Docker Images**
+   - Build frontend image with React app bundled in httpd container
+   - Build backend image with Node.js application and dependencies
+   - Tag images with git tag and timestamp
+   - Push to Amazon ECR with inline cache
+4. **Deploy to ECS**
+   - Render ECS task definitions from templates (web and worker)
+   - Register new task definitions
+   - Update ECS service to trigger deployment
+5. **Cleanup**
+   - Deregister old task definitions (keep last 3 revisions)
 
 ### Worker Task Execution
 
-The application uses AWS ECS for executing compute-intensive MAGMA analysis:
+The application supports two worker execution modes:
 
-- **Local Mode** (`WORKER_TYPE=local`): Executes jobs on the same server
-- **ECS Mode** (`WORKER_TYPE=ecs`): Launches ECS Fargate tasks for each analysis job
+- **Local Mode** (`WORKER_TYPE=local`): Executes MAGMA jobs directly on the backend server
+- **Fargate Mode** (`WORKER_TYPE=fargate`): Launches on-demand ECS Fargate tasks for each analysis job
 
-ECS task configuration requirements:
-- Task definition must include MAGMA binaries and reference data
-- Network configuration uses specified VPC, subnets, and security groups
-- Tasks receive job parameters via environment variables
+#### Fargate Worker Configuration
+
+When `WORKER_TYPE=fargate`, each analysis job triggers a new ECS task:
+
+1. Backend receives job submission and writes `params.json` to EFS input folder
+2. Backend invokes ECS RunTask API with job ID as command argument
+3. Worker task starts, reads `params.json` from input folder via job ID
+4. Worker executes MAGMA analysis and writes results to EFS output folder
+5. Worker updates `status.json` and sends email notification on completion
+6. Worker task terminates automatically
+
+Worker task requirements:
+- MAGMA binaries for the platform (`server/bin/linux/magma`)
+- Reference data files mounted via EFS
+- Network access via specified VPC, subnets, and security groups
+- Same environment variables as backend for AWS/EFS access
 
 ### Monitoring and Logging
 
 - **Application Logs**: Winston logger with configurable log levels
 - **API Monitoring**: Express middleware for request/response logging
-- **Worker Jobs**: Job status tracked in SQLite database
+- **Worker Jobs**: Job status tracked in JSON files (status.json)
 - **Email Notifications**: Sent on job completion/failure to users
 
 ### Data Persistence
 
-- **Input Files**: User-uploaded GWAS summary statistics
-- **Output Files**: MAGMA analysis results (gene scores, pathway results)
-- **Database**: SQLite database for job tracking and metadata
-- **Data Retention**: Configurable per environment tier
+- **Input Files**: User-uploaded GWAS summary statistics stored in EFS
+- **Output Files**: MAGMA analysis results (gene scores, pathway results) stored in EFS
+- **Job Status**: JSON files storing job state and metadata
+- **Query Results**: SQLite databases for efficient querying of MAGMA output
+- **Gene Mappings**: SQLite database for Ensembl ID to gene symbol lookups
 
 ### Security Considerations
 
-- Environment variables should never be committed to version control
-- Use `.env.example` as a template for required configurations
-- AWS credentials should use IAM roles when possible
-- SMTP credentials should be stored securely (AWS Secrets Manager, etc.)
-- Input validation on all user uploads and API endpoints
-
-### Scaling Considerations
-
-- **API Server**: Horizontal scaling via load balancer
-- **Worker Tasks**: Auto-scaling ECS tasks based on job queue depth
-- **Data Storage**: Consider S3 for large-scale deployments
-- **Database**: Migrate to RDS for multi-instance deployments
+- **Secrets Management**: All sensitive configuration stored in AWS Systems Manager Parameter Store
+- **AWS Authentication**: Uses OIDC-based GitHub Actions role assumption (no long-lived credentials)
+- **IAM Roles**: ECS tasks use IAM roles for AWS service access (no embedded credentials)
+- **SMTP Authentication**: Optional - configure `EMAIL_SMTP_USER` and `EMAIL_SMTP_PASSWORD` only if required
+- **Environment Variables**: Never commit `.env` files to version control; use `.env.example` as template
+- **Input Validation**: All user uploads validated using express-validator
+- **Network Security**: ECS tasks run in private subnets with security group restrictions
