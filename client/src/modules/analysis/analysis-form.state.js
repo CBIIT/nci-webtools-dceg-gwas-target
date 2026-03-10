@@ -20,7 +20,7 @@ export const defaultFormState = {
   email: null,
   geneSetFileType: "",
   bedFileType: "select",
-  useGeneSet: false,
+  enableGeneSet: false,
 };
 
 export const formState = atom({
