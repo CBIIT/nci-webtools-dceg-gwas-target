@@ -11,7 +11,7 @@ import csv
 import re
 import sys
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict
 
 
 def load_mapping(tsv_path: str) -> Dict[str, str]:
@@ -196,10 +196,10 @@ def main():
         epilog="""
 Examples:
   # Use default mapping file (server/gene_map_data/ensembl_gene_map.tsv)
-  python replace_ensembl_ids.py input.tsv output.tsv
+  python depict_replace_ensembl_ids.py input.tsv output.tsv
   
   # Use custom mapping file
-  python replace_ensembl_ids.py input.tsv output.tsv --mapping path/to/mapping.tsv
+  python depict_replace_ensembl_ids.py input.tsv output.tsv --mapping path/to/mapping.tsv
         """
     )
     
