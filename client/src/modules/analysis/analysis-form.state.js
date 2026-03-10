@@ -18,8 +18,9 @@ export const defaultFormState = {
   sendNotification: false,
   jobName: null,
   email: null,
-  geneSetFileType: "covariateFile",
+  geneSetFileType: "",
   bedFileType: "select",
+  enableGeneSet: false,
 };
 
 export const formState = atom({
