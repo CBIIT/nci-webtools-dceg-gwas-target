@@ -35,7 +35,6 @@ export default function AnalysisForm() {
   const bedFileType = watch("bedFileType") || "select";
   const enableGeneSet = watch("enableGeneSet");
 
-
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
   }, [geneSetFile, covariateFile, setValue]);
@@ -80,26 +79,34 @@ export default function AnalysisForm() {
       const dataToUpload = { ...data };
       const paramsToSubmit = mapValues(data, getFileNames);
 
-      // Filter out gene set files that aren't selected
-      if (data.geneSetFileType !== "geneSetFile") {
-        delete dataToUpload.geneSetFile;
-      }
-      if (data.geneSetFileType !== "covariateFile") {
-        delete dataToUpload.covariateFile;
-      }
-
-      // Filter out gene set parameters that aren't selected
-      if (data.geneSetFileType === "depict") {
-        // Use the default DEPICT gene set file
-        paramsToSubmit.covariateFile = "DEPICT_genesets.tsv";
-        paramsToSubmit.geneSetFile = null;
-      } else {
+      if (data.enableGeneSet) {
+        // Filter out gene set files that aren't selected
         if (data.geneSetFileType !== "geneSetFile") {
-          paramsToSubmit.geneSetFile = null;
+          delete dataToUpload.geneSetFile;
         }
         if (data.geneSetFileType !== "covariateFile") {
-          paramsToSubmit.covariateFile = null;
+          delete dataToUpload.covariateFile;
         }
+
+        // Filter out gene set parameters that aren't selected
+        if (data.geneSetFileType === "depict") {
+          // Use the default DEPICT gene set file
+          paramsToSubmit.covariateFile = "DEPICT_genesets.tsv";
+          paramsToSubmit.geneSetFile = null;
+        } else {
+          if (data.geneSetFileType !== "geneSetFile") {
+            paramsToSubmit.geneSetFile = null;
+          }
+          if (data.geneSetFileType !== "covariateFile") {
+            paramsToSubmit.covariateFile = null;
+          }
+        }
+      } else {
+        delete dataToUpload.geneSetFile;
+        delete dataToUpload.covariateFile;
+        paramsToSubmit.geneSetFile = null;
+        paramsToSubmit.covariateFile = null;
+        paramsToSubmit.geneSetFileType = null;
       }
 
       await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, dataToUpload);
