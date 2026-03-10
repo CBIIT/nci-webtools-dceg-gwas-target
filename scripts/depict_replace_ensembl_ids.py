@@ -99,13 +99,12 @@ def replace_ensembl_ids(text: str, mapping: Dict[str, str], seen_symbols: set) -
         # Get the gene symbol from mapping
         gene_symbol = mapping.get(ensembl_id)
         
-        if gene_symbol:
+        if gene_symbol and gene_symbol not in seen_symbols:
             replacements += 1
-            # Track this gene symbol
             seen_symbols.add(gene_symbol)
             return gene_symbol
         else:
-            # No mapping found, keep original ID
+            # No mapping found, or symbol already used — keep original ID
             return match.group(0)
     
     modified_text = re.sub(r'ENSG\d+', replace_match, text, flags=re.IGNORECASE)
@@ -171,7 +170,12 @@ def process_tsv(input_path: str, output_path: str, mapping: Dict[str, str]) -> N
             
             if row_modified:
                 rows_modified += 1
-            
+
+            # Track the resolved first-column value so plain gene symbols
+            # (non-Ensembl IDs already in the file) are visible to later duplicate checks
+            if new_row:
+                seen_symbols.add(new_row[0])
+
             writer.writerow(new_row)
     
     print(f"\nProcessing complete:", file=sys.stderr)

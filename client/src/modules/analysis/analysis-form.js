@@ -91,8 +91,8 @@ export default function AnalysisForm() {
       // Filter out gene set parameters that aren't selected
       if (data.geneSetFileType === "depict") {
         // Use the default DEPICT gene set file
-        paramsToSubmit.geneSetFile = "depict_geneset.tsv";
-        paramsToSubmit.covariateFile = null;
+        paramsToSubmit.covariateFile = "DEPICT_genesets.tsv";
+        paramsToSubmit.geneSetFile = null;
       } else {
         if (data.geneSetFileType !== "geneSetFile") {
           paramsToSubmit.geneSetFile = null;
