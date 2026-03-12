@@ -33,6 +33,7 @@ export default function AnalysisForm() {
   const covariateFile = watch("covariateFile");
   const geneSetFileType = watch("geneSetFileType");
   const bedFileType = watch("bedFileType") || "select";
+  const enableGeneSet = watch("enableGeneSet");
 
   useEffect(() => {
     if (geneSetFile || covariateFile) setValue("sendNotification", true);
@@ -44,6 +45,7 @@ export default function AnalysisForm() {
     switch (name) {
       case "magmaType":
         setValue("bedFileFilter", value === "enhanced" ? "" : null);
+        setValue("bedFileType", value === "enhanced" ? "select" : null);
         setValue("sampleSizeType", "constant");
         break;
       case "snpPopulation":
@@ -66,18 +68,6 @@ export default function AnalysisForm() {
     const { name, value, checked } = event.target;
     if (name === "geneSetFileType" && checked) {
       setValue("geneSetFileType", value);
-      if (value === "geneSetFile") {
-        setValue("covariateFile", null);
-      } else {
-        setValue("geneSetFile", null);
-      }
-    }
-  }
-
-  function handleFileRemove(fieldName, remainingFiles) {
-    if ((fieldName === "geneSetFile" || fieldName === "covariateFile") && remainingFiles.length === 0) {
-      setValue("sendNotification", false);
-      setValue(fieldName, null);
     }
   }
 
@@ -86,9 +76,41 @@ export default function AnalysisForm() {
       setLoading(true);
       const previousId = id;
       const newId = uuidv4();
-      await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, data);
-      const submitParams = { ...mapValues(data, getFileNames), previousId };
+      const dataToUpload = { ...data };
+      const paramsToSubmit = mapValues(data, getFileNames);
 
+      if (data.enableGeneSet) {
+        // Filter out gene set files that aren't selected
+        if (data.geneSetFileType !== "geneSetFile") {
+          delete dataToUpload.geneSetFile;
+        }
+        if (data.geneSetFileType !== "covariateFile") {
+          delete dataToUpload.covariateFile;
+        }
+
+        // Filter out gene set parameters that aren't selected
+        if (data.geneSetFileType === "depict") {
+          // Use the default DEPICT gene set file
+          paramsToSubmit.covariateFile = "DEPICT_genesets.tsv";
+          paramsToSubmit.geneSetFile = null;
+        } else {
+          if (data.geneSetFileType !== "geneSetFile") {
+            paramsToSubmit.geneSetFile = null;
+          }
+          if (data.geneSetFileType !== "covariateFile") {
+            paramsToSubmit.covariateFile = null;
+          }
+        }
+      } else {
+        delete dataToUpload.geneSetFile;
+        delete dataToUpload.covariateFile;
+        paramsToSubmit.geneSetFile = null;
+        paramsToSubmit.covariateFile = null;
+        paramsToSubmit.geneSetFileType = null;
+      }
+
+      await uploadFiles(`${process.env.PUBLIC_URL}/api/upload/${newId}`, dataToUpload);
+      const submitParams = { ...paramsToSubmit, previousId };
       await axios.post(`${process.env.PUBLIC_URL}/api/submit/${newId}`, submitParams);
       navigate(`/analysis/${newId}`);
       if (sendNotification) {
@@ -332,7 +354,7 @@ export default function AnalysisForm() {
                 <Form.Select
                   className={bedFileType === "select" ? "d-block" : "d-none"}
                   {...register("bedFileFilter", {
-                    required: (v) => magmaType === "enhanced" && !v,
+                    required: magmaType === "enhanced",
                   })}>
                   <option value="" hidden>
                     No Filter Selected
@@ -369,37 +391,66 @@ export default function AnalysisForm() {
       </fieldset>
 
       <fieldset className="fieldset border rounded mb-4 pt-4 px-3">
-        <legend className="legend fw-bold bg-light">Gene Set Analysis</legend>
-        <p>Add Covariate or Gene Set file to enable Gene Set Analysis</p>
-        <Row className="mb-3">
-          <Col sm="auto">
-            <Form.Check
-              {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
-              type="radio"
-              id="useCovariate"
-              label="Covariate File"
-              value="covariateFile"
-            />
-          </Col>
-          <Col sm="auto">
-            <Form.Check
-              {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
-              type="radio"
-              id="useGeneSet"
-              label="Gene Set File"
-              value="geneSetFile"
-            />
-          </Col>
-        </Row>
-        {geneSetFileType === "geneSetFile" ? (
+        <legend className="legend fw-bold bg-light">
+          <Form.Check
+            type="checkbox"
+            label="Gene Set Analysis"
+            id="enableGeneSet"
+            checked={enableGeneSet}
+            {...register("enableGeneSet", { onChange: handleChange })}
+          />
+        </legend>
+        <p>Use DEPICT Gene Sets or upload a Covariate or Gene Set file</p>
+        <div className="mb-3">
+          <Form.Check
+            {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
+            type="radio"
+            id="depict"
+            label="DEPICT Gene Sets"
+            value="depict"
+            disabled={!enableGeneSet}
+          />
+          <Form.Check
+            {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
+            type="radio"
+            id="useCovariate"
+            label="Covariate File"
+            value="covariateFile"
+            disabled={!enableGeneSet}
+          />
+          <Form.Check
+            {...register("geneSetFileType", { onChange: handleGeneSetFileType })}
+            type="radio"
+            id="useGeneSet"
+            label="Gene Set File"
+            value="geneSetFile"
+            disabled={!enableGeneSet}
+          />
+        </div>
+
+        {enableGeneSet && geneSetFileType === "geneSetFile" && (
           <Form.Group className="mb-3" controlId="geneSetFile">
             <Form.Label>Gene Set File</Form.Label>
-            <FileInput name="geneSetFile" control={control} disabled={covariateFile} onRemove={handleFileRemove} />
+            <FileInput
+              name="geneSetFile"
+              control={control}
+              rules={{
+                required: enableGeneSet && geneSetFileType === "geneSetFile" ? "Please upload a gene set file" : false,
+              }}
+            />
           </Form.Group>
-        ) : (
+        )}
+        {enableGeneSet && geneSetFileType === "covariateFile" && (
           <Form.Group className="mb-3" controlId="covariateFile">
             <Form.Label>Covariate File</Form.Label>
-            <FileInput name="covariateFile" control={control} disabled={geneSetFile} onRemove={handleFileRemove} />
+            <FileInput
+              name="covariateFile"
+              control={control}
+              rules={{
+                required:
+                  enableGeneSet && geneSetFileType === "covariateFile" ? "Please upload a covariate file" : false,
+              }}
+            />
           </Form.Group>
         )}
       </fieldset>
@@ -415,7 +466,7 @@ export default function AnalysisForm() {
             id="sendNotification"
             checked={sendNotification}
             {...register("sendNotification", {
-              required: (covariateFile || geneSetFile) !== null ? "Required for Gene Set Analysis" : false,
+              required: enableGeneSet ? "Required for Gene Set Analysis" : false,
               onChange: handleChange,
             })}
           />

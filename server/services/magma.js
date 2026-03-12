@@ -166,11 +166,20 @@ export async function magma(args, type = "standard", cwd = process.cwd()) {
   } catch (e) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  return await execFileAsync(execPath, args.flat().filter(Boolean), {
-    cwd,
-    windowsHide: true,
-    maxBuffer: 5 * 1024 * 1024,
-  });
+
+  const flatArgs = args.flat().filter(Boolean);
+  try {
+    return await execFileAsync(execPath, flatArgs, {
+      cwd,
+      windowsHide: true,
+      maxBuffer: 5 * 1024 * 1024,
+    });
+  } catch (error) {
+    console.error(`Command failed: ${execPath} ${flatArgs.join(" ")}`);
+    if (error.stdout) console.error(`stdout: ${error.stdout}`);
+    if (error.stderr) console.error(`stderr: ${error.stderr}`);
+    throw error;
+  }
 }
 
 export async function checkStatus(type = "standard") {
@@ -191,7 +200,7 @@ export async function runAnnotation({ snpLocFile, geneLocFile, outFile }, type =
 }
 
 export function getGeneAnalysisParams(paths, params) {
-  const runGeneSetAnalysis = Boolean(params.geneSetFile || params.covariateFile);
+  const runGeneSetAnalysis = Boolean(params.enableGeneSet);
 
   let geneAnalysisParams = {
     bFile: paths.bFile,
@@ -362,11 +371,18 @@ export async function getPaths(params, env = process.env) {
     : null;
 
   // gene set analysis input files
-  const geneSetFile = params.geneSetFile ? path.resolve(inputFolder, params.geneSetFile) : null;
-  const covariateFile = coalesceFilePaths([
-    path.resolve(inputFolder, params.covariateFile),
-    path.resolve(defaultInputFolder, params.covariateFile),
-  ]);
+  const geneSetFile = params.geneSetFile
+    ? coalesceFilePaths([
+        path.resolve(inputFolder, params.geneSetFile),
+        path.resolve(defaultInputFolder, params.geneSetFile),
+      ])
+    : null;
+  const covariateFile = params.covariateFile
+    ? coalesceFilePaths([
+        path.resolve(inputFolder, params.covariateFile),
+        path.resolve(defaultInputFolder, params.covariateFile),
+      ])
+    : null;
 
   const geneAnalyisFilePrefix = path.resolve(outputFolder, "gene_analysis");
   const geneAnalysisFile = path.resolve(outputFolder, "gene_analysis.genes.out");
