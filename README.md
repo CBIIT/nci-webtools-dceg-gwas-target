@@ -185,3 +185,5 @@ Worker task requirements:
 - **Environment Variables**: Never commit `.env` files to version control; use `.env.example` as template
 - **Input Validation**: All user uploads validated using express-validator
 - **Network Security**: ECS tasks run in private subnets with security group restrictions
+
+Signed by Lou.
