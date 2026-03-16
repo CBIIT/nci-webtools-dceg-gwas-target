@@ -1,115 +1,96 @@
-import { useEffect } from "react";
-import { initBackToTop } from "./backToTop";
+import { useScrollVisibility } from "./useScrollVisibility";
 
 function parseVersionAndDate(versionString) {
-  if (!versionString) return { version: "dev", date: new Date().toISOString().split("T")[0] };
-  const versionMatch = versionString.match(/(\d+\.\d+\.\d+)(_dev)?/);
-  const version = versionMatch ? versionMatch[1] + (versionMatch[2] || "") : "dev";
+  if (!versionString) return { version: "missing env: REACT_APP_VERSION", date: "N/A" };
 
-  // Extract 8-digit date if present
-  const dateMatch = versionString.match(/(\d{8})/)?.[1];
-  const date = dateMatch
-    ? `${dateMatch.slice(0, 4)}-${dateMatch.slice(4, 6)}-${dateMatch.slice(6, 8)}`
-    : new Date().toISOString().split("T")[0];
+  // Check for format: gwas-target_X.X.X_YYYYMMDD
+  const formatMatch = versionString.match(/gwas-target_(\d+\.\d+\.\d+)_(\d{8})/);
 
-  return { version, date };
+  if (formatMatch) {
+    const version = formatMatch[1];
+    const dateStr = formatMatch[2];
+    const date = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+    return { version, date };
+  }
+
+  return { version: versionString, date: "N/A" };
+}
+
+function FooterLinkColumn({ title, links }) {
+  return (
+    <div className="desktop:grid-col-4">
+      <div className="usa-footer__primary-content usa-footer__primary-content--collapsible">
+        <span className="usa-footer__primary-link usa-footer__nci-list-header">{title}</span>
+        <ul className="usa-list--unstyled">
+          {links.map(({ label, href, id, isText }) =>
+            isText ? (
+              <li key={label} className="usa-footer__secondary-link">
+                {label}
+              </li>
+            ) : (
+              <li key={label} className="usa-footer__secondary-link">
+                <a id={id} href={href} target="_blank" rel="noopener noreferrer" className="fw-normal">
+                  {label}
+                </a>
+              </li>
+            )
+          )}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function BackToTop({ onClick }) {
+  return (
+    <div className="usa-footer__return-to-top">
+      <button type="button" aria-label="Back To Top" id="backToTop" onClick={onClick}>
+        <span className="back-to-top-text">Back To Top</span>
+        <span className="back-to-top-icon" aria-hidden="true">
+          <i className="bi bi-arrow-up"></i>
+        </span>
+      </button>
+    </div>
+  );
 }
 
 export default function Footer() {
   const { version, date } = parseVersionAndDate(process.env.REACT_APP_VERSION);
+  const isBackToTopVisible = useScrollVisibility(100);
 
-  useEffect(() => {
-    const cleanup = initBackToTop(".usa-footer__return-to-top", 100);
-    return cleanup;
-  }, []);
+  const handleBackToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const handleBackToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const aboutLinks = [
+    { label: "About GWAS Target", href: "https://analysistools.cancer.gov/gwas-target" },
+    { label: "Contact Us", href: "mailto:NCIGWASTargetWebAdmin@mail.nih.gov" },
+    {},
+    { label: `Last Updated: ${date}`, isText: true },
+    { label: `Version: ${version}`, isText: true },
+  ];
+
+  const resourceLinks = [{ label: "DCEG", href: "https://dceg.cancer.gov/" }];
+
+  const policyLinks = [
+    { label: "Accessibility", href: "http://www.cancer.gov/policies/accessibility" },
+    { label: "FOIA", href: "https://www.cancer.gov/policies/foia" },
+    { label: "Privacy & Security", href: "https://www.cancer.gov/policies/privacy-security" },
+    { label: "Disclaimers", href: "https://www.cancer.gov/policies/disclaimer" },
+    { label: "Vulnerability Disclosure", href: "https://www.hhs.gov/vulnerability-disclosure-policy/index.html" },
+  ];
 
   return (
     <footer className="usa-footer usa-footer--nci-big flex-grow-0">
       <div className="footer">
         <div className="usa-footer__primary-section pt-4">
           <div className="grid-footer-container">
-            <div className="row grid-gap">
-              <div className="col-12 col-md-6 col-lg-4">
-                <div className="usa-footer__primary-content usa-footer__primary-content--collapsible">
-                  <div>
-                    <span className="usa-footer__primary-link usa-footer__nci-list-header">About</span>
-                    <ul className="about-list usa-list--unstyled">
-                      <li className="usa-footer__secondary-link">
-                        <a
-                          id="aboutLink"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="https://analysistools.cancer.gov/gwas-target">
-                          About GWAS Target
-                        </a>
-                      </li>
-                      <li className="usa-footer__secondary-link last-update">Last Updated: {date}</li>
-                      <li className="usa-footer__secondary-link">Version: {version}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 col-md-6 col-lg-4">
-                <div className="usa-footer__primary-content usa-footer__primary-content--collapsible">
-                  <div>
-                    <span className="usa-footer__primary-link usa-footer__nci-list-header">Resources</span>
-                    <ul className="resource-list usa-list--unstyled">
-                      <li className="usa-footer__secondary-link">
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="https://analysistools.cancer.gov/gwas-target">
-                          GWAS Target
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 col-md-6 col-lg-4">
-                <div className="usa-footer__primary-content usa-footer__primary-content--collapsible">
-                  <div>
-                    <span className="usa-footer__primary-link usa-footer__nci-list-header">Policies</span>
-                    <ul className="resource-list usa-list--unstyled">
-                      <li className="usa-footer__secondary-link">
-                        <a target="_blank" rel="noopener noreferrer" href="http://www.cancer.gov/policies/accessibility">
-                          Accessibility
-                        </a>
-                      </li>
-                      <li className="usa-footer__secondary-link">
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.cancer.gov/policies/foia">
-                          FOIA
-                        </a>
-                      </li>
-                      <li className="usa-footer__secondary-link">
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.cancer.gov/policies/privacy-security">
-                          Privacy &amp; Security
-                        </a>
-                      </li>
-                      <li className="usa-footer__secondary-link">
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.cancer.gov/policies/disclaimer">
-                          Disclaimers
-                        </a>
-                      </li>
-                      <li className="usa-footer__secondary-link">
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="https://www.hhs.gov/vulnerability-disclosure-policy/index.html">
-                          Vulnerability Disclosure
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+            <div className="grid-row grid-gap">
+              <FooterLinkColumn title="About" links={aboutLinks} />
+              <FooterLinkColumn title="Resources" links={resourceLinks} />
+              <FooterLinkColumn title="Policies" links={policyLinks} />
             </div>
           </div>
         </div>
+
         <div className="usa-footer__secondary-section">
           <div className="grid-footer-container">
             <div className="grid-row grid-gap">
@@ -138,13 +119,20 @@ export default function Footer() {
                 </div>
               </div>
             </div>
+
             <div className="grid-row grid-gap">
               <div className="usa-footer__social-links desktop:grid-col-5">
                 <div className="usa-footer__social-heading">Follow us</div>
                 <div className="grid-row grid-gap-1 nci-big__social">
                   <div className="grid-col-auto">
                     <a className="usa-social-link usa-social-link--facebook" href="https://www.facebook.com/cancer.gov">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" className="usa-icon" role="img" aria-labelledby="facebook-title_site">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        className="usa-icon"
+                        role="img"
+                        aria-labelledby="facebook-title_site">
                         <title id="facebook-title_site">Facebook</title>
                         <rect fill="none" height="24" width="24"></rect>
                         <path d="M22,12c0-5.52-4.48-10-10-10S2,6.48,2,12c0,4.84,3.44,8.87,8,9.8V15H8v-3h2V9.5C10,7.57,11.57,6,13.5,6H16v3h-2 c-0.55,0-1,0.45-1,1v2h3v3h-3v6.95C18.05,21.45,22,17.19,22,12z"></path>
@@ -153,15 +141,27 @@ export default function Footer() {
                   </div>
                   <div className="grid-col-auto">
                     <a className="usa-social-link" href="https://twitter.com/thenci">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="usa-icon" role="img" aria-labelledby="x-title">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="usa-icon"
+                        role="img"
+                        aria-labelledby="x-title">
                         <title id="x-title">Follow on X</title>
                         <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10zm5.2-15.6L13.3 11l4.3 6.2h-3.1L11.6 13 8 17.2h-.9l4.1-4.8-4.1-6h3.1l2.7 3.9 3.4-3.9h.9zm-5.6 5.4.4.6 2.8 4h1.4l-3.5-5-.4-.6-2.6-3.7H8.3l3.3 4.7z"></path>
                       </svg>
                     </a>
                   </div>
                   <div className="grid-col-auto">
-                    <a className="usa-social-link usa-social-link--instagram" href="https://www.instagram.com/nationalcancerinstitute/">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="usa-icon" role="img" aria-labelledby="instagram-title_site">
+                    <a
+                      className="usa-social-link usa-social-link--instagram"
+                      href="https://www.instagram.com/nationalcancerinstitute/">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="usa-icon"
+                        role="img"
+                        aria-labelledby="instagram-title_site">
                         <title id="instagram-title_site">Instagram</title>
                         <g id="Instagram_docsite">
                           <path d="M12,10a2,2,0,1,0,2,2A2,2,0,0,0,12,10Z"></path>
@@ -173,7 +173,12 @@ export default function Footer() {
                   </div>
                   <div className="grid-col-auto">
                     <a className="usa-social-link usa-social-link--youtube" href="https://www.youtube.com/NCIgov">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="usa-icon" role="img" aria-labelledby="youtube-title_site">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="usa-icon"
+                        role="img"
+                        aria-labelledby="youtube-title_site">
                         <title id="youtube-title_site">Youtube</title>
                         <g id="YouTube_docsite">
                           <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.75,12.91A1.49,1.49,0,0,1,16.69,16a34.65,34.65,0,0,1-4.69.26A34.65,34.65,0,0,1,7.31,16a1.49,1.49,0,0,1-1.06-1.06A15.88,15.88,0,0,1,6,12a15.88,15.88,0,0,1,.25-2.91A1.49,1.49,0,0,1,7.31,8,34.65,34.65,0,0,1,12,7.77,34.65,34.65,0,0,1,16.69,8a1.49,1.49,0,0,1,1.06,1.06A15.88,15.88,0,0,1,18,12,15.88,15.88,0,0,1,17.75,14.91Z"></path>
@@ -183,8 +188,15 @@ export default function Footer() {
                     </a>
                   </div>
                   <div className="grid-col-auto">
-                    <a className="usa-social-link usa-social-link--linkedin" href="https://www.linkedin.com/company/nationalcancerinstitute/">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="usa-icon" role="img" aria-labelledby="linkedin-title_site">
+                    <a
+                      className="usa-social-link usa-social-link--linkedin"
+                      href="https://www.linkedin.com/company/nationalcancerinstitute/">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="usa-icon"
+                        role="img"
+                        aria-labelledby="linkedin-title_site">
                         <title id="linkedin-title_site">Linkedin</title>
                         <g id="final_docsite">
                           <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M8.912001,17.584H6.584v-7.472h2.328001V17.584z M7.744,9.104C6.992,9.104,6.4,8.488,6.4,7.76c0-0.752,0.592-1.344,1.344-1.344c0.728,0,1.343999,0.592,1.343999,1.344 C9.087999,8.488,8.472,9.104,7.744,9.104z M17.6,17.584h-2.328v-3.64c0-0.856-0.024001-1.967999-1.216001-1.967999 s-1.392,0.927999-1.392,1.912v3.696H10.36v-7.472h2.224v1.008h0.024c0.464-0.752,1.296-1.216001,2.199999-1.192 c2.352001,0,2.792,1.552001,2.792,3.544001C17.6,13.472,17.6,17.584,17.6,17.584z"></path>
@@ -194,6 +206,7 @@ export default function Footer() {
                   </div>
                 </div>
               </div>
+
               <div className="usa-footer__contact-links desktop:grid-col-7">
                 <div className="usa-footer__address height-full">
                   <div className="usa-footer__contact-info grid-row grid-gap height-full">
@@ -207,18 +220,11 @@ export default function Footer() {
                 </div>
               </div>
             </div>
-            <input className="usa-input width-full" style={{ display: "none" }} id="email" name="email" type="email" value="" aria-describedby="email-error-message" readOnly />
           </div>
         </div>
       </div>
-      <div className="usa-footer__return-to-top">
-        <button type="button" aria-label="Back To Top" id="backToTop" onClick={handleBackToTop}>
-          <span className="back-to-top-text">Back To Top</span>
-          <span className="back-to-top-icon" aria-hidden="true">
-            <i className="bi bi-arrow-up"></i>
-          </span>
-        </button>
-      </div>
+
+      {isBackToTopVisible && <BackToTop onClick={handleBackToTop} />}
     </footer>
   );
 }
