@@ -29,17 +29,6 @@ $bp-tablet:    640px;  // 40em at 16px
 $bp-desktop:  1024px;  // 64em at 16px
 
 // =============================================================================
-// NCI Icon CSS custom properties (SVG data URIs — no JS required)
-// =============================================================================
-
-:root {
-  --nci-icon-arrow-up:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11 20V7.83l-4.59 4.58L5 11l7-7 7 7-1.41 1.41L13 7.83V20h-2z'/%3E%3C/svg%3E");
-  --nci-icon-plus:        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 11H13V5h-2v6H5v2h6v6h2v-6h6z'/%3E%3C/svg%3E");
-  --nci-icon-chevron:     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='m7 10 5 5 5-5z'/%3E%3C/svg%3E");
-  --nci-icon-chevron-alt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='m9 6 6 6-6 6z'/%3E%3C/svg%3E");
-}
-
-// =============================================================================
 // Grid utilities (USWDS-based, each breakpoint-prefixed class in one place)
 // =============================================================================
 
@@ -466,69 +455,6 @@ $bp-desktop:  1024px;  // 64em at 16px
     padding-right: 0;
   }
 
-  &--button {
-    border: 0;
-    cursor: pointer;
-    width: 100%;
-
-    &::before {
-      align-items: center;
-      background: var(--nci-icon-plus) no-repeat 50% / contain;
-      background-size: contain;
-      content: "";
-      display: inline-flex;
-      height: 1.25rem;
-      justify-content: center;
-      margin-left: -0.25rem;
-      margin-right: 0.25rem;
-      vertical-align: middle;
-      width: 1.25rem;
-
-      @supports ((-webkit-mask: url("")) or (mask: url(""))) {
-        background: none;
-        background-color: currentColor;
-        -webkit-mask: var(--nci-icon-plus) no-repeat center/contain;
-        mask: var(--nci-icon-plus) no-repeat center/contain;
-      }
-
-      @media (forced-colors: active) {
-        background-color: buttonText !important;
-      }
-    }
-
-    &:not([disabled]):focus {
-      outline: 0.25rem solid $focus-blue;
-      outline-offset: -0.25rem;
-    }
-
-    + .usa-list--unstyled {
-      margin-bottom: 0.5rem;
-      margin-top: 0.5rem;
-    }
-
-    &[aria-expanded="false"] {
-      &::before {
-        background: var(--nci-icon-chevron) no-repeat 50% / contain;
-        content: "";
-        display: inline-block;
-        height: 1.25rem;
-        margin-right: 0.25rem;
-        vertical-align: middle;
-        width: 1.25rem;
-
-        @supports ((-webkit-mask: url("")) or (mask: url(""))) {
-          background: none;
-          background-color: currentColor;
-          -webkit-mask: var(--nci-icon-chevron) no-repeat center/contain;
-          mask: var(--nci-icon-chevron) no-repeat center/contain;
-        }
-      }
-
-      + .usa-list--unstyled {
-        display: none;
-      }
-    }
-  }
 }
 
 .usa-footer__primary-link,
@@ -764,11 +690,6 @@ $bp-desktop:  1024px;  // 64em at 16px
         }
       }
 
-      &--collapsible {
-        .usa-list--unstyled.hidden {
-          display: block;
-        }
-      }
     }
 
     // Email sign-up form (hidden email input — kept for form library compatibility)
@@ -840,16 +761,6 @@ $bp-desktop:  1024px;  // 64em at 16px
     }
   }
 
-  // Collapse header (mobile toggle button — hidden on desktop)
-  .usa-footer__nci-collapse-header {
-    cursor: pointer;
-    display: flex;
-
-    @media (min-width: 30em) {
-      display: none;
-    }
-  }
-
   // List header (desktop column title — hidden on mobile)
   .usa-footer__nci-list-header {
     cursor: default;
@@ -857,39 +768,6 @@ $bp-desktop:  1024px;  // 64em at 16px
 
     @media (min-width: 30em) {
       display: flex;
-    }
-  }
-
-  // Collapsible primary content chevron
-  .usa-footer__primary-content--collapsible {
-    button.usa-footer__primary-link {
-      &::before {
-        background: var(--nci-icon-chevron-alt) no-repeat 50% / contain;
-        content: "";
-        display: inline-block;
-        height: 1.25rem;
-        margin-left: -0.25rem;
-        margin-right: 0.25rem;
-        -webkit-mask-size: 1.25rem 1.25rem;
-        mask-size: 1.25rem 1.25rem;
-        vertical-align: baseline;
-        width: 1.25rem;
-
-        @supports ((-webkit-mask: url("")) or (mask: url(""))) {
-          background: none;
-          background-color: $white;
-          -webkit-mask: var(--nci-icon-chevron) no-repeat center/contain;
-          mask: var(--nci-icon-chevron) no-repeat center/contain;
-        }
-
-        @media (min-width: 30em) {
-          display: none;
-        }
-      }
-
-      &[aria-expanded="true"]::before {
-        transform: rotate(90deg);
-      }
     }
   }
 
