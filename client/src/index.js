@@ -5,7 +5,7 @@ import { RecoilRoot } from "recoil";
 import { reportWebVitals } from "./reportWebVitals";
 import { routes } from "./routes";
 import "./styles/main.scss";
-import "./styles/ncids.css";
+import "./styles/ncids.scss";
 
 const root = createRoot(document.getElementById("root"));
 const router = createBrowserRouter(routes, { basename: process.env.PUBLIC_URL });

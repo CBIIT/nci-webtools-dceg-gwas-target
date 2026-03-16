@@ -1,0 +1,1183 @@
+// =============================================================================
+// Variables
+// =============================================================================
+
+// Colors
+$nci-dark-blue:   #004971;
+$nci-darker-blue: #00314b;
+$nci-blue:        #007bbd;
+$nci-yellow:      #face00;
+$white:           #fff;
+$focus-blue:      #2491ff;
+$error-red:       #e41154;
+$border-gray:     #a9aeb1;
+$banner-bg:       #f0f0f0;
+$dark-text:       #1b1b1b;
+$link-blue:       #01679d;
+$visited-purple:  #54278f;
+$nav-text:        #565c65;
+$custom-btn-blue: #185394;
+
+// Fonts
+$font-poppins:   Poppins, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, serif;
+$font-open-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+  sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Breakpoints
+$bp-mobile-lg: 480px;  // 30em at 16px
+$bp-tablet:    640px;  // 40em at 16px
+$bp-desktop:  1024px;  // 64em at 16px
+
+// =============================================================================
+// NCI Icon CSS custom properties (SVG data URIs — no JS required)
+// =============================================================================
+
+:root {
+  --nci-icon-arrow-up:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11 20V7.83l-4.59 4.58L5 11l7-7 7 7-1.41 1.41L13 7.83V20h-2z'/%3E%3C/svg%3E");
+  --nci-icon-plus:        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 11H13V5h-2v6H5v2h6v6h2v-6h6z'/%3E%3C/svg%3E");
+  --nci-icon-chevron:     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='m7 10 5 5 5-5z'/%3E%3C/svg%3E");
+  --nci-icon-chevron-alt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='m9 6 6 6-6 6z'/%3E%3C/svg%3E");
+}
+
+// =============================================================================
+// Grid utilities (USWDS-based, each breakpoint-prefixed class in one place)
+// =============================================================================
+
+[class*="grid-col"] {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+}
+
+.grid-col,
+.grid-col-auto {
+  flex: 0 1 auto;
+  max-width: 100%;
+  width: auto;
+}
+
+.grid-row {
+  display: flex;
+  flex-wrap: wrap;
+
+  &.grid-gap {
+    margin-left: -1rem;
+    margin-right: -1rem;
+
+    > * {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  &.grid-gap-4 {
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+
+  &.grid-gap-1 {
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+
+    > * {
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+  }
+}
+
+.height-full {
+  height: 100%;
+}
+
+@media (min-width: $bp-mobile-lg) {
+  .mobile-lg\:margin-bottom-3 {
+    margin-bottom: 1.5rem;
+  }
+
+  .mobile-lg\:grid-col-auto {
+    flex: 0 1 auto;
+    max-width: 100%;
+    width: auto;
+  }
+}
+
+@media (min-width: $bp-tablet) {
+  .tablet\:grid-col-8 {
+    flex: 0 1 auto;
+    width: 66.6666666667%;
+  }
+
+  .tablet\:grid-col-auto {
+    flex: 0 1 auto;
+    max-width: 100%;
+    width: auto;
+  }
+}
+
+@media (min-width: $bp-desktop) {
+  .desktop\:grid-col-4 {
+    flex: 0 1 auto;
+    width: 33.3333333333%;
+  }
+
+  .desktop\:grid-col-5 {
+    flex: 0 1 auto;
+    width: 41.6666666667%;
+  }
+
+  .desktop\:grid-col-7 {
+    flex: 0 1 auto;
+    width: 58.3333333333%;
+  }
+}
+
+// =============================================================================
+// USA Banner (consolidated from 3 duplicate blocks)
+// =============================================================================
+
+.usa-banner {
+  background-color: $banner-bg;
+  font-family: $font-open-sans;
+  font-size: 1.01rem;
+  line-height: 1.6;
+  padding-bottom: 0;
+
+  &__header {
+    font-size: 0.76rem;
+    font-weight: 400;
+    margin-left: 2.5rem !important;
+    margin-right: auto;
+    max-width: 87.5rem;
+    min-height: 3rem;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    position: relative;
+    text-align: left;
+  }
+
+  &__inner {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; // single declaration — "wrap" was dead code
+    justify-content: flex-start;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 87.5rem;
+    min-height: 1.89rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  &__header-text {
+    display: flex;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    margin-bottom: 0;
+    margin-right: 0.75rem;
+    margin-top: 0;
+    width: 100%;
+
+    &::before {
+      background-image: url("../../public/assets/images/usa_banner.png");
+      background-size: 16px 11px;
+      content: "";
+      display: block;
+      height: 11px;
+      margin-right: 0.75rem;
+      max-width: 16px;
+      width: 100%;
+    }
+  }
+}
+
+// =============================================================================
+// NCI Header
+// =============================================================================
+
+.nci-header--extended {
+  .nci-header__navbar {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 6rem;
+    padding-right: 6rem;
+
+    .nci-header-nav__secondary {
+      margin-top: 0;
+    }
+  }
+
+  nav.nci-header-nav {
+    .nci-header-nav__inner {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    ul.nci-header-nav__primary li.nci-header-nav__primary-item {
+      > a.nci-header-nav__primary-link,
+      > button.nci-header-nav__primary-button {
+        -webkit-font-smoothing: inherit;
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        color: $nav-text;
+        cursor: pointer;
+        display: block;
+        font-family: $font-poppins;
+        font-size: 1.04rem;
+        font-weight: 600;
+        line-height: 1;
+        margin: 0;
+        padding: 1rem;
+        position: relative;
+        text-align: left;
+        text-decoration: none;
+        z-index: 300;
+
+        &:visited {
+          color: $nav-text;
+        }
+
+        &:hover {
+          color: $nci-blue;
+          text-decoration: none;
+        }
+      }
+
+      // Active/hover underline indicator (deduplicated — was defined twice)
+      .usa-current:after,
+      a.nci-header-nav__primary-link:hover:after,
+      button.nci-header-nav__primary-button:hover:after,
+      .usa-current:active {
+        background-color: $nci-blue;
+        border-radius: 0;
+        bottom: 0;
+        content: "";
+        display: block;
+        height: 0.25rem;
+        left: 1rem;
+        position: absolute;
+        right: 1rem;
+      }
+    }
+  }
+}
+
+.nci-header-nav__primary {
+  align-content: flex-start;
+  display: flex;
+  list-style-type: none;
+}
+
+.nci-header-nav__primary-item {
+  flex: 1 1 auto;
+  max-width: fit-content;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
+}
+
+// NCI header layout (logo + search bar)
+.nci-header__navbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding-left: 6rem;
+  padding-right: 6rem;
+}
+
+.nci-logo {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.nci-header-search {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  max-width: 50%;
+
+  .form-control {
+    max-width: 300px;
+    width: 100%;
+  }
+}
+
+.desktop-logo {
+  display: block;
+}
+
+.mobile-logo {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .nci-header__navbar {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-left: 4.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .nci-header-search {
+    justify-content: flex-start;
+    margin-top: 10px;
+    width: 100%;
+
+    .form-control {
+      width: 100%;
+    }
+  }
+
+  .desktop-logo {
+    display: none;
+  }
+
+  .mobile-logo {
+    display: block;
+  }
+}
+
+// =============================================================================
+// Bootstrap navbar overrides
+// =============================================================================
+
+.navbar-light .navbar-nav {
+  .nav-link {
+    font-family: $font-poppins !important;
+    font-weight: 600;
+
+    &.active,
+    &:hover {
+      border-bottom: solid $nci-blue !important;
+      border-width: 0 0 4px !important;
+      display: inline-block !important;
+    }
+  }
+}
+
+// =============================================================================
+// USA Footer — base USWDS styles
+// =============================================================================
+
+.usa-footer,
+.usa-footer__primary-section {
+  font-family: $font-open-sans;
+  font-size: 1.01rem !important;
+  line-height: 1.6;
+}
+
+.usa-footer {
+  overflow: hidden;
+}
+
+// Shared container padding for all grid-footer-container children
+.usa-footer > .grid-footer-container,
+.usa-footer__primary-section > .grid-footer-container,
+.usa-footer__secondary-section > .grid-footer-container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 6rem;
+  padding-right: 6rem;
+}
+
+.usa-list {
+  line-height: 1.6;
+  margin-bottom: 1em;
+  margin-top: 1em;
+  padding-left: 3ch;
+}
+
+.usa-list--unstyled {
+  list-style-type: none;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-left: 0;
+
+  > li {
+    margin-bottom: 0;
+    max-width: unset;
+  }
+}
+
+.usa-icon {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  position: relative;
+  width: 1em;
+}
+
+.usa-social-link {
+  background-color: rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  height: 3rem;
+  padding: 0.25rem;
+  width: 3rem;
+
+  &:hover {
+    background-color: $white;
+  }
+
+  @media (forced-colors: active) {
+    background-color: #d3d3d3;
+    forced-color-adjust: none;
+  }
+
+  &__icon {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+}
+
+.usa-footer__primary-section {
+  background-color: #225e88;
+  padding-bottom: 1rem;
+}
+
+.usa-footer__primary-content {
+  border-top: 1px solid $border-gray;
+  line-height: 1.2;
+
+  @media (min-width: 30em) {
+    border: none;
+  }
+}
+
+.usa-footer__primary-link {
+  color: $white;
+  display: block;
+  font-weight: 600;
+  padding: 1rem;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @media (min-width: 30em) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  &--button {
+    border: 0;
+    cursor: pointer;
+    width: 100%;
+
+    &::before {
+      align-items: center;
+      background: var(--nci-icon-plus) no-repeat 50% / contain;
+      background-size: contain;
+      content: "";
+      display: inline-flex;
+      height: 1.25rem;
+      justify-content: center;
+      margin-left: -0.25rem;
+      margin-right: 0.25rem;
+      vertical-align: middle;
+      width: 1.25rem;
+
+      @supports ((-webkit-mask: url("")) or (mask: url(""))) {
+        background: none;
+        background-color: currentColor;
+        -webkit-mask: var(--nci-icon-plus) no-repeat center/contain;
+        mask: var(--nci-icon-plus) no-repeat center/contain;
+      }
+
+      @media (forced-colors: active) {
+        background-color: buttonText !important;
+      }
+    }
+
+    &:not([disabled]):focus {
+      outline: 0.25rem solid $focus-blue;
+      outline-offset: -0.25rem;
+    }
+
+    + .usa-list--unstyled {
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    &[aria-expanded="false"] {
+      &::before {
+        background: var(--nci-icon-chevron) no-repeat 50% / contain;
+        content: "";
+        display: inline-block;
+        height: 1.25rem;
+        margin-right: 0.25rem;
+        vertical-align: middle;
+        width: 1.25rem;
+
+        @supports ((-webkit-mask: url("")) or (mask: url(""))) {
+          background: none;
+          background-color: currentColor;
+          -webkit-mask: var(--nci-icon-chevron) no-repeat center/contain;
+          mask: var(--nci-icon-chevron) no-repeat center/contain;
+        }
+      }
+
+      + .usa-list--unstyled {
+        display: none;
+      }
+    }
+  }
+}
+
+.usa-footer__primary-link,
+.usa-footer__secondary-link {
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.usa-footer__secondary-link {
+  line-height: 1.2;
+  margin-left: 1rem;
+  padding: 0;
+
+  a {
+    color: $link-blue;
+    text-decoration: underline;
+
+    &:visited { color: $visited-purple; }
+    &:hover   { color: $nci-dark-blue; }
+    &:active  { color: $nci-darker-blue; }
+    &:focus   { outline: 0.25rem solid $focus-blue; outline-offset: 0; }
+  }
+
+  + .usa-footer__secondary-link {
+    padding-top: 1rem;
+  }
+
+  @media (min-width: 30em) {
+    margin-left: 0;
+  }
+}
+
+.usa-footer__secondary-section {
+  background-color: #dfe1e2;
+  color: $dark-text;
+  padding-bottom: 1.25rem;
+  padding-top: 1.25rem;
+
+  a {
+    color: $dark-text;
+  }
+}
+
+.usa-footer__logo {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+
+  @media (min-width: 30em) {
+    align-items: center;
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  &-img {
+    max-width: 5rem;
+  }
+
+  &-heading {
+    font-family: $font-open-sans;
+    font-size: 1.39rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.usa-footer__contact-links {
+  margin-top: 1.5rem;
+
+  @media (min-width: 30em) {
+    margin-top: 0;
+    text-align: right;
+  }
+}
+
+.usa-footer__contact-heading {
+  font-family: $font-open-sans;
+  font-size: 1.39rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 0;
+
+  @media (min-width: 30em) {
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.usa-footer__contact-info {
+  line-height: 1.2;
+
+  a {
+    color: $dark-text;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (min-width: 30em) {
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+}
+
+.usa-footer__address {
+  justify-content: flex-end;
+
+  @media (min-width: 30em) {
+    justify-content: flex-end;
+  }
+}
+
+.usa-footer__social-links {
+  line-height: 1;
+  padding-bottom: 0.5rem;
+
+  a {
+    text-decoration: none;
+  }
+
+  @media (min-width: 30em) {
+    justify-content: flex-end;
+  }
+}
+
+.usa-footer__nav {
+  border-bottom: 1px solid $border-gray;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 87.5rem;
+  padding-left: 0;
+  padding-right: 0;
+
+  > ul {
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-left: 0;
+  }
+
+  @media (min-width: 30em) {
+    border-bottom: none;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 64em) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+// =============================================================================
+// USA Footer — NCI Big modifier
+// =============================================================================
+
+.usa-footer--nci-big {
+  // Single definition: all link/section states use white text
+  .usa-footer__primary-link,
+  .usa-footer__primary-link:focus,
+  .usa-footer__primary-link:hover,
+  .usa-footer__primary-link:link,
+  .usa-footer__primary-link:visited,
+  .usa-footer__primary-section,
+  .usa-footer__primary-section:focus,
+  .usa-footer__primary-section:hover,
+  .usa-footer__primary-section:link,
+  .usa-footer__primary-section:visited,
+  .usa-footer__secondary-link a,
+  .usa-footer__secondary-link a:focus,
+  .usa-footer__secondary-link a:hover,
+  .usa-footer__secondary-link a:link,
+  .usa-footer__secondary-link a:visited,
+  .usa-footer__secondary-section,
+  .usa-footer__secondary-section:focus,
+  .usa-footer__secondary-section:hover,
+  .usa-footer__secondary-section:link,
+  .usa-footer__secondary-section:visited,
+  .usa-footer__secondary-section a,
+  .usa-footer__secondary-section a:focus,
+  .usa-footer__secondary-section a:hover,
+  .usa-footer__secondary-section a:link,
+  .usa-footer__secondary-section a:visited {
+    color: $white;
+  }
+
+  // Primary section
+  .usa-footer__primary-section {
+    background-color: $nci-dark-blue;
+
+    > .grid-footer-container {
+      padding-left: 6rem;
+      padding-right: 6rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .usa-footer__nav {
+      border-bottom: none;
+      margin-bottom: 2rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-top: 2rem;
+
+      @media (min-width: $bp-tablet) {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+
+    .usa-footer__primary-content {
+      border-top-color: $nci-dark-blue;
+
+      .usa-list--unstyled {
+        padding-bottom: 1.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        @media (min-width: 30em) {
+          margin-bottom: 1.5rem;
+          margin-top: 0.25rem;
+          padding: 0.75rem 0 2rem;
+        }
+      }
+
+      &--collapsible {
+        .usa-list--unstyled.hidden {
+          display: block;
+        }
+      }
+    }
+
+    // Email sign-up form (hidden email input — kept for form library compatibility)
+    .usa-sign-up {
+      .usa-form {
+        max-width: 100%;
+      }
+
+      .usa-label {
+        margin-bottom: 0.5rem;
+      }
+
+      .usa-input {
+        margin-top: 0;
+        max-width: 100%;
+      }
+
+      .usa-button {
+        margin-top: 1.25rem;
+        width: 100%;
+
+        @media (min-width: $bp-tablet) {
+          width: auto;
+        }
+      }
+
+      .usa-form-group--error {
+        border-left-color: $error-red;
+      }
+
+      .usa-form-group {
+        .usa-error-message {
+          background: $error-red;
+          border-color: $error-red;
+          color: $white;
+          line-height: 1.6;
+          padding: 0.5rem 0.5rem 0;
+
+          &.hidden {
+            display: none;
+          }
+        }
+
+        .usa-input--error {
+          border-color: $error-red;
+        }
+      }
+    }
+  }
+
+  // Primary link overrides
+  .usa-footer__primary-link {
+    background: none;
+    border: none;
+    cursor: default;
+    display: flex;
+    text-decoration: none;
+    visibility: visible;
+    width: 100%;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    @media (min-width: 30em) {
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+  }
+
+  // Collapse header (mobile toggle button — hidden on desktop)
+  .usa-footer__nci-collapse-header {
+    cursor: pointer;
+    display: flex;
+
+    @media (min-width: 30em) {
+      display: none;
+    }
+  }
+
+  // List header (desktop column title — hidden on mobile)
+  .usa-footer__nci-list-header {
+    cursor: default;
+    display: none;
+
+    @media (min-width: 30em) {
+      display: flex;
+    }
+  }
+
+  // Collapsible primary content chevron
+  .usa-footer__primary-content--collapsible {
+    button.usa-footer__primary-link {
+      &::before {
+        background: var(--nci-icon-chevron-alt) no-repeat 50% / contain;
+        content: "";
+        display: inline-block;
+        height: 1.25rem;
+        margin-left: -0.25rem;
+        margin-right: 0.25rem;
+        -webkit-mask-size: 1.25rem 1.25rem;
+        mask-size: 1.25rem 1.25rem;
+        vertical-align: baseline;
+        width: 1.25rem;
+
+        @supports ((-webkit-mask: url("")) or (mask: url(""))) {
+          background: none;
+          background-color: $white;
+          -webkit-mask: var(--nci-icon-chevron) no-repeat center/contain;
+          mask: var(--nci-icon-chevron) no-repeat center/contain;
+        }
+
+        @media (min-width: 30em) {
+          display: none;
+        }
+      }
+
+      &[aria-expanded="true"]::before {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  // Secondary link overrides
+  .usa-footer__secondary-link {
+    a {
+      line-height: 1.3;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Secondary section
+  .usa-footer__secondary-section {
+    background-color: $nci-darker-blue;
+    padding-bottom: 1.25rem;
+    padding-top: 1.25rem;
+
+    > .grid-footer-container {
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+
+    .usa-footer__logo {
+      align-items: baseline;
+      margin-bottom: 0;
+      margin-top: 0;
+
+      @media (min-width: 64em) {
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    .usa-footer__logo-heading {
+      font-family: $font-poppins;
+      margin-bottom: 0;
+      margin-top: 0;
+
+      .logo__agency-name {
+        display: block;
+        font-size: 1.56rem;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .logo__parent-organization {
+        font-size: 1.17rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+    }
+
+    .usa-footer__contact-heading,
+    .usa-footer__social-heading {
+      font-family: $font-poppins;
+      font-size: 1.43rem;
+      font-weight: 600;
+    }
+
+    .usa-footer__contact-heading {
+      margin-bottom: 0.25rem;
+    }
+
+    .usa-footer__social-heading {
+      margin-bottom: 1rem;
+      margin-top: 1rem;
+
+      @media (min-width: 64em) {
+        margin-top: 0.75rem;
+      }
+    }
+
+    .usa-footer__social-links {
+      padding-bottom: 0;
+
+      .usa-social-link {
+        background: transparent;
+        height: auto;
+        padding: 0 0.5rem 0 0;
+        width: auto;
+
+        .usa-icon {
+          color: $nci-yellow;
+          fill: $nci-yellow;
+          height: 40px;
+          margin-left: -3px;
+          margin-right: -3px;
+          width: 40px;
+        }
+      }
+    }
+
+    .usa-footer__contact-links {
+      margin-top: 1.25rem;
+      text-align: left;
+
+      @media (min-width: 64em) {
+        margin-top: 0;
+        text-align: right;
+      }
+
+      a {
+        font-size: 1.01rem;
+        line-height: 1.6;
+      }
+
+      address a {
+        display: block;
+        font-size: 0.89rem;
+      }
+    }
+
+    .usa-footer__contact-info {
+      justify-content: flex-start;
+
+      @media (min-width: 64em) {
+        justify-content: flex-end;
+      }
+    }
+
+    .usa-footer__address {
+      justify-content: flex-end;
+    }
+
+    .usa-footer__secondary-section a,
+    .usa-footer__secondary-section a:focus,
+    .usa-footer__secondary-section a:hover,
+    .usa-footer__secondary-section a:link,
+    .usa-footer__secondary-section a:visited {
+      color: $white;
+    }
+  }
+
+  @media print {
+    &,
+    footer {
+      display: none;
+    }
+  }
+}
+
+// =============================================================================
+// Footer wrapper + link column custom styles
+// =============================================================================
+
+.footer {
+  padding-bottom: 0;
+
+  .usa-footer__primary-link {
+    display: block;
+    font-size: 1.01rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .about-list,
+  .resource-list {
+    list-style-type: none;
+    margin-top: 0.25rem;
+    padding-left: 0;
+
+    li {
+      list-style: none;
+      padding-left: 0;
+      text-align: left;
+
+      a {
+        color: inherit;
+        display: block;
+        font-weight: 500;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.last-update {
+  padding-top: 4rem !important;
+
+  @media (max-width: 991px) {
+    padding-top: 1.5rem !important;
+  }
+}
+
+// =============================================================================
+// Back-to-top button (fixed corner)
+// =============================================================================
+
+.usa-footer__return-to-top {
+  align-items: center;
+  background-color: #027bbd;
+  border-top-left-radius: 100%;
+  bottom: 0;
+  color: $white;
+  display: flex;
+  font-size: 0.7rem;
+  font-weight: 600;
+  height: 85px;
+  justify-content: center;
+  overflow: hidden;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.25s ease-in-out;
+  width: 85px;
+  z-index: 10;
+
+  #backToTop {
+    background: transparent;
+    border: 0;
+    color: $white;
+    cursor: pointer;
+    display: block;
+    font: inherit;
+    height: 100%;
+    line-height: 1.2;
+    outline: none;
+    padding: 5px 5px 5px 30px;
+    padding-top: 25px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+
+    &:hover {
+      color: $white;
+      text-decoration: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $white;
+      outline-offset: -2px;
+    }
+  }
+}
+
+.back-to-top-text {
+  display: inline;
+}
+
+.back-to-top-icon {
+  display: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .back-to-top-text {
+    display: none;
+  }
+
+  .back-to-top-icon {
+    display: inline;
+  }
+}
+
+// =============================================================================
+// Custom utility classes
+// =============================================================================
+
+.ml-3_5 {
+  margin-left: 3.5rem;
+}
+
+.custom-blue-button {
+  background-color: $custom-btn-blue !important;
+  border: 1px solid $custom-btn-blue !important;
+  color: $white !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+
+  &:hover {
+    background-color: $white !important;
+    border: 1px solid black !important;
+    color: black !important;
+  }
+}
