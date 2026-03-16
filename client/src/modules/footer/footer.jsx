@@ -71,7 +71,7 @@ export default function Footer() {
   const resourceLinks = [{ label: "DCEG", href: "https://dceg.cancer.gov/" }];
 
   const policyLinks = [
-    { label: "Accessibility", href: "http://www.cancer.gov/policies/accessibility" },
+    { label: "Accessibility", href: "https://www.cancer.gov/policies/accessibility" },
     { label: "FOIA", href: "https://www.cancer.gov/policies/foia" },
     { label: "Privacy & Security", href: "https://www.cancer.gov/policies/privacy-security" },
     { label: "Disclaimers", href: "https://www.cancer.gov/policies/disclaimer" },
