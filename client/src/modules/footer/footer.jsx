@@ -98,7 +98,7 @@ export default function Footer() {
                 <div className="mobile-lg:grid-col-auto mobile-lg:margin-bottom-3">
                   <p className="usa-footer__logo-heading">
                     <span className="logo__agency-name">National Cancer Institute </span>
-                    <span className="logo__parent-organization">at the National Institute of Health</span>
+                    <span className="logo__parent-organization">at the National Institutes of Health</span>
                   </p>
                 </div>
               </div>
