@@ -10,6 +10,20 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+function numericStringSortingFn(rowA, rowB, columnId) {
+  const aRaw = rowA.getValue(columnId);
+  const bRaw = rowB.getValue(columnId);
+  const a = parseFloat(aRaw);
+  const b = parseFloat(bRaw);
+  if (!isNaN(a) && !isNaN(b)) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+  const aStr = String(aRaw ?? "");
+  const bStr = String(bRaw ?? "");
+  return aStr < bStr ? -1 : aStr > bStr ? 1 : 0;
+}
+numericStringSortingFn.autoRemove = (val) => isNaN(parseFloat(val));
+
 export default function AnalysisResultsTable({ data, columns }) {
   const [sorting, setSorting] = useState([{ id: "P", desc: false }]);
   const table = useReactTable({
@@ -20,6 +34,9 @@ export default function AnalysisResultsTable({ data, columns }) {
       sorting,
     },
     onSortingChange: setSorting,
+    sortingFns: {
+      numericString: numericStringSortingFn,
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
