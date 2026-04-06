@@ -14,6 +14,7 @@ import {
   resultsSelector,
   geneSetSelector,
 } from "./analysis.state";
+import Instructions from "./instructions";
 
 export default function AnalysisResults() {
   const id = useParams().id || "default";
@@ -57,6 +58,9 @@ export default function AnalysisResults() {
           <Card.Header>
             <Nav variant="tabs" defaultActiveKey={tab} activeKey={tab} onSelect={(e) => setTab(e)}>
               <Nav.Item>
+                <Nav.Link eventKey="instructions">Instructions</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
                 <Nav.Link eventKey="gene_analysis">Gene Analysis</Nav.Link>
               </Nav.Item>
               <Nav.Item>
@@ -67,14 +71,20 @@ export default function AnalysisResults() {
             </Nav>
           </Card.Header>
           <Card.Body>
-            <div className="text-end mb-3">
-              <a
-                href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${file}`}
-                download={`${params.magmaType === "enhanced" ? "F MAGMA" : "Standard Magma"}_${file}`}>
-                Download Results
-              </a>
-            </div>
-            <AnalysisResultsTable data={data} columns={columns} />
+            {tab === "instructions" ? (
+              <div>
+                <Instructions />
+              </div>
+            ) : <div>
+              <div className="text-end mb-3">
+                <a
+                  href={`${process.env.PUBLIC_URL}/api/data/output/${id}/${file}`}
+                  download={`${params.magmaType === "enhanced" ? "F MAGMA" : "Standard Magma"}_${file}`}>
+                  Download Results
+                </a>
+              </div>
+              <AnalysisResultsTable data={data} columns={columns} />
+            </div>}
           </Card.Body>
         </Card>
       )}
