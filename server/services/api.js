@@ -1,6 +1,5 @@
 import path from "path";
 import express from "express";
-import Router from "express-promise-router";
 import { check } from "express-validator";
 import multer from "multer";
 import { ping, submit, query } from "./analysis.js";
@@ -17,7 +16,7 @@ export function createApi(env) {
   const validate = check("id").isUUID();
 
   // register middleware
-  const router = Router();
+  const router = express.Router();
 
   router.use(express.json());
   router.use(logRequests());
