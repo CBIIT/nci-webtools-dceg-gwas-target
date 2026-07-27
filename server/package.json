@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "pm2-runtime start pm2.config.json --only prod",
     "start:dev": "pm2-runtime start pm2.config.json --only dev",
