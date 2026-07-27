@@ -79,9 +79,9 @@ export default function Instructions() {
         </p>
         <ul>
           <li>
-            <b>Select/Upload:</b> You can use pre-loaded roadmap epigenomics data (e.g., <b>E032 Primary B cells</b>) to
-            prioritize genes or you can upload your own epigenomic peak/functional element BED file (make sure it is the
-            right genome build!).
+            <b>Select/Upload:</b> You can use pre-loaded roadmap epigenomics data (e.g.,{" "}
+            <b>DNase I hotspots for E032 Primary B cells</b>) to prioritize genes or you can upload your own epigenomic
+            peak/functional element BED file (make sure it is the right genome build!).
           </li>
         </ul>
       </div>
