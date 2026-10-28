@@ -1,5 +1,4 @@
-import path from "path";
-import { isMainModule, readJson } from "./services/utils.js";
+import { isMainModule, readJson, resolveSafePath } from "./services/utils.js";
 import { createLogger } from "./services/logger.js";
 import { runMagma } from "./services/magma.js";
 
@@ -16,7 +15,7 @@ if (isMainModule(import.meta)) {
 export async function main(argv = process.argv, env = process.env) {
   const id = argv[2];
   if (!id) throw new Error("Missing id");
-  const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, "params.json");
+  const paramsFilePath = resolveSafePath(env.INPUT_FOLDER, id, "params.json");
   const params = await readJson(paramsFilePath);
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   logger.log({ params });

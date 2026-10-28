@@ -1,7 +1,6 @@
-import path from "path";
 import ECS, { ECSClient, RunTaskCommand } from "@aws-sdk/client-ecs";
 import { runMagma } from "./magma.js";
-import { readJson } from "./utils.js";
+import { readJson, resolveSafePath } from "./utils.js";
 import { createLogger } from "./logger.js";
 
 export function getWorkerCommand(id) {
@@ -26,7 +25,7 @@ export function getWorker(workerType = "local") {
  * @returns
  */
 export async function runLocalWorker(id, env = process.env) {
-  const paramsFilePath = path.resolve(env.INPUT_FOLDER, id, "params.json");
+  const paramsFilePath = resolveSafePath(env.INPUT_FOLDER, id, "params.json");
   const params = await readJson(paramsFilePath);
   const logger = createLogger(env.APP_NAME, env.LOG_LEVEL);
   return await runMagma(params, logger, env);

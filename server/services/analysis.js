@@ -1,5 +1,4 @@
-import path from "path";
-import { mkdirs, readJson, writeJson } from "./utils.js";
+import { mkdirs, readJson, resolveSafePath, writeJson } from "./utils.js";
 import { checkStatus, waitUntilComplete } from "./magma.js";
 import { getSqliteConnection } from "./database.js";
 import { getWorker } from "./workers.js";
@@ -15,10 +14,10 @@ export async function ping(params) {
 
 export async function submit(params, env = process.env) {
   const id = params.id;
-  const inputFolder = path.resolve(env.INPUT_FOLDER, id);
-  const outputFolder = path.resolve(env.OUTPUT_FOLDER, id);
-  const paramsFilePath = path.resolve(inputFolder, "params.json");
-  const statusFilePath = path.resolve(outputFolder, "status.json");
+  const inputFolder = resolveSafePath(env.INPUT_FOLDER, id);
+  const outputFolder = resolveSafePath(env.OUTPUT_FOLDER, id);
+  const paramsFilePath = resolveSafePath(inputFolder, "params.json");
+  const statusFilePath = resolveSafePath(outputFolder, "status.json");
   await mkdirs([inputFolder, outputFolder]);
 
   const worker = getWorker(WORKER_TYPE);
@@ -33,7 +32,7 @@ export async function submit(params, env = process.env) {
 
 export async function query(params, env = process.env) {
   const { id, table, columns, conditions, orderBy, offset, limit } = params;
-  const databaseFilePath = path.resolve(env.OUTPUT_FOLDER, id, "results.db");
+  const databaseFilePath = resolveSafePath(env.OUTPUT_FOLDER, id, "results.db");
   if (!existsSync(databaseFilePath)) return [];
   
   const results = await getSqliteConnection(databaseFilePath)
