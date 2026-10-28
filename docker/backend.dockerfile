@@ -4,8 +4,8 @@ RUN dnf -y update \
  && dnf -y install \
     make \
     gcc-c++ \
-    nodejs \
-    npm \
+    nodejs24 \
+    nodejs24-npm \
  && dnf clean all
 
 RUN mkdir -p /server

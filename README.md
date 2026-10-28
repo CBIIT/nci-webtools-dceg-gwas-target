@@ -52,6 +52,8 @@ The application uses environment-specific configurations managed through `.env` 
 ### Deployment Architecture
 
 #### Local Development
+Requires Node.js 24 (see `.nvmrc`; run `nvm use`). The Docker images install the `nodejs24` package from Amazon Linux 2023.
+
 ```bash
 # Install dependencies
 npm install

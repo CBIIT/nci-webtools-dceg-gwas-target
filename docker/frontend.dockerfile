@@ -4,8 +4,8 @@ RUN dnf -y update \
    && dnf -y install \
    httpd \
    make \
-   nodejs \
-   npm \
+   nodejs24 \
+   nodejs24-npm \
    && dnf clean all
 
 RUN mkdir -p /deploy/client
