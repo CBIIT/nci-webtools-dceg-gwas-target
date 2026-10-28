@@ -32,10 +32,6 @@ RUN npm run build
 # scanners flag inside the toolchain but that never run in production.
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
-# Cache-bust so OS security patches actually apply on each deploy. Without this the registry
-# build cache freezes the `dnf update` layer (its instruction text never changes) and OS
-# packages stay pinned at an old build. The deploy workflow feeds CACHEBUST (the build datetime).
-ARG CACHEBUST=unset
 RUN dnf -y update \
  && dnf -y install httpd \
  && dnf clean all
