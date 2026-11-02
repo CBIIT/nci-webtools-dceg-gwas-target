@@ -23,6 +23,25 @@ export function isMainModule(importMeta, env = process.env) {
 }
 
 /**
+ * Resolves a path within a base directory, throwing an error if the
+ * resolved path traverses outside of the base directory.
+ * @param {string} base Base directory path
+ * @param {...string} paths Path segments to resolve within the base directory
+ * @returns {string} The resolved path
+ */
+export function resolveSafePath(base, ...paths) {
+  const basePath = path.resolve(base);
+  const resolvedPath = path.resolve(basePath, ...paths);
+  if (
+    resolvedPath !== basePath &&
+    !resolvedPath.startsWith(basePath + path.sep)
+  ) {
+    throw new Error("Invalid path");
+  }
+  return resolvedPath;
+}
+
+/**
  * Creates directories if they don't exist.
  * @param {string[]} dirs
  * @returns
